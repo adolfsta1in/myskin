@@ -57,6 +57,20 @@ struct TreatmentView: View {
                 .padding(.bottom, 32)
             }
             .screenScaffold()
+            .sheet(isPresented: $isAdding) {
+                AddTreatmentSheet()
+            }
+            .sheet(item: $editing) { treatment in
+                NavigationStack {
+                    TreatmentEditor(draft: TreatmentDraft(treatment), treatment: treatment, onDone: { editing = nil })
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Cancel", systemImage: "xmark") { editing = nil }
+                            }
+                        }
+                }
+                .fontDesign(.rounded)
+            }
             .toolbar {
                 if !treatments.isEmpty {
                     ToolbarItem(placement: .primaryAction) {
