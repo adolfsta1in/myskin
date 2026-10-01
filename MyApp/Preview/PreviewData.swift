@@ -108,13 +108,15 @@ enum PreviewData {
         )
         [ointment, shampoo, biologic, emollient].forEach(context.insert)
 
+        // Logs close their planned slots (`scheduledAt`), like marks made on Today.
+        func at(_ ago: Int, _ minutes: Int) -> Date { daysAgo(ago).addingTimeInterval(TimeInterval(minutes * 60)) }
         for ago in 1...6 {
-            context.insert(DoseLog(treatment: ointment, timestamp: daysAgo(ago).addingTimeInterval(8 * 3600), status: .done, fingertipUnits: 1))
-            context.insert(DoseLog(treatment: ointment, timestamp: daysAgo(ago).addingTimeInterval(21 * 3600), status: ago == 3 ? .skipped : .done))
+            context.insert(DoseLog(treatment: ointment, scheduledAt: at(ago, 8 * 60), timestamp: at(ago, 8 * 60), status: .done, fingertipUnits: 1))
+            context.insert(DoseLog(treatment: ointment, scheduledAt: at(ago, 21 * 60), timestamp: at(ago, 21 * 60), status: ago == 3 ? .skipped : .done))
         }
-        context.insert(DoseLog(treatment: biologic, timestamp: daysAgo(30), status: .done, injectionSite: .abdomenRight))
-        context.insert(DoseLog(treatment: biologic, timestamp: daysAgo(16), status: .done, injectionSite: .thighLeft))
-        context.insert(DoseLog(treatment: biologic, timestamp: daysAgo(2), status: .done, injectionSite: .thighRight))
+        context.insert(DoseLog(treatment: biologic, scheduledAt: at(30, 9 * 60), timestamp: at(30, 9 * 60), status: .done, injectionSite: .abdomenRight))
+        context.insert(DoseLog(treatment: biologic, scheduledAt: at(16, 9 * 60), timestamp: at(16, 9 * 60), status: .done, injectionSite: .thighLeft))
+        context.insert(DoseLog(treatment: biologic, scheduledAt: at(2, 9 * 60), timestamp: at(2, 9 * 60), status: .done, injectionSite: .thighRight))
 
         // Questionnaires.
         context.insert(QuestionnaireResult(kind: .dlqi, date: daysAgo(60), answers: [2, 2, 1, 1, 2, 1, 1, 1, 1, 0], score: 12))
