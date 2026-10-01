@@ -1,10 +1,15 @@
+import SwiftData
 import SwiftUI
 
 struct PhotosView: View {
-    @Environment(AppStore.self) private var store
-    @State private var cameraZone: PhotoZone?
+    @Query(sort: \Photo.createdAt, order: .reverse) private var photos: [Photo]
+    @State private var pendingSource: PhotoSource?
+    @State private var isChoosingZone = false
+    @State private var zoneID: String?
+    @State private var source: PhotoSource?
 
     var body: some View {
+        let zones = PhotoRecords.zonesWithPhotos(photos)
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
@@ -18,18 +23,17 @@ struct PhotosView: View {
                     }
                     .padding(.top, 12)
 
-                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], spacing: 14) {
-                        ForEach(store.photoZones) { zone in
-                            NavigationLink {
-                                ZoneProgressView(zone: zone)
-                            } label: {
-                                zoneTile(zone)
+                    if zones.isEmpty {
+                        emptyState
+                    } else {
+                        LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], spacing: 14) {
+                            ForEach(zones, id: \.zoneID) { zone in
+                                zoneTile(zoneID: zone.zoneID, latest: zone.latest, count: zone.count)
                             }
-                            .buttonStyle(.plain)
                         }
                     }
 
-                    Label("Photos are stored only on this device and never appear in your shared photo library.", systemImage: "lock.fill")
+                    Label("Photos are kept inside MySkin. They are not added to your photo library and are not included in device backups.", systemImage: "lock.fill")
                         .font(.rounded(.footnote))
                         .foregroundStyle(Theme.inkSoft)
                         .glassCard(padding: 14)
@@ -40,28 +44,67 @@ struct PhotosView: View {
             .screenScaffold()
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        cameraZone = store.photoZones.first
-                    } label: {
-                        Label("New photo", systemImage: "camera")
-                    }
+                    addMenu
                 }
             }
-            .fullScreenCover(item: $cameraZone) { zone in
-                CameraOverlayView(zoneName: zone.name)
+            .sheet(isPresented: $isChoosingZone, onDismiss: {
+                // Open the source only after the zone sheet has gone, so the two don't overlap.
+                if zoneID != nil { source = pendingSource }
+                pendingSource = nil
+            }) {
+                PhotoZonePicker { zone in zoneID = zone.id }
             }
+            .photoImport(zoneID: zoneID, source: $source)
         }
     }
 
-    private func zoneTile(_ zone: PhotoZone) -> some View {
+    private var addMenu: some View {
+        Menu {
+            ForEach(PhotoSource.available) { option in
+                Button(option.title, systemImage: option.systemImage) { start(option) }
+            }
+        } label: {
+            Label("Add photo", systemImage: "plus")
+        }
+    }
+
+    private func start(_ option: PhotoSource) {
+        zoneID = nil
+        pendingSource = option
+        isChoosingZone = true
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 16) {
+            SoftIllustration(systemImage: "camera", size: 120)
+            Text("No photos yet")
+                .font(.rounded(.title3, weight: .semibold))
+                .foregroundStyle(Theme.ink)
+            Text("Photos of the same area over time make changes easier to see — for you and your doctor.")
+                .font(.rounded(.subheadline))
+                .foregroundStyle(Theme.inkSoft)
+                .multilineTextAlignment(.center)
+            ForEach(PhotoSource.available) { option in
+                if option == PhotoSource.available.first {
+                    PrimaryButton(title: option.title, systemImage: option.systemImage) { start(option) }
+                } else {
+                    SecondaryButton(title: option.title) { start(option) }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .glassCard(padding: 24)
+    }
+
+    private func zoneTile(zoneID: String, latest: Photo, count: Int) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            AbstractSkinPlaceholder(seed: zone.photos.last?.seed ?? 0, calmness: zone.photos.last?.calmness ?? 0.5, cornerRadius: 18)
+            StoredPhotoImage(fileName: latest.fileName)
                 .aspectRatio(1, contentMode: .fit)
             VStack(alignment: .leading, spacing: 2) {
-                Text(zone.name)
+                Text(BodyZone.zone(id: zoneID)?.name ?? "Other area")
                     .font(.rounded(.headline, weight: .semibold))
                     .foregroundStyle(Theme.ink)
-                Text("\(zone.photos.count) photos · \(zone.photos.last?.date.formatted(.dateTime.month(.abbreviated).day()) ?? "—")")
+                Text("\(count) photo\(count == 1 ? "" : "s") · \(latest.day.formatted(.dateTime.month(.abbreviated).day()))")
                     .font(.rounded(.caption))
                     .foregroundStyle(Theme.inkSoft)
             }
@@ -245,8 +288,4 @@ nonisolated struct GhostOutline: Shape {
 #Preview("Photos") {
     PhotosView()
         .previewSetup()
-}
-
-#Preview("Camera") {
-    CameraOverlayView(zoneName: "Left elbow")
 }

@@ -68,7 +68,7 @@ docs/                  spec, research, current-state, migration-plan
 - `docs/reaserch.md` — медицинский первоисточник. Читать только при сомнениях в медицинском содержании (шкалы, препараты, триггеры).
 
 ## Статус
-- **Текущий шаг: Шаг 27** — Photos: добавление из медиатеки.
+- **Текущий шаг: Шаг 28** — Photos: съёмка камерой.
 - Готово: фазы анализа (spec, current-state, migration-plan), этап 0 целиком:
   - Шаг 1 — git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`;
   - Шаг 2 — bundle id `com.adolfsta1in.myskin`, usage descriptions для Face ID и камеры;
@@ -100,6 +100,7 @@ docs/                  spec, research, current-state, migration-plan
     - Шаг 24 — `Screens/Today/DoseRows.swift`: `rows(for:on:)` — дозы активных лечений на день через `DoseScheduler` (по времени, затем имени); `toggle` — пишет `DoseLog(scheduledAt:, .done, FTU)` или удаляет отметку. `RemindersCard` читает активные `Treatment` через `@Query`, пустые состояния. Из `AppStore` удалены `reminders`, из `Models` — `TreatmentReminder`. Тесты 174.
     - Шаг 25 — `Logic/InjectionPlan.swift`: `lastSite` (последний лог с местом), `suggestedSite` (по кругу `InjectionSite.allCases`), `daysUntilNextDose` (через `DoseScheduler.nextDose`, отмеченная доза сдвигает на следующую), `countdownText`. В `TreatmentView`: у активного биологика — полоса 14 дней с реальным днём дозы (подпись — день недели), под группой Biologics — `InjectionSitesCard` по `DoseLog`. На Today отметка инъекции спрашивает место (`confirmationDialog`, предложенное — первым). Инъекцию вне расписания отметить нельзя. Из `AppStore` удалены `lastInjectionSite`/`suggestedInjectionSite`. Тесты 178.
     - Шаг 26 — `Services/PhotoStore.swift` (`nonisolated`, `Sendable`): папка `Application Support/Photos` (`.complete`, вне бэкапа), `save(imageData:)` — перекодирование через ImageIO в JPEG ≤ 2048 px **без метаданных** (геолокация не сохраняется), файлы с `.completeFileProtection` и `isExcludedFromBackup`; `data`, `thumbnail`, `delete`, `exists`; имя файла без путей. Тесты на временной папке, класс защиты проверяется. Тесты 182.
+    - Шаг 27 — `Screens/Photos/` (туда перенесён `PhotosView`; группы проекта синхронизируются с ФС — файлы, созданные вне Xcode, попадают в таргет сами). `PhotoRecords`: `add` (файл через `PhotoStore` в фоне через `@concurrent`, затем запись `Photo`; при ошибке записи файл удаляется), `delete`, `zonesWithPhotos`; `PhotoStore.shared`; `StoredPhotoImage` — миниатюра, декодируется не на главном потоке. `PhotoImport`: `.photoImport(zoneID:source:)` — системный `photosPicker` (вне процесса, без доступа к медиатеке), `PhotoZonePicker`. Сетка — зоны с фото из `@Query`, пустое состояние; текст о хранении — только то, что реально сделано. Плитки станут ссылками на `ZoneProgressView` в шаге 29. Тесты 185.
 - Ресурсы: Mac с 8 ГБ RAM — не держать симулятор и превью без нужды, превью рендерить по одному, симулятор запускать только для критерия шага.
 - Известная проблема (не регрессия): превью `DoctorReportView` падает в AttributeGraph (навбар/Liquid Glass) — так же падало и до шага 9.
 - Замечание по сборке: `BuildProject(buildForTesting:)` не пересобирает `MyApp` перед тестами — сначала обычный `BuildProject`, потом `RunAllTests`.
