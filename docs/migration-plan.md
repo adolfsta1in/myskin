@@ -397,7 +397,7 @@ MySkinTests/      Swift Testing
 
 ## Этап D. Второстепенные функции MVP
 
-### Шаг 33. Экран опросника (общий) + DLQI
+### Шаг 33. Экран опросника (общий) + DLQI ✅
 - **Цель:** пошаговое прохождение и сохранение результата.
 - **Файлы:** `Screens/Questionnaires/QuestionnaireView.swift`, `QuestionnaireHistoryView.swift`.
 - **Зависимости:** 12, 8.

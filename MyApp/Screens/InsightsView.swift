@@ -42,6 +42,31 @@ struct InsightsView: View {
                     }
                     .buttonStyle(.plain)
 
+                    NavigationLink {
+                        QuestionnaireHistoryView()
+                    } label: {
+                        HStack(spacing: 14) {
+                            Image(systemName: "list.clipboard")
+                                .font(.title3)
+                                .foregroundStyle(Theme.accent)
+                                .frame(width: 44, height: 44)
+                                .background(Theme.accentSoft.opacity(0.8), in: .circle)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Questionnaires")
+                                    .font(.rounded(.headline, weight: .semibold))
+                                    .foregroundStyle(Theme.ink)
+                                Text("DLQI and PEST · scores over time")
+                                    .font(.rounded(.subheadline))
+                                    .foregroundStyle(Theme.inkSoft)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundStyle(Theme.inkSoft)
+                        }
+                        .glassCard()
+                    }
+                    .buttonStyle(.plain)
+
                     SectionHeader(title: "Patterns we noticed", systemImage: "sparkle.magnifyingglass")
                     ForEach(store.insights) { insight in
                         insightCard(insight)
