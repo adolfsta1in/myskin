@@ -16,7 +16,7 @@
 - Режим Calm/Flare определяется автоматически (`FlareDetector`), ручного переключателя нет.
 
 ## Стек
-- iOS 27, только iPhone, портретная ориентация. SwiftUI, Liquid Glass, Swift Charts.
+- SDK iOS 27, **минимальная версия iOS 26.0** (чтобы запускать на iPhone 11 пользователя с iOS 26.5). API только из iOS 27 — лишь под `if #available(iOS 27, *)`. Только iPhone, портретная ориентация. SwiftUI, Liquid Glass, Swift Charts.
 - SwiftData с `VersionedSchema` с первого дня. Фото — файлы в Application Support, не в БД.
 - `@Observable` + `@Environment`. Combine не используем, только async/await.
 - `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`. Swift 6 language mode — с шага 3 плана.
