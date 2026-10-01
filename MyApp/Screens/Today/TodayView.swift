@@ -43,7 +43,6 @@ struct TodayView: View {
                         CalmDaysCard()
                             .transition(.opacity)
                     }
-                    SkinForecastCard()
                     RemindersCard()
                     QuestionnaireDueCards { takingQuestionnaire = $0 }
                     ItchChartCard()

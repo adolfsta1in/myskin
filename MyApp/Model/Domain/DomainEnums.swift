@@ -233,3 +233,58 @@ nonisolated enum DoseStatus: String, Codable, CaseIterable, Identifiable, Sendab
         }
     }
 }
+
+// MARK: - Goal
+
+nonisolated enum Goal: String, Codable, CaseIterable, Identifiable, Sendable {
+    case triggers, treatment, doctor, sleep, journal
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .triggers: "Find my triggers"
+        case .treatment: "Check my treatment"
+        case .doctor: "Prepare for my doctor"
+        case .sleep: "Itch less, sleep better"
+        case .journal: "Just keep a diary"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .triggers: "magnifyingglass"
+        case .treatment: "cross.vial"
+        case .doctor: "stethoscope"
+        case .sleep: "moon.zzz"
+        case .journal: "book.closed"
+        }
+    }
+}
+
+// MARK: - App mode
+
+/// Calm / Flare, computed by `FlareDetector` and never stored.
+nonisolated enum AppMode: String, CaseIterable, Identifiable, Sendable {
+    case calm, flare
+
+    var id: String { rawValue }
+    var title: String { self == .calm ? "Calm" : "Flare" }
+}
+
+// MARK: - Injection site
+
+nonisolated enum InjectionSite: String, Codable, CaseIterable, Identifiable, Sendable {
+    case abdomenLeft, abdomenRight, thighLeft, thighRight
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .abdomenLeft: "Abdomen · left"
+        case .abdomenRight: "Abdomen · right"
+        case .thighLeft: "Thigh · left"
+        case .thighRight: "Thigh · right"
+        }
+    }
+}

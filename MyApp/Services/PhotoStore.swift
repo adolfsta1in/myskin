@@ -27,7 +27,7 @@ nonisolated struct PhotoStore: Sendable {
     let directory: URL
 
     /// Store in `Application Support/Photos`, created on first use.
-    static func appStore() throws -> PhotoStore {
+    static func appFolder() throws -> PhotoStore {
         let support = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         return try PhotoStore(directory: support.appending(path: "Photos", directoryHint: .isDirectory))
     }

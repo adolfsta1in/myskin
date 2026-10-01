@@ -6,8 +6,8 @@ struct WelcomeStep: View {
     let next: () -> Void
 
     private let promises: [(String, String)] = [
-        ("magnifyingglass", "Find what triggers your flares"),
-        ("chart.xyaxis.line", "See if your treatment is working"),
+        ("magnifyingglass", "Log itch, flares and possible triggers"),
+        ("chart.xyaxis.line", "See how your skin changes with treatment"),
         ("doc.text", "Arrive at your doctor with a ready report"),
     ]
 

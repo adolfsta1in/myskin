@@ -7,12 +7,6 @@ import SwiftUI
 struct DesignCanvasView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var scale: CGFloat = 0.3
-    @State private var store = AppStore.preview
-    @State private var onboardingStore: AppStore = {
-        let store = AppStore()
-        store.condition = .eczema
-        return store
-    }()
 
     private static let phoneSize = CGSize(width: 393, height: 852)
 
@@ -38,7 +32,7 @@ struct DesignCanvasView: View {
                         ForEach(OnboardingStep.allCases) { step in
                             phone(step.label) {
                                 OnboardingFlow(startAt: step)
-                                    .environment(onboardingStore)
+                                    .modelContainer(PreviewData.emptyContainer())
                             }
                         }
                     }
@@ -55,9 +49,14 @@ struct DesignCanvasView: View {
                         phone("7 · Doctor report") {
                             NavigationStack { DoctorReportView() }
                         }
+                        phone("Questionnaires") {
+                            NavigationStack { QuestionnaireHistoryView() }
+                        }
+                        phone("DLQI") { QuestionnaireView(kind: .dlqi) }
+                        phone("Red flag") { RedFlagView(flags: [.widespreadPustules]) }
+                        phone("Settings") { SettingsView() }
                         phone("Privacy lock") { PrivacyLockView() }
                     }
-                    .environment(store)
                 }
                 .padding(32)
             }

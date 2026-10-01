@@ -4,7 +4,7 @@ import UIKit
 
 extension PhotoStore {
     /// The app's photo folder; nil only if Application Support can't be created.
-    static let shared: PhotoStore? = try? appStore()
+    static let shared: PhotoStore? = try? appFolder()
 
     /// Encodes and writes off the main actor.
     @concurrent

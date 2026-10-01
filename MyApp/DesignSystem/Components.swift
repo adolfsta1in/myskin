@@ -190,59 +190,7 @@ struct SecondaryButton: View {
     }
 }
 
-// MARK: - Placeholders & illustrations
-
-/// Neutral abstract stand-in for a skin photo. Never depicts real skin.
-/// `calmness` 0 = more intense soft patches, 1 = calm.
-struct AbstractSkinPlaceholder: View {
-    var seed: Int = 0
-    var calmness: Double = 0.5
-    var cornerRadius: CGFloat = 20
-
-    var body: some View {
-        GeometryReader { geo in
-            let w = geo.size.width
-            let h = geo.size.height
-            ZStack {
-                LinearGradient(colors: [Theme.sand, Theme.creamDeep], startPoint: .topLeading, endPoint: .bottomTrailing)
-                // Soft patches drawn with radial gradients instead of blur (much cheaper).
-                ForEach(0..<4, id: \.self) { index in
-                    let offset = pseudoRandom(index)
-                    let size = max(w, h) * (0.35 + offset.0 * 0.35) * (1.2 - calmness * 0.6)
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                colors: [patchColor.opacity(0.6 * (1 - calmness) + 0.12), patchColor.opacity(0)],
-                                center: .center,
-                                startRadius: 0,
-                                endRadius: size / 2
-                            )
-                        )
-                        .frame(width: size, height: size)
-                        .position(x: w * (0.2 + offset.0 * 0.6), y: h * (0.2 + offset.1 * 0.6))
-                }
-                Image(systemName: "photo")
-                    .font(.system(size: min(w, h) * 0.16, weight: .light))
-                    .foregroundStyle(Theme.inkSoft.opacity(0.35))
-            }
-        }
-        .clipShape(.rect(cornerRadius: cornerRadius))
-        // Static artwork: rasterize once into a single layer.
-        .drawingGroup()
-        .accessibilityLabel("Photo placeholder")
-    }
-
-    private var patchColor: Color {
-        calmness > 0.6 ? Theme.intensityMild : Theme.intensityModerate
-    }
-
-    /// Deterministic pseudo random pair in 0...1 based on seed and index.
-    private func pseudoRandom(_ index: Int) -> (Double, Double) {
-        let a = sin(Double(seed * 31 + index * 17) * 12.9898) * 43758.5453
-        let b = sin(Double(seed * 13 + index * 29) * 78.233) * 12345.6789
-        return (a - a.rounded(.down), b - b.rounded(.down))
-    }
-}
+// MARK: - Illustrations
 
 /// Soft circular illustration with an SF Symbol, used instead of any skin imagery.
 struct SoftIllustration: View {

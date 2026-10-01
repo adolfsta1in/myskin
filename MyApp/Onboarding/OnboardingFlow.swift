@@ -286,5 +286,5 @@ struct PermissionButtons: View {
 #Preview {
     OnboardingFlow()
         .modelContainer(PreviewData.emptyContainer())
-        .previewSetup(AppStore())
+        .previewSetup()
 }

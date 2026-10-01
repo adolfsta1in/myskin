@@ -4,7 +4,7 @@
 
 Приложение — **дневник, а не медицинское изделие**: оно не ставит диагноз и не назначает лечение. Все подсказки формулируются как «discuss with your doctor».
 
-Сейчас проект — UI-демо, которое пошагово превращается в MVP. Модель (`AppStore` с моками) заменяется на SwiftData, экраны переводятся на реальные данные.
+Проект пошагово превращён из UI-демо в MVP: данные — SwiftData, моки остались только в `Preview/PreviewData` (DEBUG).
 
 ## Рамки MVP
 - Только **псориаз**: экзема и себорейный дерматит удаляются.
@@ -24,19 +24,22 @@
 - Проект: `Untitled Project.xcodeproj`, таргет и схема `MyApp`, display name «MySkin».
 
 ## Структура папок
-Текущая (демо):
+Текущая:
 ```
 MyApp/
-  App/                 MyApp.swift (точка входа, AppStore + modelContainer)
-  Model/               AppStore (моки, будет удалён), Models (остатки демо)
-    Domain/            DomainEnums, BodyZone
+  App/                 MyApp.swift (точка входа, modelContainer), AppSettings
+  Model/
+    Domain/            DomainEnums (+ Goal, AppMode, InjectionSite), BodyZone, MedicationCatalog
     Persistence/       SchemaV1, MigrationPlan, AppModelContainer
+  Logic/               чистые функции (Severity, Flare, RedFlag, Doses, Questionnaires, Trends, DoctorReport…)
+  Services/            PhotoStore, NotificationService/Permission, BiometricAuth (+AppLock), ReportRenderer, DataExport
   Preview/             PreviewData (только DEBUG)
-  Screens/             MainTabView+RootView, Today/ (TodayView, CheckInDraft), BodyMap, Photos, ZoneProgress,
-                       Treatment, Insights, DoctorReport, PrivacyLock
-  Onboarding/          OnboardingFlow, OnboardingStepsIntro, OnboardingStepsSetup
-  DesignSystem/        Theme, Components, SharedViews (BodySilhouette, графики)
+  Screens/             MainTabView+RootView, PrivacyLockView, Today/, Body/, Photos/, Treatment/, Insights/,
+                       Questionnaires/, Settings/
+  Onboarding/          OnboardingFlow, OnboardingDraft, OnboardingStepsIntro, OnboardingStepsSetup
+  DesignSystem/        Theme, Components, SharedViews (BodySilhouette, графики), HealthDataShare
   Canvas/              DesignCanvasView (только DEBUG)
+MySkinTests/           Swift Testing
 docs/                  spec, research, current-state, migration-plan
 ```
 Целевая: `App/`, `Model/Domain/`, `Model/Persistence/`, `Logic/`, `Services/`, `Screens/<Раздел>/`, `Onboarding/`, `DesignSystem/`, `Preview/`, `MySkinTests/`. Подробности — в migration-plan, часть 2.
@@ -68,7 +71,7 @@ docs/                  spec, research, current-state, migration-plan
 - `docs/reaserch.md` — медицинский первоисточник. Читать только при сомнениях в медицинском содержании (шкалы, препараты, триггеры).
 
 ## Статус
-- **Текущий шаг: Шаг 43** — Уборка демо.
+- **Текущий шаг: Шаг 44** — Финальная проверка MVP.
 - Готово: фазы анализа (spec, current-state, migration-plan), этап 0 целиком:
   - Шаг 1 — git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`;
   - Шаг 2 — bundle id `com.adolfsta1in.myskin`, usage descriptions для Face ID и камеры;
@@ -119,6 +122,7 @@ docs/                  spec, research, current-state, migration-plan
     - Шаг 40 — `Services/ReportRenderer.swift`: `ReportPaper` → `ImageRenderer` → PDF (ширина A4 595 pt, одна страница по высоте отчёта, текст и графики векторные). `ExportFolder` — `tmp/Export` (`.complete`, вне бэкапа), очищается перед каждым экспортом и при запуске (не при закрытии окна — AirDrop может ещё отправлять). `DesignSystem/HealthDataShare.swift`: `.healthDataShare(isPresented:makeFile:)` — алерт «This contains health data» → файл → `UIActivityViewController`. Текстовый `ReportText` удалён. Тест открывает PDF через PDFKit (1 страница, текст есть). Тесты 233.
     - Шаг 41 — `Screens/Settings/SettingsView.swift` (лист из шестерёнки в шапке Today): формы псориаза и год начала (правят `Profile`, создают его, если нет), напоминания (включение сначала запрашивает разрешение; при отказе — алерт с переходом в настройки iOS, тумблер остаётся выключен), время чек-ина, `LockToggle`, «About» (дисклеймер, атрибуция DLQI/PEST, версия). `NotificationPermission.isAllowed()`. Перепланирование напоминаний — через существующий `ReminderSync`. Тесты 233.
     - Шаг 42 — `Services/DataExport.swift`: 5 CSV (check-ins, zone-assessments, treatments, doses, questionnaires; RFC 4180, стабильные id + читаемое имя зоны; фото не входят) в `ExportFolder`, отправка через `healthDataShare` (теперь принимает несколько файлов). `DataReset.deleteAll`: все записи (сначала дозы), все файлы фото (`PhotoStore.deleteAllFiles`), экспорт, `AppSettings.resetAll()` (→ онбординг, блокировка выкл.); из настроек ещё `NotificationService.removeAll()` и снятие блокировки. В настройках — «Your data»: экспорт и удаление с двумя подтверждениями. `ReminderSync` не планирует, пока онбординг не пройден. Тесты 237.
+    - Шаг 43 — удалены `Model/AppStore.swift` и `Model/Models.swift`; `Goal`, `AppMode`, `InjectionSite` (rawValue без изменений) — в `DomainEnums`, `DayValue` — в `Logic/Trends.swift`. Удалены `SkinForecastCard`, `AbstractSkinPlaceholder`; `previewSetup()` без параметра; канвас без `AppStore`, добавлены опросники, DLQI, красный флаг, настройки. `PhotoStore.appStore()` → `appFolder()`. Тексты: Welcome — «Log itch, flares and possible triggers» / «See how your skin changes with treatment» (корреляций нет); Privacy — «Your diary is stored in the app on this iPhone», «MySkin never sends your data anywhere — you choose what to share». Поиск `AppStore|POEM|eczema` в `MyApp/` пуст. Тесты 237. Канвас не открывался (тяжёлый для 8 ГБ).
   - Вне очереди (по просьбе пользователя):
     - Шаг 36 — `Logic/ReminderPlan.swift` (чек-ин — ежедневный повтор в `checkInMinutes`; дозы — открытые дозы активных лечений на 7 дней вперёд, одно напоминание на одно время, лимит 60 из 64 iOS; тексты только «Time for your diary check-in.» / «Time for your treatment.», id с префиксом `myskin.`), `Services/NotificationService.swift` (`sync`: удаляет свои ожидающие и ставит заново; без разрешения ничего не делает и диалог не показывает; `NotificationPresenter` — баннер и при открытом приложении). Перепланирование — `ReminderSync` в `MainTabView` (меняются лечения, отметки доз, настройки, приложение стало активным). В симуляторе iPhone 11 баннер дозы пришёл. Время чек-ина пока меняется только в онбординге — экран настроек в шаге 41. Тесты 199.
 - Ресурсы: Mac с 8 ГБ RAM — не держать симулятор и превью без нужды, превью рендерить по одному, симулятор запускать только для критерия шага. Симулятор — **iPhone 11** (легче); перед запуском выключать остальные (`xcrun simctl shutdown all`).

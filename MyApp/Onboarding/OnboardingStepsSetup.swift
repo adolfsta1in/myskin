@@ -267,9 +267,9 @@ struct PrivacyStep: View {
 
                 VStack(alignment: .leading, spacing: 14) {
                     privacyRow("photo.badge.checkmark", "Photos never go to your shared photo library")
-                    privacyRow("iphone", "Everything is stored on this device")
+                    privacyRow("iphone", "Your diary is stored in the app on this iPhone")
                     privacyRow("person.crop.circle.badge.xmark", "No account needed")
-                    privacyRow("square.and.arrow.up", "Nothing leaves your phone unless you share it")
+                    privacyRow("square.and.arrow.up", "MySkin never sends your data anywhere — you choose what to share")
                 }
                 .glassCard()
             }

@@ -1,5 +1,12 @@
 import Foundation
 
+/// One point of a chart: a day (or week start) and a value.
+struct DayValue: Identifiable {
+    let date: Date
+    let value: Double
+    var id: Date { date }
+}
+
 /// Series for the Insights charts and the doctor report, built from stored records.
 enum Trends {
     /// Default Insights window, in days.
