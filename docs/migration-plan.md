@@ -261,7 +261,7 @@ MySkinTests/      Swift Testing
 
 ## Этап B. Логика (чистые функции + тесты, без UI)
 
-### Шаг 11. `SeverityCalculator`
+### Шаг 11. `SeverityCalculator` ✅
 - **Цель:** BSA, само-PASI и категория тяжести по spec §2.2.
 - **Файлы:** `Logic/SeverityCalculator.swift`, `MySkinTests/SeverityCalculatorTests.swift`.
 - **Зависимости:** 6, 7.

@@ -68,7 +68,7 @@ docs/                  spec, research, current-state, migration-plan
 - `docs/reaserch.md` — медицинский первоисточник. Читать только при сомнениях в медицинском содержании (шкалы, препараты, триггеры).
 
 ## Статус
-- **Текущий шаг: Шаг 11** — `SeverityCalculator` (начало этапа B). Перед ним — вручную проверить критерий шага 10 в симуляторе.
+- **Текущий шаг: Шаг 12** — подсчёт баллов DLQI и PEST. Критерий шага 10 в симуляторе всё ещё не проверен.
 - Готово: фазы анализа (spec, current-state, migration-plan), этап 0 целиком:
   - Шаг 1 — git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`;
   - Шаг 2 — bundle id `com.adolfsta1in.myskin`, usage descriptions для Face ID и камеры;
@@ -81,6 +81,8 @@ docs/                  spec, research, current-state, migration-plan
     - Шаг 8 — `Treatment` (расписание: `scheduleKind` + `timesPerDay`/`interval`/`weekday`/`doseMinutes`), `DoseLog` (каскад от `Treatment`), `Photo`, `QuestionnaireResult`; `MigrationPlan.swift` (`MySkinMigrationPlan`, стадий нет). У новой модели **нет** `typealias Treatment` — имя занято демо-структурой; до шага 22 писать `SchemaV1.Treatment`.
     - Шаг 9 — `App/MyApp.swift` (`.modelContainer`), `Model/Persistence/AppModelContainer.swift` (`makePersistent`: `Application Support/Store/MySkin.store`, без CloudKit, папка и файлы с `.completeUnlessOpen` — чтобы открытая SQLite могла дописать при блокировке; `makeInMemory` для превью и тестов). `Preview/PreviewData.swift` (DEBUG): профиль, 14 чек-инов, оценки зон, 4 лечения с дозами, DLQI/PEST; фото нет. `previewSetup` и `DesignCanvasView` подключают `PreviewData.container`. При ошибке открытия хранилища — `fatalError` (без тихого пустого хранилища).
     - Шаг 10 — `App/AppSettings.swift` (`@Observable` поверх `UserDefaults`, ключи в `AppSettings.Key` не переименовывать; время чек-ина хранится как `checkInMinutes`). `RootView`, `OnboardingFlow`, `NotificationsStep`, `PrivacyStep`, `PlanReadyStep` читают настройки отсюда; из `AppStore` поля удалены, `isLocked` остался (состояние сессии). `faceIDEnabled` по умолчанию **false** — настоящей блокировки ещё нет (шаг 37). Превью — `PreviewData.settings` (отдельный suite). Тесты 23/23. **Не проверено в симуляторе:** «онбординг → перезапуск → сразу вкладки» (Xcode падал, Mac 8 ГБ).
+  - Этап B:
+    - Шаг 11 — `Logic/SeverityCalculator.swift`: вход — `ZoneScore` (копия `ZoneAssessment`, `.score`), выход — `SeveritySnapshot` (BSA, индекс 0–72, `specialSiteIDs`, `category`, `isElevated`). Площадь зоны ограничена `BodyZone.area`, площадь региона — суммой зон силуэта (quick-зоны лежат внутри силуэта, так снято перекрытие `front.head`/`quick.face`), BSA ≤ 100. Правило десяток: BSA/индекс/DLQI > 10 → severe; особая зона или `arthritisSuspected` поднимают mild → moderate. Пороги — `SeverityCalculator.Threshold`. Тесты 54/54.
 - Ресурсы: Mac с 8 ГБ RAM — не держать симулятор и превью без нужды, превью рендерить по одному, симулятор запускать только для критерия шага.
 - Известная проблема (не регрессия): превью `DoctorReportView` падает в AttributeGraph (навбар/Liquid Glass) — так же падало и до шага 9.
 - Замечание по сборке: `BuildProject(buildForTesting:)` не пересобирает `MyApp` перед тестами — сначала обычный `BuildProject`, потом `RunAllTests`.
