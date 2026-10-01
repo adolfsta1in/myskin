@@ -86,11 +86,11 @@ struct DoctorReportView: View {
         .navigationTitle("Doctor report")
         .navigationBarTitleDisplayMode(.inline)
         .healthDataShare(isPresented: $isSharing) {
-            try ReportRenderer.makePDF(
+            [try ReportRenderer.makePDF(
                 report: report,
                 weeklyItch: Trends.weeklyItch(checkIns: checkIns.map(\.sample), from: report.start, to: report.end),
                 images: images
-            )
+            )]
         }
         .task(id: report.photos.flatMap { [$0.before, $0.now] }) {
             await loadImages(for: report.photos)

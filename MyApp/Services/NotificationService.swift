@@ -22,6 +22,15 @@ enum NotificationService {
             try? await center.add(UNNotificationRequest(identifier: reminder.id, content: content, trigger: trigger))
         }
     }
+
+    /// Removes all of MySkin's pending and delivered reminders (used by «Delete all data»).
+    static func removeAll() async {
+        let center = UNUserNotificationCenter.current()
+        let pending = await center.pendingNotificationRequests().map(\.identifier).filter { $0.hasPrefix(ReminderPlan.idPrefix) }
+        center.removePendingNotificationRequests(withIdentifiers: pending)
+        let delivered = await center.deliveredNotifications().map(\.request.identifier).filter { $0.hasPrefix(ReminderPlan.idPrefix) }
+        center.removeDeliveredNotifications(withIdentifiers: delivered)
+    }
 }
 
 /// Shows reminders as banners even while MySkin is open.

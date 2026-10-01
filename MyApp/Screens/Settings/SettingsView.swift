@@ -24,6 +24,7 @@ struct SettingsView: View {
                 } footer: {
                     Text("When on, MySkin locks each time you leave the app and hides its content in the app switcher.")
                 }
+                DataSection()
                 aboutSection
             }
             .font(.rounded(.body))
@@ -146,6 +147,61 @@ struct SettingsView: View {
             if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String {
                 LabeledContent("Version", value: version)
             }
+        }
+    }
+}
+
+/// CSV export and «Delete all data» (two confirmations).
+private struct DataSection: View {
+    @Environment(AppSettings.self) private var settings
+    @Environment(AppLock.self) private var lock
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+    @State private var isExporting = false
+    @State private var isConfirmingDelete = false
+    @State private var isConfirmingDeleteAgain = false
+    @State private var deleteError: String?
+
+    var body: some View {
+        Section {
+            Button("Export diary as CSV", systemImage: "tablecells") { isExporting = true }
+            Button("Delete all data", systemImage: "trash", role: .destructive) { isConfirmingDelete = true }
+        } header: {
+            Text("Your data")
+        } footer: {
+            Text("The export contains check-ins, body map assessments, treatments, doses and questionnaires. Photos aren't included.")
+        }
+        .healthDataShare(isPresented: $isExporting) {
+            try DataExport.writeCSV(from: modelContext)
+        }
+        .confirmationDialog("Delete all data?", isPresented: $isConfirmingDelete, titleVisibility: .visible) {
+            Button("Delete all data", role: .destructive) { isConfirmingDeleteAgain = true }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Check-ins, body maps, photos, treatments and questionnaires will be removed from this iPhone.")
+        }
+        .alert("This can't be undone", isPresented: $isConfirmingDeleteAgain) {
+            Button("Delete everything", role: .destructive, action: deleteAll)
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Export your diary first if you might need it later.")
+        }
+        .alert("Couldn't delete", isPresented: Binding(get: { deleteError != nil }, set: { if !$0 { deleteError = nil } })) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(deleteError ?? "")
+        }
+    }
+
+    private func deleteAll() {
+        do {
+            try DataReset.deleteAll(context: modelContext, photoStore: PhotoStore.shared, settings: settings)
+            lock.isLocked = false
+            Task { await NotificationService.removeAll() }
+            dismiss()
+        } catch {
+            modelContext.rollback()
+            deleteError = error.localizedDescription
         }
     }
 }

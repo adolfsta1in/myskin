@@ -48,14 +48,15 @@ private struct ReminderSync: ViewModifier {
     private var signature: String {
         let schedules = treatments.map { "\($0.doseSchedule.hashValue)" }.sorted().joined(separator: ",")
         return [
-            "\(settings.checkInReminder)", "\(settings.checkInMinutes)", "\(settings.doseReminders)",
+            "\(settings.hasCompletedOnboarding)", "\(settings.checkInReminder)", "\(settings.checkInMinutes)", "\(settings.doseReminders)",
             schedules, "\(doseLogs.count)", "\(scenePhase == .active)",
         ].joined(separator: "|")
     }
 
     func body(content: Content) -> some View {
         content.task(id: signature) {
-            guard scenePhase == .active else { return }
+            // After «Delete all data» the tabs are on their way out; don't plan reminders again.
+            guard scenePhase == .active, settings.hasCompletedOnboarding else { return }
             let reminders = ReminderPlan.reminders(
                 now: .now,
                 checkInEnabled: settings.checkInReminder,

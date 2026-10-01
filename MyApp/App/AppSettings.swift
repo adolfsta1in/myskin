@@ -54,6 +54,18 @@ final class AppSettings {
         doseReminders = defaults.bool(forKey: Key.doseReminders)
     }
 
+    /// Back to a fresh install: onboarding again, lock off, default reminders.
+    func resetAll() {
+        for key in [Key.hasCompletedOnboarding, Key.faceIDEnabled, Key.checkInReminder, Key.checkInMinutes, Key.doseReminders] {
+            defaults.removeObject(forKey: key)
+        }
+        hasCompletedOnboarding = defaults.bool(forKey: Key.hasCompletedOnboarding)
+        faceIDEnabled = defaults.bool(forKey: Key.faceIDEnabled)
+        checkInReminder = defaults.bool(forKey: Key.checkInReminder)
+        checkInMinutes = defaults.integer(forKey: Key.checkInMinutes)
+        doseReminders = defaults.bool(forKey: Key.doseReminders)
+    }
+
     /// Today's date at `checkInMinutes` — for `DatePicker` and display.
     var checkInTime: Date {
         get {

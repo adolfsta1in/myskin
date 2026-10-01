@@ -2,22 +2,22 @@ import SwiftUI
 import UIKit
 
 extension View {
-    /// Warns that the file contains health data, then builds it and opens the system share sheet.
+    /// Warns that the files contain health data, then builds them and opens the system share sheet.
     /// Old exports are removed before the next export and on launch (not on close: AirDrop may still be sending).
-    func healthDataShare(isPresented: Binding<Bool>, makeFile: @escaping () throws -> URL) -> some View {
-        modifier(HealthDataShare(isAsking: isPresented, makeFile: makeFile))
+    func healthDataShare(isPresented: Binding<Bool>, makeFiles: @escaping () throws -> [URL]) -> some View {
+        modifier(HealthDataShare(isAsking: isPresented, makeFiles: makeFiles))
     }
 }
 
 private struct HealthDataShare: ViewModifier {
     @Binding var isAsking: Bool
-    let makeFile: () throws -> URL
-    @State private var file: SharedFile?
+    let makeFiles: () throws -> [URL]
+    @State private var files: SharedFiles?
     @State private var error: String?
 
-    struct SharedFile: Identifiable {
-        let url: URL
-        var id: URL { url }
+    struct SharedFiles: Identifiable {
+        let id = UUID()
+        let urls: [URL]
     }
 
     func body(content: Content) -> some View {
@@ -25,7 +25,7 @@ private struct HealthDataShare: ViewModifier {
             .alert("This contains health data", isPresented: $isAsking) {
                 Button("Continue") {
                     do {
-                        file = SharedFile(url: try makeFile())
+                        files = SharedFiles(urls: try makeFiles())
                     } catch {
                         self.error = error.localizedDescription
                     }
@@ -34,8 +34,8 @@ private struct HealthDataShare: ViewModifier {
             } message: {
                 Text("Only share it with people you trust, such as your doctor. Once it leaves MySkin, the app can't protect it.")
             }
-            .sheet(item: $file) { file in
-                ActivityView(items: [file.url])
+            .sheet(item: $files) { files in
+                ActivityView(items: files.urls)
                     .presentationDetents([.medium, .large])
             }
             .alert("Couldn't export", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
