@@ -92,14 +92,6 @@ struct DemoTreatment: Identifiable {
     var nextDoseInDays: Int?
 }
 
-struct TreatmentReminder: Identifiable {
-    let id = UUID()
-    let title: String
-    let detail: String
-    let systemImage: String
-    var isDone: Bool = false
-}
-
 enum InjectionSite: String, CaseIterable, Identifiable {
     case abdomenLeft, abdomenRight, thighLeft, thighRight
 

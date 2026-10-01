@@ -422,45 +422,79 @@ private struct CalmDaysCard: View {
     }
 }
 
+/// Today's planned doses from the treatment plan; ticking one writes a `DoseLog`.
 private struct RemindersCard: View {
-    @Environment(AppStore.self) private var store
+    @Environment(\.modelContext) private var modelContext
+    @Query(filter: #Predicate<Treatment> { $0.endDate == nil }, sort: \Treatment.name) private var treatments: [Treatment]
+    @State private var saveError: String?
 
     var body: some View {
-        @Bindable var store = store
+        let rows = DoseRows.rows(for: treatments, on: .now)
         VStack(alignment: .leading, spacing: 12) {
             SectionHeader(title: "Treatment today", systemImage: "calendar")
-            ForEach($store.reminders) { $reminder in
+            if rows.isEmpty {
+                Text(treatments.isEmpty
+                     ? "Add your treatments in the Treatment tab to see today's doses here."
+                     : "Nothing planned for today.")
+                    .font(.rounded(.subheadline))
+                    .foregroundStyle(Theme.inkSoft)
+            }
+            ForEach(rows) { row in
                 HStack(spacing: 12) {
-                    Image(systemName: reminder.systemImage)
+                    Image(systemName: row.treatment.kind.systemImage)
                         .foregroundStyle(Theme.accent)
                         .frame(width: 36, height: 36)
                         .background(Theme.accentSoft.opacity(0.7), in: .circle)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(reminder.title)
+                        Text(row.treatment.name)
                             .font(.rounded(.body, weight: .medium))
                             .foregroundStyle(Theme.ink)
-                            .strikethrough(reminder.isDone, color: Theme.inkSoft)
-                        Text(reminder.detail)
+                            .strikethrough(row.isDone, color: Theme.inkSoft)
+                        Text(detail(row))
                             .font(.rounded(.footnote))
                             .foregroundStyle(Theme.inkSoft)
                     }
                     Spacer()
                     Button {
-                        withAnimation(.bouncy) { reminder.isDone.toggle() }
+                        toggle(row)
                     } label: {
-                        Image(systemName: reminder.isDone ? "checkmark.circle.fill" : "circle")
+                        Image(systemName: row.isDone ? "checkmark.circle.fill" : "circle")
                             .font(.title2)
-                            .foregroundStyle(reminder.isDone ? Theme.sageDeep : Theme.sandDeep)
+                            .foregroundStyle(row.isDone ? Theme.sageDeep : Theme.sandDeep)
                             .frame(width: 44, height: 44)
                             .contentShape(.rect)
                     }
                     .buttonStyle(.plain)
-                    .sensoryFeedback(.success, trigger: reminder.isDone) { _, done in done }
-                    .accessibilityLabel(reminder.isDone ? "Done" : "Mark as done")
+                    .sensoryFeedback(.success, trigger: row.isDone) { _, done in done }
+                    .accessibilityLabel(row.isDone ? "Done" : "Mark as done")
                 }
             }
         }
         .glassCard()
+        .alert("Couldn't save", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(saveError ?? "")
+        }
+    }
+
+    private func detail(_ row: DoseRow) -> String {
+        var parts = [row.scheduledAt.formatted(date: .omitted, time: .shortened)]
+        let zones = row.treatment.zoneIDs.compactMap { BodyZone.zone(id: $0)?.name }
+        if !zones.isEmpty { parts.append(zones.formatted(.list(type: .and))) }
+        if let ftu = row.treatment.fingertipUnits {
+            parts.append("\(ftu.formatted(.number.precision(.fractionLength(0...1)))) FTU")
+        }
+        return parts.joined(separator: " · ")
+    }
+
+    private func toggle(_ row: DoseRow) {
+        do {
+            try withAnimation(.bouncy) { try DoseRows.toggle(row, in: modelContext) }
+        } catch {
+            modelContext.rollback()
+            saveError = error.localizedDescription
+        }
     }
 }
 

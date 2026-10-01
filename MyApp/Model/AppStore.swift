@@ -17,13 +17,6 @@ final class AppStore {
     var locationAllowed = false
     var healthAllowed = false
 
-    // MARK: Today
-    var reminders: [TreatmentReminder] = [
-        TreatmentReminder(title: "Tacrolimus ointment", detail: "Elbows · tonight", systemImage: "hand.point.up.left"),
-        TreatmentReminder(title: "Rich moisturizer", detail: "Whole body · after shower", systemImage: "drop", isDone: true),
-        TreatmentReminder(title: "Adalimumab injection", detail: "In 3 days · Friday", systemImage: "syringe"),
-    ]
-
     // MARK: Body map (zone id → intensity 0...3)
     var zoneIntensity: [String: Int] = [
         "back.elbow.left": 3,
