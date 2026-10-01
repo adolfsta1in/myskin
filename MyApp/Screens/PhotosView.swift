@@ -217,7 +217,7 @@ struct CameraOverlayView: View {
 }
 
 /// Stylised outline of a bent arm, standing in for the previous photo's contour.
-struct GhostOutline: Shape {
+nonisolated struct GhostOutline: Shape {
     func path(in rect: CGRect) -> Path {
         let w = rect.width
         let h = rect.height

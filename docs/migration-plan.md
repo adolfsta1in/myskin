@@ -209,7 +209,7 @@ MySkinTests/      Swift Testing
 - **Зависимости:** 1.
 - **Готово, когда:** проект собирается и запускается в симуляторе; в Build Settings виден новый bundle id и оба usage description.
 
-### Шаг 3. Swift 6 language mode
+### Шаг 3. Swift 6 language mode ✅
 - **Цель:** строгая проверка concurrency с самого начала.
 - **Файлы:** `SWIFT_VERSION = 6`, исправление предупреждений и ошибок, если появятся.
 - **Зависимости:** 2.

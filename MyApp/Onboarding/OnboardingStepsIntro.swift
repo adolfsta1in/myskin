@@ -284,7 +284,7 @@ struct DelayInsightStep: View {
     }
 }
 
-private struct Line: Shape {
+nonisolated private struct Line: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
         path.move(to: CGPoint(x: rect.minX, y: rect.midY))
