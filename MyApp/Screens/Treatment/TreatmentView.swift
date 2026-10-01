@@ -43,6 +43,9 @@ struct TreatmentView: View {
                                 ForEach(items) { treatment in
                                     card(treatment)
                                 }
+                                if group.kinds.contains(.biologic) {
+                                    InjectionSitesCard(records: items.flatMap(\.doses).map(\.injectionRecord))
+                                }
                             }
                         }
                         if !stopped.isEmpty {
@@ -148,6 +151,10 @@ private struct TreatmentCard: View {
                 }
             }
 
+            if treatment.kind == .biologic, treatment.isActive {
+                NextDoseStrip(treatment: treatment)
+            }
+
             if let ftu = treatment.fingertipUnits, treatment.isActive {
                 HStack(spacing: 14) {
                     FingerIllustration()
@@ -189,6 +196,107 @@ private struct TreatmentCard: View {
             return "\(started) · \(stopped) · \(reason)"
         }
         return "\(started) · \(stopped)"
+    }
+}
+
+/// Next 14 days with the next dose highlighted, from the real schedule and marks.
+private struct NextDoseStrip: View {
+    let treatment: Treatment
+
+    var body: some View {
+        let days = InjectionPlan.daysUntilNextDose(from: .now, schedule: treatment.doseSchedule, logs: treatment.doses.map(\.logged))
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 6) {
+                ForEach(0..<14, id: \.self) { offset in
+                    let isDose = offset == days
+                    let date = Calendar.current.date(byAdding: .day, value: offset, to: .now) ?? .now
+                    VStack(spacing: 4) {
+                        Circle()
+                            .fill(isDose ? Theme.accent : (offset == 0 ? Theme.sage : Theme.sand))
+                            .frame(width: isDose ? 16 : 10, height: isDose ? 16 : 10)
+                        if offset == 0 || isDose {
+                            Text(offset == 0 ? "Today" : date.formatted(.dateTime.weekday(.abbreviated)))
+                                .font(.rounded(.caption2, weight: .medium))
+                                .foregroundStyle(Theme.inkSoft)
+                                .fixedSize()
+                        } else {
+                            Text(" ").font(.rounded(.caption2))
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+            .accessibilityHidden(true)
+            if let days {
+                Label(InjectionPlan.countdownText(days: days, from: .now), systemImage: "calendar.badge.clock")
+                    .font(.rounded(.subheadline, weight: .semibold))
+                    .foregroundStyle(Theme.accent)
+            }
+        }
+    }
+}
+
+/// Rotation of injection sites from marked doses: last site and the suggested next one.
+private struct InjectionSitesCard: View {
+    let records: [InjectionRecord]
+
+    var body: some View {
+        let last = InjectionPlan.lastSite(records)
+        let next = InjectionPlan.suggestedSite(after: last)
+        VStack(alignment: .leading, spacing: 14) {
+            SectionHeader(title: "Injection sites", subtitle: "Rotating helps your skin recover")
+            HStack(spacing: 18) {
+                // Mini torso diagram
+                ZStack {
+                    RoundedRectangle(cornerRadius: 30).fill(Theme.sand).frame(width: 96, height: 90).offset(y: -40)
+                    Capsule().fill(Theme.sand).frame(width: 40, height: 92).offset(x: -26, y: 50)
+                    Capsule().fill(Theme.sand).frame(width: 40, height: 92).offset(x: 26, y: 50)
+                    siteDot(.abdomenRight, last: last, next: next).offset(x: -22, y: -34)
+                    siteDot(.abdomenLeft, last: last, next: next).offset(x: 22, y: -34)
+                    siteDot(.thighRight, last: last, next: next).offset(x: -26, y: 44)
+                    siteDot(.thighLeft, last: last, next: next).offset(x: 26, y: 44)
+                }
+                .frame(width: 110, height: 190)
+                .accessibilityHidden(true)
+
+                VStack(alignment: .leading, spacing: 10) {
+                    ForEach(InjectionSite.allCases) { site in
+                        HStack(spacing: 8) {
+                            Circle()
+                                .fill(color(for: site, last: last, next: next))
+                                .frame(width: 10, height: 10)
+                            Text(site.title)
+                                .font(.rounded(.subheadline, weight: site == next ? .semibold : .regular))
+                                .foregroundStyle(Theme.ink)
+                            if site == last {
+                                Text("last").font(.rounded(.caption2)).foregroundStyle(Theme.inkSoft)
+                            } else if site == next {
+                                Text("next").font(.rounded(.caption2, weight: .bold)).foregroundStyle(Theme.accent)
+                            }
+                        }
+                    }
+                }
+            }
+            if last == nil {
+                Text("Choose the site when you mark an injection on Today.")
+                    .font(.rounded(.footnote))
+                    .foregroundStyle(Theme.inkSoft)
+            }
+        }
+        .glassCard()
+    }
+
+    private func color(for site: InjectionSite, last: InjectionSite?, next: InjectionSite) -> Color {
+        if site == next { return Theme.accent }
+        if site == last { return Theme.sandDeep }
+        return Theme.sage
+    }
+
+    private func siteDot(_ site: InjectionSite, last: InjectionSite?, next: InjectionSite) -> some View {
+        Circle()
+            .fill(color(for: site, last: last, next: next))
+            .frame(width: 18, height: 18)
+            .overlay(Circle().stroke(.white, lineWidth: 2))
     }
 }
 

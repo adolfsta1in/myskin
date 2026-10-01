@@ -40,7 +40,6 @@ final class AppStore {
         totalDays: 21,
         note: "Keep logging itch daily — at the end we'll compare with your previous 3 weeks."
     )
-    var lastInjectionSite: InjectionSite = .abdomenLeft
     var photoZones: [PhotoZone]
 
     init() {
@@ -114,12 +113,6 @@ final class AppStore {
 
     var scoreName: String {
         condition == .psoriasis ? "Self-assessment" : "POEM"
-    }
-
-    var suggestedInjectionSite: InjectionSite {
-        let all = InjectionSite.allCases
-        let index = all.firstIndex(of: lastInjectionSite) ?? 0
-        return all[(index + 1) % all.count]
     }
 
     func cycleIntensity(for zoneID: String) {

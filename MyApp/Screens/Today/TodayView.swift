@@ -427,6 +427,8 @@ private struct RemindersCard: View {
     @Environment(\.modelContext) private var modelContext
     @Query(filter: #Predicate<Treatment> { $0.endDate == nil }, sort: \Treatment.name) private var treatments: [Treatment]
     @State private var saveError: String?
+    /// Injection waiting for its site to be chosen.
+    @State private var pendingInjection: DoseRow?
 
     var body: some View {
         let rows = DoseRows.rows(for: treatments, on: .now)
@@ -471,6 +473,20 @@ private struct RemindersCard: View {
             }
         }
         .glassCard()
+        .confirmationDialog(
+            "Where did you inject?",
+            isPresented: Binding(get: { pendingInjection != nil }, set: { if !$0 { pendingInjection = nil } }),
+            titleVisibility: .visible,
+            presenting: pendingInjection
+        ) { row in
+            let suggested = InjectionPlan.suggestedSite(after: InjectionPlan.lastSite(row.treatment.doses.map(\.injectionRecord)))
+            ForEach([suggested] + InjectionSite.allCases.filter { $0 != suggested }) { site in
+                Button(site == suggested ? "\(site.title) (suggested)" : site.title) {
+                    mark(row, site: site)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        }
         .alert("Couldn't save", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -489,8 +505,17 @@ private struct RemindersCard: View {
     }
 
     private func toggle(_ row: DoseRow) {
+        // Injections ask for the site first, so the rotation stays accurate.
+        if row.treatment.kind == .biologic && !row.isDone {
+            pendingInjection = row
+        } else {
+            mark(row, site: nil)
+        }
+    }
+
+    private func mark(_ row: DoseRow, site: InjectionSite?) {
         do {
-            try withAnimation(.bouncy) { try DoseRows.toggle(row, in: modelContext) }
+            try withAnimation(.bouncy) { try DoseRows.toggle(row, injectionSite: site, in: modelContext) }
         } catch {
             modelContext.rollback()
             saveError = error.localizedDescription

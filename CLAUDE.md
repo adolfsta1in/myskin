@@ -68,7 +68,7 @@ docs/                  spec, research, current-state, migration-plan
 - `docs/reaserch.md` — медицинский первоисточник. Читать только при сомнениях в медицинском содержании (шкалы, препараты, триггеры).
 
 ## Статус
-- **Текущий шаг: Шаг 25** — Treatment: биологики и места инъекций.
+- **Текущий шаг: Шаг 26** — `PhotoStore`.
 - Готово: фазы анализа (spec, current-state, migration-plan), этап 0 целиком:
   - Шаг 1 — git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`;
   - Шаг 2 — bundle id `com.adolfsta1in.myskin`, usage descriptions для Face ID и камеры;
@@ -98,6 +98,7 @@ docs/                  spec, research, current-state, migration-plan
     - Шаг 22 — `Screens/Treatment/TreatmentView.swift` (перенесён): `@Query` по `Treatment`, группы (Creams & ointments = cream/ointment/foam/shampoo, Tablets, Biologics, Phototherapy) + «Stopped»; пустое состояние с «Add treatment». Демо-структура переименована в `DemoTreatment` (её ещё читает `DoctorReportView`), добавлен `typealias Treatment = SchemaV1.Treatment`. `DoseScheduler.summary(for:)` — текст расписания («Twice a day», «Weekly · Monday», «Every 2 weeks»). Календарь биологика и места инъекций временно убраны — вернутся в шаге 25. Тесты 162.
     - Шаг 23 — `Screens/Treatment/TreatmentDraft.swift` (из справочника — типичное расписание; «свой» — только имя; `apply`/`makeTreatment`; у не-топических препаратов зоны/класс/FTU обнуляются; `stop`/`resume`; `search`; `sensitiveAreaWarning` — стероид класса I–II на лице/складках/гениталиях). `TreatmentEditor.swift`: `AddTreatmentSheet` (поиск по `MedicationCatalog` с секциями + «Custom…») → `TreatmentEditor` (Form: имя, тип, класс, FTU, расписание и время доз, дата начала, зоны через `ZonePicker`, заметка; для сохранённого — Stop с причиной / Resume / Delete). Тап по карточке открывает редактор. Тесты 170.
     - Шаг 24 — `Screens/Today/DoseRows.swift`: `rows(for:on:)` — дозы активных лечений на день через `DoseScheduler` (по времени, затем имени); `toggle` — пишет `DoseLog(scheduledAt:, .done, FTU)` или удаляет отметку. `RemindersCard` читает активные `Treatment` через `@Query`, пустые состояния. Из `AppStore` удалены `reminders`, из `Models` — `TreatmentReminder`. Тесты 174.
+    - Шаг 25 — `Logic/InjectionPlan.swift`: `lastSite` (последний лог с местом), `suggestedSite` (по кругу `InjectionSite.allCases`), `daysUntilNextDose` (через `DoseScheduler.nextDose`, отмеченная доза сдвигает на следующую), `countdownText`. В `TreatmentView`: у активного биологика — полоса 14 дней с реальным днём дозы (подпись — день недели), под группой Biologics — `InjectionSitesCard` по `DoseLog`. На Today отметка инъекции спрашивает место (`confirmationDialog`, предложенное — первым). Инъекцию вне расписания отметить нельзя. Из `AppStore` удалены `lastInjectionSite`/`suggestedInjectionSite`. Тесты 178.
 - Ресурсы: Mac с 8 ГБ RAM — не держать симулятор и превью без нужды, превью рендерить по одному, симулятор запускать только для критерия шага.
 - Известная проблема (не регрессия): превью `DoctorReportView` падает в AttributeGraph (навбар/Liquid Glass) — так же падало и до шага 9.
 - Замечание по сборке: `BuildProject(buildForTesting:)` не пересобирает `MyApp` перед тестами — сначала обычный `BuildProject`, потом `RunAllTests`.
