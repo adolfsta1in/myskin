@@ -3,10 +3,6 @@ import SwiftUI
 /// In-memory app state with realistic sample data for the prototype.
 @Observable
 final class AppStore {
-    // MARK: Flow
-    /// Session-only lock state. Persistent flags live in `AppSettings`.
-    var isLocked = false
-
     // MARK: Onboarding answers
     var condition: Condition?
 

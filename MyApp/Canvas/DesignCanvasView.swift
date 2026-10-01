@@ -66,6 +66,7 @@ struct DesignCanvasView: View {
         .fontDesign(.rounded)
         .preferredColorScheme(.light)
         .environment(PreviewData.settings)
+        .environment(AppLock(isLocked: true))
         .modelContainer(PreviewData.container)
     }
 

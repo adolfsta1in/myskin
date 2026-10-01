@@ -254,28 +254,16 @@ struct NotificationsStep: View {
 // MARK: - Privacy
 
 struct PrivacyStep: View {
-    @Environment(AppSettings.self) private var settings
     let next: () -> Void
 
     var body: some View {
-        @Bindable var settings = settings
         OnboardingPage(
             title: "Your skin, your privacy",
             why: "Skin photos are personal. We keep them away from your camera roll."
         ) {
             VStack(spacing: 16) {
-                Toggle(isOn: $settings.faceIDEnabled) {
-                    HStack(spacing: 12) {
-                        Image(systemName: "faceid")
-                            .font(.title2)
-                            .foregroundStyle(Theme.accent)
-                        Text("Protect MySkin with Face ID")
-                            .font(.rounded(.body, weight: .semibold))
-                            .foregroundStyle(Theme.ink)
-                    }
-                }
-                .tint(Theme.accent)
-                .glassCard()
+                LockToggle()
+                    .glassCard()
 
                 VStack(alignment: .leading, spacing: 14) {
                     privacyRow("photo.badge.checkmark", "Photos never go to your shared photo library")
@@ -298,6 +286,50 @@ struct PrivacyStep: View {
             Text(text)
                 .font(.rounded(.subheadline))
                 .foregroundStyle(Theme.ink)
+        }
+    }
+}
+
+/// Face ID lock switch. Turning it on asks for Face ID (or the passcode) first,
+/// so the lock is only on once it is known to work. Also used in Settings.
+struct LockToggle: View {
+    @Environment(AppSettings.self) private var settings
+    @State private var isAuthenticating = false
+    private let method = BiometricAuth.method
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Toggle(isOn: Binding(get: { settings.faceIDEnabled }, set: setEnabled)) {
+                HStack(spacing: 12) {
+                    Image(systemName: method.systemImage)
+                        .font(.title2)
+                        .foregroundStyle(Theme.accent)
+                    Text(method == .passcode ? "Lock MySkin with your passcode" : "Lock MySkin with \(method.title)")
+                        .font(.rounded(.body, weight: .semibold))
+                        .foregroundStyle(Theme.ink)
+                }
+            }
+            .tint(Theme.accent)
+            .disabled(method == .unavailable || isAuthenticating)
+            if method == .unavailable {
+                Text("Set a device passcode in Settings to use the lock.")
+                    .font(.rounded(.footnote))
+                    .foregroundStyle(Theme.inkSoft)
+            }
+        }
+    }
+
+    private func setEnabled(_ enabled: Bool) {
+        guard enabled else {
+            settings.faceIDEnabled = false
+            return
+        }
+        isAuthenticating = true
+        Task {
+            if await BiometricAuth.authenticate(reason: "Turn on the lock for your skin diary") {
+                settings.faceIDEnabled = true
+            }
+            isAuthenticating = false
         }
     }
 }

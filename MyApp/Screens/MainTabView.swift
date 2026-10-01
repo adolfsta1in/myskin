@@ -69,8 +69,9 @@ private struct ReminderSync: ViewModifier {
 }
 
 /// Decides between onboarding, privacy lock and the main app.
+/// Content is covered whenever the app is not active (app switcher, Control Center).
 struct RootView: View {
-    @Environment(AppStore.self) private var store
+    @Environment(AppLock.self) private var lock
     @Environment(AppSettings.self) private var settings
     @Environment(\.scenePhase) private var scenePhase
 
@@ -79,7 +80,7 @@ struct RootView: View {
             if !settings.hasCompletedOnboarding {
                 OnboardingFlow()
                     .transition(.opacity)
-            } else if store.isLocked {
+            } else if lock.isLocked {
                 PrivacyLockView()
                     .transition(.opacity)
             } else {
@@ -87,16 +88,40 @@ struct RootView: View {
                     .transition(.opacity)
             }
         }
+        .overlay {
+            if scenePhase != .active && settings.hasCompletedOnboarding {
+                PrivacyCover()
+            }
+        }
         .animation(.smooth, value: settings.hasCompletedOnboarding)
-        .animation(.smooth, value: store.isLocked)
+        .animation(.smooth, value: lock.isLocked)
         .fontDesign(.rounded)
         .preferredColorScheme(.light)
         .onChange(of: scenePhase) { _, phase in
             // Re-lock when the app goes to the background.
             if phase == .background, settings.faceIDEnabled, settings.hasCompletedOnboarding {
-                store.isLocked = true
+                lock.isLocked = true
             }
         }
+        .onChange(of: settings.faceIDEnabled) { _, enabled in
+            if !enabled { lock.isLocked = false }
+        }
+    }
+}
+
+/// Hides the diary in the app switcher snapshot.
+private struct PrivacyCover: View {
+    var body: some View {
+        ZStack {
+            Rectangle().fill(.ultraThinMaterial)
+            WarmBackground()
+                .opacity(0.85)
+            Image(systemName: "lock.fill")
+                .font(.system(size: 44, weight: .light))
+                .foregroundStyle(Theme.accent)
+        }
+        .ignoresSafeArea()
+        .accessibilityHidden(true)
     }
 }
 

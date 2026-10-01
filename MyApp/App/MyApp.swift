@@ -4,10 +4,14 @@ import UserNotifications
 
 @main struct MyApp: App {
     @State private var store = AppStore()
-    @State private var settings = AppSettings()
+    @State private var settings: AppSettings
+    @State private var lock: AppLock
     private let modelContainer: ModelContainer
 
     init() {
+        let settings = AppSettings()
+        _settings = State(initialValue: settings)
+        _lock = State(initialValue: AppLock(settings: settings))
         do {
             modelContainer = try AppModelContainer.makePersistent()
         } catch {
@@ -22,6 +26,7 @@ import UserNotifications
             RootView()
                 .environment(store)
                 .environment(settings)
+                .environment(lock)
         }
         .modelContainer(modelContainer)
     }

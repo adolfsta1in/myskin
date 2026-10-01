@@ -421,7 +421,7 @@ MySkinTests/      Swift Testing
 - **Зависимости:** 16, 23, 32.
 - **Готово, когда:** время чек-ина ставим через 1–2 минуты → уведомление приходит в симуляторе с текстом «Time for your diary check-in».
 
-### Шаг 37. Настоящая блокировка Face ID
+### Шаг 37. Настоящая блокировка Face ID ✅
 - **Цель:** `LAContext` и скрытие содержимого.
 - **Файлы:** `Services/BiometricAuth.swift`, `PrivacyLockView.swift`, `RootView` (размытие при `.inactive`, блокировка при `.background`).
 - **Зависимости:** 10, 2.

@@ -33,7 +33,6 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
 }
 
 struct OnboardingFlow: View {
-    @Environment(AppStore.self) private var store
     @Environment(AppSettings.self) private var settings
     @Environment(\.modelContext) private var modelContext
     @State private var step: OnboardingStep
@@ -107,7 +106,6 @@ struct OnboardingFlow: View {
             try draft.save(in: modelContext)
             withAnimation(.smooth(duration: 0.35)) {
                 settings.hasCompletedOnboarding = true
-                store.isLocked = false
             }
         } catch {
             modelContext.rollback()

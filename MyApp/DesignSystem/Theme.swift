@@ -73,6 +73,7 @@ extension View {
             .preferredColorScheme(.light)
             #if DEBUG
             .environment(PreviewData.settings)
+            .environment(AppLock(isLocked: false))
             .modelContainer(PreviewData.container)
             #endif
     }
