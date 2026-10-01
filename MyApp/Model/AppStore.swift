@@ -18,9 +18,6 @@ final class AppStore {
     var healthAllowed = false
 
     // MARK: Today
-    var todayItch: Double = 3
-    var selectedTags: Set<String> = []
-    var tags: [String] = ["Stress", "Alcohol", "Poor sleep", "Sick", "New cosmetics"]
     var reminders: [TreatmentReminder] = [
         TreatmentReminder(title: "Tacrolimus ointment", detail: "Elbows · tonight", systemImage: "hand.point.up.left"),
         TreatmentReminder(title: "Rich moisturizer", detail: "Whole body · after shower", systemImage: "drop", isDone: true),
@@ -138,14 +135,6 @@ final class AppStore {
     func cycleIntensity(for zoneID: String) {
         let next = ((zoneIntensity[zoneID] ?? 0) + 1) % 4
         zoneIntensity[zoneID] = next == 0 ? nil : next
-    }
-
-    func toggleTag(_ tag: String) {
-        if selectedTags.contains(tag) {
-            selectedTags.remove(tag)
-        } else {
-            selectedTags.insert(tag)
-        }
     }
 
     /// Sample store used by previews and the design canvas.

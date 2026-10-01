@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 struct TodayView: View {
@@ -75,22 +76,39 @@ private struct TodayHeader: View {
 // MARK: - Check-in
 
 /// Owns all check-in state so slider drags only invalidate this card.
+/// Loads today's `DailyCheckIn` if there is one; saving updates it in place.
 private struct CheckInCard: View {
-    @Environment(AppStore.self) private var store
+    @Environment(\.modelContext) private var modelContext
+    @Query private var todayCheckIns: [DailyCheckIn]
+    @Query(sort: \DailyCheckIn.day, order: .reverse) private var allCheckIns: [DailyCheckIn]
     let mode: AppMode
+    private let day: Date
 
+    @State private var draft = CheckInDraft()
+    @State private var showsDetails = false
     @State private var isAddingTag = false
     @State private var newTag = ""
     @State private var isSaved = false
+    @State private var saveCount = 0
+    @State private var saveError: String?
 
-    // Flare-mode extras
-    @State private var flareZones: Set<String> = ["Elbows"]
-    @State private var sleepQuality = 1
-    @State private var burning: Double = 4
-    @State private var note = ""
+    init(mode: AppMode, day: Date = .now) {
+        self.mode = mode
+        let start = Calendar.current.startOfDay(for: day)
+        self.day = start
+        _todayCheckIns = Query(filter: #Predicate<DailyCheckIn> { $0.day == start })
+    }
+
+    private var existing: DailyCheckIn? { todayCheckIns.first }
+
+    /// Earlier custom tags plus the ones picked today.
+    private var customTags: [String] {
+        let known = CheckInDraft.knownTags(from: allCheckIns)
+        return known + draft.customTags.filter { !known.contains($0) }
+    }
 
     private var itchDescription: String {
-        switch store.todayItch {
+        switch draft.itch {
         case ..<1: "Barely there"
         case ..<4: "Noticeable"
         case ..<7: "Hard to ignore"
@@ -99,7 +117,6 @@ private struct CheckInCard: View {
     }
 
     var body: some View {
-        @Bindable var store = store
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 SectionHeader(
@@ -120,7 +137,7 @@ private struct CheckInCard: View {
                         .font(.rounded(.subheadline, weight: .medium))
                         .foregroundStyle(Theme.ink)
                     Spacer()
-                    Text("\(Int(store.todayItch))")
+                    Text("\(draft.itch)")
                         .font(.rounded(.title2, weight: .bold))
                         .foregroundStyle(Theme.ink)
                         .contentTransition(.numericText())
@@ -128,7 +145,7 @@ private struct CheckInCard: View {
                         .font(.rounded(.subheadline))
                         .foregroundStyle(Theme.inkSoft)
                 }
-                Slider(value: $store.todayItch, in: 0...10, step: 1) {
+                Slider(value: Binding(get: { Double(draft.itch) }, set: { draft.itch = Int($0) }), in: 0...10, step: 1) {
                     Text("Itch")
                 } minimumValueLabel: {
                     Text("0").font(.rounded(.caption)).foregroundStyle(Theme.inkSoft)
@@ -136,110 +153,164 @@ private struct CheckInCard: View {
                     Text("10").font(.rounded(.caption)).foregroundStyle(Theme.inkSoft)
                 }
                 .tint(Theme.accent)
-                .sensoryFeedback(.selection, trigger: store.todayItch)
+                .sensoryFeedback(.selection, trigger: draft.itch)
             }
 
-            GlassEffectContainer(spacing: 8) {
-                FlowLayout(spacing: 8) {
-                    ForEach(store.tags, id: \.self) { tag in
-                        TagChip(title: tag, systemImage: Self.symbol(for: tag), isSelected: store.selectedTags.contains(tag)) {
-                            store.toggleTag(tag)
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Anything that might matter?")
+                    .font(.rounded(.subheadline, weight: .medium))
+                    .foregroundStyle(Theme.ink)
+                GlassEffectContainer(spacing: 8) {
+                    FlowLayout(spacing: 8) {
+                        TagChip(title: "New or spreading spots", systemImage: "circle.dotted.circle", isSelected: draft.newSpots) {
+                            draft.newSpots.toggle()
                         }
+                        ForEach(Trigger.allCases) { trigger in
+                            TagChip(title: trigger.title, systemImage: trigger.systemImage, isSelected: draft.triggers.contains(trigger)) {
+                                draft.toggle(trigger)
+                            }
+                        }
+                        ForEach(customTags, id: \.self) { tag in
+                            TagChip(title: tag, systemImage: "tag", isSelected: draft.customTags.contains(tag)) {
+                                draft.toggleCustomTag(tag)
+                            }
+                        }
+                        TagChip(title: "Add", systemImage: "plus") { isAddingTag = true }
                     }
-                    TagChip(title: "Add", systemImage: "plus") { isAddingTag = true }
                 }
             }
 
-            if mode == .flare {
-                flareDetails
+            if mode == .flare || showsDetails {
+                details
                     .transition(.opacity.combined(with: .move(edge: .top)))
+            } else {
+                Button("Add pain, sleep, mood or a note", systemImage: "plus.circle") {
+                    withAnimation(.smooth) { showsDetails = true }
+                }
+                .font(.rounded(.subheadline, weight: .medium))
+                .foregroundStyle(Theme.accent)
             }
 
-            Button {
-                withAnimation(.bouncy) { isSaved = true }
-            } label: {
-                Text(isSaved ? "Update check-in" : "Save check-in")
+            Button(action: save) {
+                Text(existing == nil ? "Save check-in" : "Update check-in")
                     .font(.rounded(.headline, weight: .semibold))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 4)
             }
             .buttonStyle(.glassProminent)
             .tint(Theme.accent)
-            .sensoryFeedback(.success, trigger: isSaved)
+            .sensoryFeedback(.success, trigger: saveCount)
         }
         .glassCard()
+        // Reload when today's record appears (first save, or data changed elsewhere).
+        .task(id: existing?.persistentModelID) {
+            if let existing {
+                draft = CheckInDraft(existing)
+                showsDetails = existing.pain != nil || existing.sleep != nil || existing.mood != nil || !existing.note.isEmpty
+            }
+        }
         .alert("Add a tag", isPresented: $isAddingTag) {
             TextField("e.g. Hot shower", text: $newTag)
                 .submitLabel(.done)
             Button("Add") {
-                let tag = newTag.trimmingCharacters(in: .whitespaces)
-                if !tag.isEmpty, !store.tags.contains(tag) {
-                    store.tags.append(tag)
-                    store.selectedTags.insert(tag)
-                }
+                draft.addCustomTag(newTag, known: customTags)
                 newTag = ""
             }
             Button("Cancel", role: .cancel) { newTag = "" }
         }
+        .alert("Couldn't save", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(saveError ?? "")
+        }
     }
 
-    private var flareDetails: some View {
+    private var details: some View {
         VStack(alignment: .leading, spacing: 14) {
             Divider()
-            Text("Where is it flaring?")
-                .font(.rounded(.subheadline, weight: .medium))
-                .foregroundStyle(Theme.ink)
-            GlassEffectContainer(spacing: 8) {
-                FlowLayout(spacing: 8) {
-                    ForEach(["Elbows", "Knees", "Scalp", "Hands", "Back", "Face"], id: \.self) { zone in
-                        TagChip(title: zone, isSelected: flareZones.contains(zone)) {
-                            if flareZones.contains(zone) { flareZones.remove(zone) } else { flareZones.insert(zone) }
-                        }
+            OptionalScaleRow(title: "Burning or pain", value: $draft.pain, range: 0...10, lowLabel: "None", highLabel: "Worst")
+            OptionalScaleRow(title: "Sleep last night", value: $draft.sleep, range: 0...10, lowLabel: "Poor", highLabel: "Great")
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Mood")
+                    .font(.rounded(.subheadline, weight: .medium))
+                    .foregroundStyle(Theme.ink)
+                Picker("Mood", selection: $draft.mood) {
+                    ForEach(1...5, id: \.self) { value in
+                        Text(Self.moodTitle(value)).tag(Optional(value))
                     }
-                }
-            }
-
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Burning or pain · \(Int(burning))")
-                    .font(.rounded(.subheadline, weight: .medium))
-                    .foregroundStyle(Theme.ink)
-                Slider(value: $burning, in: 0...10, step: 1)
-                    .tint(Theme.accent)
-            }
-
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Sleep last night")
-                    .font(.rounded(.subheadline, weight: .medium))
-                    .foregroundStyle(Theme.ink)
-                Picker("Sleep last night", selection: $sleepQuality) {
-                    Text("Good").tag(0)
-                    Text("Okay").tag(1)
-                    Text("Poor").tag(2)
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
             }
 
-            TextField("Anything else? (optional)", text: $note, axis: .vertical)
+            TextField("Anything else? (optional)", text: $draft.note, axis: .vertical)
                 .font(.rounded(.body))
                 .submitLabel(.done)
                 .padding(12)
                 .background(.white.opacity(0.45), in: .rect(cornerRadius: 16))
-
-            Label("Take a photo of the flare", systemImage: "camera")
-                .font(.rounded(.subheadline, weight: .medium))
-                .foregroundStyle(Theme.accent)
         }
     }
 
-    private static func symbol(for tag: String) -> String? {
-        switch tag {
-        case "Stress": "brain.head.profile"
-        case "Alcohol": "wineglass"
-        case "Poor sleep": "moon.zzz"
-        case "Sick": "thermometer.medium"
-        case "New cosmetics": "sparkles"
-        default: "tag"
+    private func save() {
+        if let existing {
+            draft.apply(to: existing)
+        } else {
+            modelContext.insert(draft.makeCheckIn(day: day))
+        }
+        do {
+            try modelContext.save()
+            saveCount += 1
+            withAnimation(.bouncy) { isSaved = true }
+        } catch {
+            modelContext.rollback()
+            saveError = error.localizedDescription
+        }
+    }
+
+    private static func moodTitle(_ value: Int) -> String {
+        switch value {
+        case 1: "Low"
+        case 2: "Meh"
+        case 3: "Okay"
+        case 4: "Good"
+        default: "Great"
+        }
+    }
+}
+
+/// 0–10 slider that stays "Not set" until it is moved.
+private struct OptionalScaleRow: View {
+    let title: String
+    @Binding var value: Int?
+    let range: ClosedRange<Int>
+    let lowLabel: String
+    let highLabel: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(title)
+                    .font(.rounded(.subheadline, weight: .medium))
+                    .foregroundStyle(Theme.ink)
+                Spacer()
+                Text(value.map(String.init) ?? "Not set")
+                    .font(.rounded(.subheadline, weight: value == nil ? .regular : .semibold))
+                    .foregroundStyle(value == nil ? Theme.inkSoft : Theme.ink)
+                    .contentTransition(.numericText())
+            }
+            Slider(
+                value: Binding(get: { Double(value ?? range.lowerBound) }, set: { value = Int($0) }),
+                in: Double(range.lowerBound)...Double(range.upperBound),
+                step: 1
+            ) {
+                Text(title)
+            } minimumValueLabel: {
+                Text(lowLabel).font(.rounded(.caption)).foregroundStyle(Theme.inkSoft)
+            } maximumValueLabel: {
+                Text(highLabel).font(.rounded(.caption)).foregroundStyle(Theme.inkSoft)
+            }
+            .tint(Theme.accent)
         }
     }
 }

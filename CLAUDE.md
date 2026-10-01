@@ -32,7 +32,7 @@ MyApp/
     Domain/            DomainEnums, BodyZone
     Persistence/       SchemaV1, MigrationPlan, AppModelContainer
   Preview/             PreviewData (только DEBUG)
-  Screens/             MainTabView+RootView, Today, BodyMap, Photos, ZoneProgress,
+  Screens/             MainTabView+RootView, Today/ (TodayView, CheckInDraft), BodyMap, Photos, ZoneProgress,
                        Treatment, Insights, DoctorReport, PrivacyLock
   Onboarding/          OnboardingFlow, OnboardingStepsIntro, OnboardingStepsSetup
   DesignSystem/        Theme, Components, SharedViews (BodySilhouette, графики)
@@ -68,7 +68,7 @@ docs/                  spec, research, current-state, migration-plan
 - `docs/reaserch.md` — медицинский первоисточник. Читать только при сомнениях в медицинском содержании (шкалы, препараты, триггеры).
 
 ## Статус
-- **Текущий шаг: Шаг 17** — Today: сохранение чек-ина (начало этапа C). Этап B закрыт.
+- **Текущий шаг: Шаг 18** — Today: график зуда и «calm days» из данных.
 - Готово: фазы анализа (spec, current-state, migration-plan), этап 0 целиком:
   - Шаг 1 — git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`;
   - Шаг 2 — bundle id `com.adolfsta1in.myskin`, usage descriptions для Face ID и камеры;
@@ -89,6 +89,8 @@ docs/                  spec, research, current-state, migration-plan
     - Шаг 15 — `Model/Domain/MedicationCatalog.swift`: 39 позиций (`Medication`: стабильный `id` для `Treatment.catalogID` — не переименовывать, `kind`, `MedicationCategory`, `steroidClass?`, `TypicalSchedule`, `notes`). Биологики — интервал поддерживающей фазы (стартовые дозы — в `notes`). Классы стероидов (US) и режимы требуют сверки врачом/фармацевтом. Тесты 110/110.
     - Шаг 16 — `Logic/DoseScheduler.swift`: вход — `DoseSchedule` (`treatment.doseSchedule`) и `LoggedDose` (`doseLog.logged`). `doses(on:)` → `[ScheduledDose]` со статусом (лог закрывает слот по точному `scheduledAt`); `nextDose(onOrAfter:)` — первая неотмеченная доза с начала дня. Времена по умолчанию 08:00…20:00; интервальные схемы привязаны к `startDate` (поздняя инъекция не сдвигает график); после `endDate` доз нет. Тесты 124/124.
     - Шаг 16.1 — `front.head` («Face» на силуэте) — особая зона (`isSpecialSite`), `back.head` — нет (волосистую часть покрывает `quick.scalp`).
+  - Этап C:
+    - Шаг 17 — `Screens/Today/TodayView.swift` (перенесён в папку), `CheckInCard` работает с `DailyCheckIn` через `@Query` за сегодня; черновик — `Screens/Today/CheckInDraft.swift` (боль/сон/настроение `nil`, пока не тронуты; триггеры из `Trigger` + свои теги из прошлых чек-инов). В Calm детали раскрываются кнопкой, во Flare видны всегда. Убраны несохраняемые чипы «Where is it flaring?» и надпись «Take a photo». Из `AppStore` удалены `todayItch`, `selectedTags`, `tags`, `toggleTag`. Тесты 130/130; критерий проверен в симуляторе (сохранить → перезапуск → значения на месте, «Update check-in»).
 - Ресурсы: Mac с 8 ГБ RAM — не держать симулятор и превью без нужды, превью рендерить по одному, симулятор запускать только для критерия шага.
 - Известная проблема (не регрессия): превью `DoctorReportView` падает в AttributeGraph (навбар/Liquid Glass) — так же падало и до шага 9.
 - Замечание по сборке: `BuildProject(buildForTesting:)` не пересобирает `MyApp` перед тестами — сначала обычный `BuildProject`, потом `RunAllTests`.
