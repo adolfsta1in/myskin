@@ -317,10 +317,17 @@ private struct OptionalScaleRow: View {
 
 // MARK: - Cards
 
+/// Calm days this month: days with a check-in and no flare signal (`TodayStats.calmDaysThisMonth`).
 private struct CalmDaysCard: View {
-    @Environment(AppStore.self) private var store
+    @Query private var checkIns: [DailyCheckIn]
+    @Query private var assessments: [ZoneAssessment]
+
+    private var calmDays: Int {
+        TodayStats.calmDaysThisMonth(on: .now, checkIns: checkIns.map(\.sample), zones: assessments.map(\.datedScore))
+    }
 
     var body: some View {
+        let count = calmDays
         HStack(spacing: 14) {
             Image(systemName: "leaf.fill")
                 .font(.title2)
@@ -328,10 +335,11 @@ private struct CalmDaysCard: View {
                 .frame(width: 48, height: 48)
                 .background(Theme.sageSoft, in: .circle)
             VStack(alignment: .leading, spacing: 2) {
-                Text("\(store.calmDaysThisMonth) calm days this month")
+                Text(count == 0 ? "No calm days logged yet" : "\(count) calm \(count == 1 ? "day" : "days") this month")
                     .font(.rounded(.headline, weight: .semibold))
                     .foregroundStyle(Theme.ink)
-                Text("Your skin is settling. That's worth noticing.")
+                    .contentTransition(.numericText())
+                Text(count == 0 ? "Check in daily and calm days will add up here." : "Days you checked in without signs of a flare.")
                     .font(.rounded(.subheadline))
                     .foregroundStyle(Theme.inkSoft)
             }
@@ -383,22 +391,65 @@ private struct RemindersCard: View {
 }
 
 private struct ItchChartCard: View {
-    @Environment(AppStore.self) private var store
+    @Query private var checkIns: [DailyCheckIn]
 
     var body: some View {
+        let samples = checkIns.map(\.sample)
+        let history = TodayStats.itchHistory(endingOn: .now, checkIns: samples)
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
-                SectionHeader(title: "Itch · last 14 days")
-                Text("Trending down")
-                    .font(.rounded(.caption, weight: .semibold))
-                    .foregroundStyle(Theme.sageDeep)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(Theme.sageSoft, in: .capsule)
+                SectionHeader(title: "Itch · last \(TodayStats.Threshold.chartDays) days")
+                if let trend = TodayStats.itchTrend(endingOn: .now, checkIns: samples) {
+                    TrendBadge(trend: trend)
+                }
             }
-            ItchMiniChart(data: store.itchHistory)
+            if history.count >= TodayStats.Threshold.minChartPoints {
+                ItchMiniChart(data: history)
+            } else {
+                Text("Your itch chart will appear after a few check-ins.")
+                    .font(.rounded(.subheadline))
+                    .foregroundStyle(Theme.inkSoft)
+                    .frame(maxWidth: .infinity, minHeight: 80)
+            }
         }
         .glassCard()
+    }
+}
+
+private struct TrendBadge: View {
+    let trend: ItchTrend
+
+    private var title: String {
+        switch trend {
+        case .down: "Trending down"
+        case .steady: "Steady"
+        case .up: "Trending up"
+        }
+    }
+
+    private var background: Color {
+        switch trend {
+        case .down: Theme.sageSoft
+        case .steady: Theme.accentSoft
+        case .up: Theme.sand
+        }
+    }
+
+    private var foreground: Color {
+        switch trend {
+        case .down: Theme.sageDeep
+        case .steady: Theme.accent
+        case .up: Theme.ink
+        }
+    }
+
+    var body: some View {
+        Text(title)
+            .font(.rounded(.caption, weight: .semibold))
+            .foregroundStyle(foreground)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(background, in: .capsule)
     }
 }
 

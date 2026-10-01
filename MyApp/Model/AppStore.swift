@@ -124,8 +124,6 @@ final class AppStore {
         condition == .psoriasis ? "Self-assessment" : "POEM"
     }
 
-    var calmDaysThisMonth: Int { 12 }
-
     var suggestedInjectionSite: InjectionSite {
         let all = InjectionSite.allCases
         let index = all.firstIndex(of: lastInjectionSite) ?? 0
