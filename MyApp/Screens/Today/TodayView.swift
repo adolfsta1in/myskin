@@ -5,6 +5,9 @@ struct TodayView: View {
     @Query private var checkIns: [DailyCheckIn]
     @Query private var assessments: [ZoneAssessment]
     @State private var isShowingCanvas = false
+    /// Questionnaire opened from a due card. The sheet lives here, so it stays open
+    /// when the card disappears after the result is saved.
+    @State private var takingQuestionnaire: QuestionnaireKind?
 
     /// Calm / Flare is computed from the data (`FlareDetector`), never chosen by hand.
     private var status: FlareStatus {
@@ -26,6 +29,7 @@ struct TodayView: View {
                     }
                     SkinForecastCard()
                     RemindersCard()
+                    QuestionnaireDueCards { takingQuestionnaire = $0 }
                     ItchChartCard()
                 }
                 .padding(.horizontal, Theme.screenPadding)
@@ -33,6 +37,9 @@ struct TodayView: View {
             .screenScaffold()
             .toolbar(.hidden, for: .navigationBar)
             .animation(.smooth, value: status.mode)
+            .sheet(item: $takingQuestionnaire) { kind in
+                QuestionnaireView(kind: kind)
+            }
             #if DEBUG
             .fullScreenCover(isPresented: $isShowingCanvas) {
                 DesignCanvasView()
@@ -519,6 +526,45 @@ private struct RemindersCard: View {
         } catch {
             modelContext.rollback()
             saveError = error.localizedDescription
+        }
+    }
+}
+
+/// «Time for …» cards for questionnaires that are due (`QuestionnaireSchedule`); a card goes away once taken.
+private struct QuestionnaireDueCards: View {
+    @Query private var results: [QuestionnaireResult]
+    let onTake: (QuestionnaireKind) -> Void
+
+    var body: some View {
+        let due = QuestionnaireSchedule.due(now: .now, results: results)
+        ForEach(due) { kind in
+            let neverTaken = !results.contains { $0.kind == kind }
+            Button {
+                onTake(kind)
+            } label: {
+                HStack(spacing: 14) {
+                    Image(systemName: kind.systemImage)
+                        .font(.title3)
+                        .foregroundStyle(Theme.accent)
+                        .frame(width: 44, height: 44)
+                        .background(Theme.accentSoft.opacity(0.8), in: .circle)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Time for: \(kind.title)")
+                            .font(.rounded(.headline, weight: .semibold))
+                            .foregroundStyle(Theme.ink)
+                        Text(QuestionnaireSchedule.reason(kind, neverTaken: neverTaken))
+                            .font(.rounded(.subheadline))
+                            .foregroundStyle(Theme.inkSoft)
+                            .multilineTextAlignment(.leading)
+                    }
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(Theme.inkSoft)
+                }
+                .glassCard(tint: Theme.accentSoft)
+            }
+            .buttonStyle(.plain)
+            .transition(.opacity)
         }
     }
 }

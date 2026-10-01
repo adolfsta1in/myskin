@@ -68,7 +68,7 @@ docs/                  spec, research, current-state, migration-plan
 - `docs/reaserch.md` — медицинский первоисточник. Читать только при сомнениях в медицинском содержании (шкалы, препараты, триггеры).
 
 ## Статус
-- **Текущий шаг: Шаг 34** — PEST и карточки «пора пройти» на Today.
+- **Текущий шаг: Шаг 35** — Экран экстренного предупреждения.
 - Готово: фазы анализа (spec, current-state, migration-plan), этап 0 целиком:
   - Шаг 1 — git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`;
   - Шаг 2 — bundle id `com.adolfsta1in.myskin`, usage descriptions для Face ID и камеры;
@@ -111,6 +111,7 @@ docs/                  spec, research, current-state, migration-plan
     - Найдено, не исправлено (кандидаты в отдельные шаги): карточка «Skin forecast» на Today — демо-мок с советом; Privacy-шаг обещает Face ID и «stored on this device» до шага 37; в онбординге плавающий подвал перекрывает quick-зоны (карта) и результаты поиска при клавиатуре (лечение); в выборе зоны для фото «Face» встречается дважды (`front.head` и `quick.face`).
   - Этап D:
     - Шаг 33 — `Logic/QuestionnaireSession.swift` (пошаговое прохождение: `answer`/`goBack`, ответ остаётся выбранным при возврате, `makeResult`; `Questionnaires.maxScore/headline/interpretation/needsAttention/intro`). `Screens/Questionnaires/QuestionnaireView` (лист: вступление → по вопросу на странице → результат, сохраняется после последнего ответа; во время прохождения свайп-закрытие отключено), `QuestionnaireHistoryView` (последний балл с интерпретацией + прошлые, удаление через контекстное меню, «Take it again»). Вход — карточка «Questionnaires» на Insights. Тесты 206 (запуск на iPhone A).
+    - Шаг 34 — `Logic/QuestionnaireSchedule.swift`: DLQI раз в 30 дней, PEST раз в 91 день от последнего результата; не пройден ни разу — пора сразу. На Today — `QuestionnaireDueCards` («Time for: …»), лист `QuestionnaireView` держит `TodayView` (иначе исчезающая карточка закрыла бы лист с результатом). PEST ≥ 3 → заголовок «Tell a rheumatologist» в результате и истории. Тесты 211.
   - Вне очереди (по просьбе пользователя):
     - Шаг 36 — `Logic/ReminderPlan.swift` (чек-ин — ежедневный повтор в `checkInMinutes`; дозы — открытые дозы активных лечений на 7 дней вперёд, одно напоминание на одно время, лимит 60 из 64 iOS; тексты только «Time for your diary check-in.» / «Time for your treatment.», id с префиксом `myskin.`), `Services/NotificationService.swift` (`sync`: удаляет свои ожидающие и ставит заново; без разрешения ничего не делает и диалог не показывает; `NotificationPresenter` — баннер и при открытом приложении). Перепланирование — `ReminderSync` в `MainTabView` (меняются лечения, отметки доз, настройки, приложение стало активным). В симуляторе iPhone 11 баннер дозы пришёл. Время чек-ина пока меняется только в онбординге — экран настроек в шаге 41. Тесты 199.
 - Ресурсы: Mac с 8 ГБ RAM — не держать симулятор и превью без нужды, превью рендерить по одному, симулятор запускать только для критерия шага. Симулятор — **iPhone 11** (легче); перед запуском выключать остальные (`xcrun simctl shutdown all`).
