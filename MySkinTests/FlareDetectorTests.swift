@@ -29,8 +29,14 @@ struct FlareDetectorTests {
 
     // MARK: - Not enough data
 
-    @Test func fewerThanThreeCheckInsIsCalm() {
-        #expect(status([CheckInSample(day: day(-1), itch: 9), CheckInSample(day: today, itch: 10)]) == .calm)
+    @Test func firstCheckInWithHighItchIsFlare() {
+        let result = status([CheckInSample(day: today, itch: 8)])
+        #expect(result.mode == .flare)
+        #expect(result.reasons == [.highItch(8)])
+    }
+
+    @Test func firstCheckInWithLowItchIsCalm() {
+        #expect(status([CheckInSample(day: today, itch: 3)]) == .calm)
     }
 
     @Test func noDataIsCalm() {

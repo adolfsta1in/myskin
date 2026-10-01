@@ -76,7 +76,7 @@ enum FlareDetector {
         static let itchSpike = 3.0
         /// Days before the check-in used for the average.
         static let averageWindowDays = 7
-        /// Check-ins needed for the average and for any Flare at all.
+        /// Earlier check-ins needed for the itch average (spike rule only).
         static let minCheckIns = 3
         /// BSA growth in percentage points vs the previous assessment.
         static let bsaIncrease = 1.0
@@ -91,8 +91,8 @@ enum FlareDetector {
         calendar: Calendar = .current
     ) -> FlareStatus {
         let today = calendar.startOfDay(for: date)
+        // Any single signal counts, even on the very first check-in (e.g. itch 8 on day one).
         let pastCheckIns = checkIns.filter { calendar.startOfDay(for: $0.day) <= today }
-        guard pastCheckIns.count >= Threshold.minCheckIns else { return .calm }
 
         for offset in 0..<Threshold.calmDays {
             guard let day = calendar.date(byAdding: .day, value: -offset, to: today) else { continue }
