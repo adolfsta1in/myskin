@@ -35,12 +35,13 @@ struct BodySilhouette: View {
     }
 }
 
+/// Severity scale for the body map: 0 clear … 3 severe (`SeverityCalculator.level`).
 struct IntensityLegend: View {
     static func label(for level: Int) -> String {
         switch level {
         case 1: "Mild"
         case 2: "Moderate"
-        case 3: "Strong"
+        case 3: "Severe"
         default: "Clear"
         }
     }

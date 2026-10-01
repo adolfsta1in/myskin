@@ -33,7 +33,6 @@ final class AppStore {
         "back.torso.lower": 1,
         "quick.scalp": 2,
     ]
-    var lastWeekArea: Double = 5.1
 
     // MARK: History
     let itchHistory: [DayValue]

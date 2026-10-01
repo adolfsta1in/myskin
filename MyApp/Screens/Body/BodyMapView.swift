@@ -2,14 +2,27 @@ import SwiftData
 import SwiftUI
 
 struct BodyMapView: View {
-    @Environment(AppStore.self) private var store
     @Query private var assessments: [ZoneAssessment]
+    @Query(sort: \QuestionnaireResult.date, order: .reverse) private var questionnaires: [QuestionnaireResult]
     @State private var side: BodySide = .front
     @State private var lastTapped: BodyZone?
     @State private var editingZone: BodyZone?
     @State private var tapCount = 0
 
+    /// Latest DLQI and PEST feed the rule of tens and the «elevated» mark.
+    private var summary: BodyMapSummary {
+        let dlqi = questionnaires.first { $0.kind == .dlqi }?.score
+        let pest = questionnaires.first { $0.kind == .pest }?.score
+        return BodyMapSummary.make(
+            zones: assessments.map(\.datedScore),
+            dlqi: dlqi,
+            arthritisSuspected: pest.map(PEST.suggestsRheumatologist) ?? false
+        )
+    }
+
     var body: some View {
+        let summary = summary
+        let levels = summary.levels
         NavigationStack {
             ScrollView {
                 VStack(spacing: 18) {
@@ -31,7 +44,7 @@ struct BodyMapView: View {
                     .labelsHidden()
 
                     VStack(spacing: 12) {
-                        BodySilhouette(side: side, intensities: store.zoneIntensity) { zone in
+                        BodySilhouette(side: side, intensities: levels) { zone in
                             lastTapped = zone
                             editingZone = zone
                             tapCount += 1
@@ -42,7 +55,7 @@ struct BodyMapView: View {
                         .id(side)
                         .transition(.opacity.combined(with: .scale(scale: 0.96)))
 
-                        Text(lastTappedDescription)
+                        Text(lastTappedDescription(levels))
                             .font(.rounded(.footnote, weight: .medium))
                             .foregroundStyle(Theme.inkSoft)
                             .contentTransition(.opacity)
@@ -52,8 +65,8 @@ struct BodyMapView: View {
                     .glassCard()
                     .animation(.smooth, value: side)
 
-                    quickZones
-                    areaCard
+                    quickZones(levels)
+                    summaryCard(summary)
                 }
                 .padding(.horizontal, Theme.screenPadding)
                 .padding(.bottom, 32)
@@ -66,18 +79,18 @@ struct BodyMapView: View {
         }
     }
 
-    private var lastTappedDescription: String {
+    private func lastTappedDescription(_ levels: [String: Int]) -> String {
         guard let lastTapped else { return "Front and back views are tracked separately" }
-        return "\(lastTapped.name) · \(IntensityLegend.label(for: store.zoneIntensity[lastTapped.id] ?? 0))"
+        return "\(lastTapped.name) · \(IntensityLegend.label(for: levels[lastTapped.id] ?? 0))"
     }
 
-    private var quickZones: some View {
+    private func quickZones(_ levels: [String: Int]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             SectionHeader(title: "Quick zones", subtitle: "Hard-to-draw areas")
             GlassEffectContainer(spacing: 10) {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                 ForEach(BodyZone.quickZones) { zone in
-                    let level = store.zoneIntensity[zone.id] ?? 0
+                    let level = levels[zone.id] ?? 0
                     Button {
                         editingZone = zone
                     } label: {
@@ -106,36 +119,83 @@ struct BodyMapView: View {
         .glassCard()
     }
 
-    private var areaCard: some View {
-        let change = store.affectedArea - store.lastWeekArea
-        return HStack(alignment: .center, spacing: 16) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Estimated area")
-                    .font(.rounded(.subheadline, weight: .medium))
-                    .foregroundStyle(Theme.inkSoft)
-                Text("≈ \(store.affectedArea, format: .number.precision(.fractionLength(0...1)))%")
-                    .font(.system(size: 40, weight: .bold, design: .rounded))
-                    .foregroundStyle(Theme.ink)
-                    .contentTransition(.numericText())
-                Text("of body surface")
-                    .font(.rounded(.footnote))
-                    .foregroundStyle(Theme.inkSoft)
+    @ViewBuilder
+    private func summaryCard(_ summary: BodyMapSummary) -> some View {
+        let snapshot = summary.snapshot
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .center, spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Estimated area")
+                        .font(.rounded(.subheadline, weight: .medium))
+                        .foregroundStyle(Theme.inkSoft)
+                    Text("≈ \(snapshot.bsa, format: .number.precision(.fractionLength(0...1)))%")
+                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .foregroundStyle(Theme.ink)
+                        .contentTransition(.numericText())
+                    Text("of body surface")
+                        .font(.rounded(.footnote))
+                        .foregroundStyle(Theme.inkSoft)
+                }
+                Spacer()
+                VStack(alignment: .trailing, spacing: 6) {
+                    Text(snapshot.category.title)
+                        .font(.rounded(.subheadline, weight: .semibold))
+                        .foregroundStyle(Theme.ink)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 5)
+                        .background(Theme.intensity(level: snapshot.category.rawValue + 1).opacity(0.6), in: .capsule)
+                    Text("Severity index \(snapshot.severityIndex, format: .number.precision(.fractionLength(1)))")
+                        .font(.rounded(.caption))
+                        .foregroundStyle(Theme.inkSoft)
+                }
             }
-            Spacer()
-            VStack(alignment: .trailing, spacing: 6) {
+
+            if let change = summary.bsaChange {
                 Label(
-                    "\(abs(change), format: .number.precision(.fractionLength(1)))% \(change <= 0 ? "less" : "more")",
-                    systemImage: change <= 0 ? "arrow.down.right" : "arrow.up.right"
+                    change == 0
+                        ? "Same area as the previous assessment"
+                        : "\(abs(change), format: .number.precision(.fractionLength(1)))% \(change < 0 ? "less" : "more") vs previous assessment",
+                    systemImage: change < 0 ? "arrow.down.right" : change > 0 ? "arrow.up.right" : "equal"
                 )
                 .font(.rounded(.subheadline, weight: .semibold))
                 .foregroundStyle(change <= 0 ? Theme.sageDeep : Theme.intensityModerate)
-                Text("than last week (\(store.lastWeekArea, format: .number.precision(.fractionLength(1)))%)")
+            } else if summary.lastAssessed == nil {
+                Text("Tap an area on the map to start. The total updates as you go.")
+                    .font(.rounded(.subheadline))
+                    .foregroundStyle(Theme.inkSoft)
+            }
+
+            if snapshot.isElevated {
+                elevatedNote(snapshot)
+            }
+
+            if let day = summary.lastAssessed {
+                Text("Last updated \(day.formatted(.dateTime.month().day()))")
                     .font(.rounded(.caption))
                     .foregroundStyle(Theme.inkSoft)
             }
         }
-        .glassCard(tint: change <= 0 ? Theme.sageSoft : nil)
-        .animation(.smooth, value: store.affectedArea)
+        .glassCard(tint: (summary.bsaChange ?? 0) < 0 ? Theme.sageSoft : nil)
+        .animation(.smooth, value: snapshot.bsa)
+    }
+
+    /// Special site or suspected arthritis (spec §2.2): a hint to talk to the doctor, not a diagnosis.
+    private func elevatedNote(_ snapshot: SeveritySnapshot) -> some View {
+        let names = snapshot.specialSiteIDs.compactMap { BodyZone.zone(id: $0)?.name }
+        let reason = names.isEmpty ? "Your joint answers" : "Special area: \(names.formatted(.list(type: .and)))"
+        return HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Image(systemName: "exclamationmark.circle")
+                .foregroundStyle(Theme.intensitySevere)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Elevated · \(reason)")
+                    .font(.rounded(.subheadline, weight: .semibold))
+                    .foregroundStyle(Theme.ink)
+                Text("This may be a reason to discuss systemic treatment with your doctor.")
+                    .font(.rounded(.footnote))
+                    .foregroundStyle(Theme.inkSoft)
+            }
+        }
+        .accessibilityElement(children: .combine)
     }
 }
 
