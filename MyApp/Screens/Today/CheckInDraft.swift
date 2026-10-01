@@ -12,6 +12,8 @@ struct CheckInDraft: Equatable {
     var customTags: [String] = []
     var newSpots = false
     var note = ""
+    /// Flare-mode safety questions. Not stored: they are only used to check red flags on save.
+    var symptoms = RedFlagSymptoms()
 
     init() {}
 

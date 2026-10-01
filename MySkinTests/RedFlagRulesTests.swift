@@ -39,7 +39,17 @@ struct RedFlagRulesTests {
         #expect(RedFlagRules.flags(zones: zones, symptoms: RedFlagSymptoms(fever: true)).isEmpty)
     }
 
+    @Test func reportedWidespreadPustulesWithFeverIsFlag() {
+        let symptoms = RedFlagSymptoms(fever: true, widespreadPustules: true)
+        #expect(RedFlagRules.flags(zones: [], symptoms: symptoms) == [.widespreadPustules])
+        #expect(RedFlagRules.flags(zones: [], symptoms: RedFlagSymptoms(widespreadPustules: true)).isEmpty)
+    }
+
     // MARK: - Redness
+
+    @Test func reportedWidespreadRednessIsFlag() {
+        #expect(RedFlagRules.flags(zones: [], symptoms: RedFlagSymptoms(widespreadRedness: true)) == [.widespreadRedness])
+    }
 
     @Test func rednessOverThreeQuartersIsFlag() {
         #expect(RedFlagRules.flags(zones: redBody(share: 0.8), symptoms: RedFlagSymptoms()) == [.widespreadRedness])

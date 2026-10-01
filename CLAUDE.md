@@ -68,7 +68,7 @@ docs/                  spec, research, current-state, migration-plan
 - `docs/reaserch.md` — медицинский первоисточник. Читать только при сомнениях в медицинском содержании (шкалы, препараты, триггеры).
 
 ## Статус
-- **Текущий шаг: Шаг 35** — Экран экстренного предупреждения.
+- **Текущий шаг: Шаг 37** — Настоящая блокировка Face ID.
 - Готово: фазы анализа (spec, current-state, migration-plan), этап 0 целиком:
   - Шаг 1 — git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`;
   - Шаг 2 — bundle id `com.adolfsta1in.myskin`, usage descriptions для Face ID и камеры;
@@ -112,6 +112,7 @@ docs/                  spec, research, current-state, migration-plan
   - Этап D:
     - Шаг 33 — `Logic/QuestionnaireSession.swift` (пошаговое прохождение: `answer`/`goBack`, ответ остаётся выбранным при возврате, `makeResult`; `Questionnaires.maxScore/headline/interpretation/needsAttention/intro`). `Screens/Questionnaires/QuestionnaireView` (лист: вступление → по вопросу на странице → результат, сохраняется после последнего ответа; во время прохождения свайп-закрытие отключено), `QuestionnaireHistoryView` (последний балл с интерпретацией + прошлые, удаление через контекстное меню, «Take it again»). Вход — карточка «Questionnaires» на Insights. Тесты 206 (запуск на iPhone A).
     - Шаг 34 — `Logic/QuestionnaireSchedule.swift`: DLQI раз в 30 дней, PEST раз в 91 день от последнего результата; не пройден ни разу — пора сразу. На Today — `QuestionnaireDueCards` («Time for: …»), лист `QuestionnaireView` держит `TodayView` (иначе исчезающая карточка закрыла бы лист с результатом). PEST ≥ 3 → заголовок «Tell a rheumatologist» в результате и истории. Тесты 211.
+    - Шаг 35 — `Screens/Today/RedFlagView.swift` (полноэкранно: «Seek medical care now», сообщения флагов, «Call 112/911…» через `tel:`, «Find emergency care nearby» → Apple Maps, «I understand»). `Logic/EmergencyNumber.swift` — номер по региону (по умолчанию 112). В чек-ине режима Flare — «Any of these today?»: температура, слабость, озноб, пустулы/покраснение на большой площади (самоотчёт, если карта не обновлена — добавлено в `RedFlagSymptoms`), отмена системных стероидов. Ответы не хранятся (`CheckInDraft.symptoms`), проверка — после сохранения чек-ина. Флаги только по карте тела (покраснение > 75 %) — постоянная карточка `RedFlagCard` на Today. Тесты 215.
   - Вне очереди (по просьбе пользователя):
     - Шаг 36 — `Logic/ReminderPlan.swift` (чек-ин — ежедневный повтор в `checkInMinutes`; дозы — открытые дозы активных лечений на 7 дней вперёд, одно напоминание на одно время, лимит 60 из 64 iOS; тексты только «Time for your diary check-in.» / «Time for your treatment.», id с префиксом `myskin.`), `Services/NotificationService.swift` (`sync`: удаляет свои ожидающие и ставит заново; без разрешения ничего не делает и диалог не показывает; `NotificationPresenter` — баннер и при открытом приложении). Перепланирование — `ReminderSync` в `MainTabView` (меняются лечения, отметки доз, настройки, приложение стало активным). В симуляторе iPhone 11 баннер дозы пришёл. Время чек-ина пока меняется только в онбординге — экран настроек в шаге 41. Тесты 199.
 - Ресурсы: Mac с 8 ГБ RAM — не держать симулятор и превью без нужды, превью рендерить по одному, симулятор запускать только для критерия шага. Симулятор — **iPhone 11** (легче); перед запуском выключать остальные (`xcrun simctl shutdown all`).

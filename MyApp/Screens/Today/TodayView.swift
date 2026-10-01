@@ -8,21 +8,36 @@ struct TodayView: View {
     /// Questionnaire opened from a due card. The sheet lives here, so it stays open
     /// when the card disappears after the result is saved.
     @State private var takingQuestionnaire: QuestionnaireKind?
+    /// Red flags on the full-screen warning; empty when it is closed.
+    @State private var shownFlags: [RedFlag] = []
 
     /// Calm / Flare is computed from the data (`FlareDetector`), never chosen by hand.
     private var status: FlareStatus {
         FlareDetector.status(on: .now, checkIns: checkIns, assessments: assessments)
     }
 
+    /// Latest assessment of each zone.
+    private var currentZones: [ZoneScore] {
+        Array(BodyMapSummary.make(zones: assessments.map(\.datedScore)).current.values)
+    }
+
     var body: some View {
         let status = status
+        // Flags from the body map alone stay visible until the map changes (they can't be hidden).
+        let mapFlags = RedFlagRules.flags(zones: currentZones, symptoms: RedFlagSymptoms(), isFlare: status.mode == .flare)
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     TodayHeader(onLongPress: { isShowingCanvas = true })
                     ModeBanner(status: status)
+                    if !mapFlags.isEmpty {
+                        RedFlagCard { shownFlags = mapFlags }
+                    }
 
-                    CheckInCard(mode: status.mode)
+                    CheckInCard(mode: status.mode) { symptoms in
+                        let flags = RedFlagRules.flags(zones: currentZones, symptoms: symptoms, isFlare: status.mode == .flare)
+                        if !flags.isEmpty { shownFlags = flags }
+                    }
                     if status.mode == .calm {
                         CalmDaysCard()
                             .transition(.opacity)
@@ -39,6 +54,9 @@ struct TodayView: View {
             .animation(.smooth, value: status.mode)
             .sheet(item: $takingQuestionnaire) { kind in
                 QuestionnaireView(kind: kind)
+            }
+            .fullScreenCover(isPresented: Binding(get: { !shownFlags.isEmpty }, set: { if !$0 { shownFlags = [] } })) {
+                RedFlagView(flags: shownFlags)
             }
             #if DEBUG
             .fullScreenCover(isPresented: $isShowingCanvas) {
@@ -126,6 +144,33 @@ private struct BulletLabelStyle: LabelStyle {
     }
 }
 
+/// Stays on Today while the body map itself shows a red flag.
+private struct RedFlagCard: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 14) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.title2)
+                    .foregroundStyle(Theme.intensitySevere)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Seek medical care now")
+                        .font(.rounded(.headline, weight: .semibold))
+                        .foregroundStyle(Theme.ink)
+                    Text("Your body map shows signs that need urgent attention. Tap for details.")
+                        .font(.rounded(.subheadline))
+                        .foregroundStyle(Theme.inkSoft)
+                        .multilineTextAlignment(.leading)
+                }
+                Spacer(minLength: 0)
+            }
+            .glassCard(tint: Theme.intensityModerate)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 // MARK: - Header
 
 private struct TodayHeader: View {
@@ -163,6 +208,8 @@ private struct CheckInCard: View {
     @Query private var todayCheckIns: [DailyCheckIn]
     @Query(sort: \DailyCheckIn.day, order: .reverse) private var allCheckIns: [DailyCheckIn]
     let mode: AppMode
+    /// Called after a successful save with the flare safety answers.
+    let onSaved: (RedFlagSymptoms) -> Void
     private let day: Date
 
     @State private var draft = CheckInDraft()
@@ -173,8 +220,9 @@ private struct CheckInCard: View {
     @State private var saveCount = 0
     @State private var saveError: String?
 
-    init(mode: AppMode, day: Date = .now) {
+    init(mode: AppMode, day: Date = .now, onSaved: @escaping (RedFlagSymptoms) -> Void = { _ in }) {
         self.mode = mode
+        self.onSaved = onSaved
         let start = Calendar.current.startOfDay(for: day)
         self.day = start
         _todayCheckIns = Query(filter: #Predicate<DailyCheckIn> { $0.day == start })
@@ -286,7 +334,10 @@ private struct CheckInCard: View {
         // Reload when today's record appears (first save, or data changed elsewhere).
         .task(id: existing?.persistentModelID) {
             if let existing {
+                // Safety answers aren't stored; keep what was ticked in this session.
+                let symptoms = draft.symptoms
                 draft = CheckInDraft(existing)
+                draft.symptoms = symptoms
                 showsDetails = existing.pain != nil || existing.sleep != nil || existing.mood != nil || !existing.note.isEmpty
             }
         }
@@ -309,6 +360,10 @@ private struct CheckInCard: View {
     private var details: some View {
         VStack(alignment: .leading, spacing: 14) {
             Divider()
+            if mode == .flare {
+                safetyQuestions
+                Divider()
+            }
             OptionalScaleRow(title: "Burning or pain", value: $draft.pain, range: 0...10, lowLabel: "None", highLabel: "Worst")
             OptionalScaleRow(title: "Sleep last night", value: $draft.sleep, range: 0...10, lowLabel: "Poor", highLabel: "Great")
 
@@ -333,6 +388,38 @@ private struct CheckInCard: View {
         }
     }
 
+    /// Red-flag questions (spec §2.8), asked in Flare mode.
+    private var safetyQuestions: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Any of these today?")
+                .font(.rounded(.subheadline, weight: .medium))
+                .foregroundStyle(Theme.ink)
+            GlassEffectContainer(spacing: 8) {
+                FlowLayout(spacing: 8) {
+                    TagChip(title: "Fever", systemImage: "thermometer.medium", isSelected: draft.symptoms.fever) {
+                        draft.symptoms.fever.toggle()
+                    }
+                    TagChip(title: "Feeling weak or unwell", systemImage: "bed.double", isSelected: draft.symptoms.feelsUnwell) {
+                        draft.symptoms.feelsUnwell.toggle()
+                    }
+                    TagChip(title: "Chills", systemImage: "thermometer.snowflake", isSelected: draft.symptoms.chills) {
+                        draft.symptoms.chills.toggle()
+                    }
+                    TagChip(title: "Pus-filled bumps on a large area", systemImage: "circle.grid.3x3", isSelected: draft.symptoms.widespreadPustules) {
+                        draft.symptoms.widespreadPustules.toggle()
+                    }
+                    TagChip(title: "Redness over most of my body", systemImage: "figure.stand", isSelected: draft.symptoms.widespreadRedness) {
+                        draft.symptoms.widespreadRedness.toggle()
+                    }
+                    TagChip(title: "Recently stopped steroid tablets or injections", systemImage: "pills", isSelected: draft.symptoms.stoppedSystemicSteroids) {
+                        draft.symptoms.stoppedSystemicSteroids.toggle()
+                    }
+                }
+            }
+            WhyWeAskText(text: "some combinations need urgent medical care, and we'll tell you if so.")
+        }
+    }
+
     private func save() {
         if let existing {
             draft.apply(to: existing)
@@ -343,6 +430,7 @@ private struct CheckInCard: View {
             try modelContext.save()
             saveCount += 1
             withAnimation(.bouncy) { isSaved = true }
+            onSaved(mode == .flare ? draft.symptoms : RedFlagSymptoms())
         } catch {
             modelContext.rollback()
             saveError = error.localizedDescription

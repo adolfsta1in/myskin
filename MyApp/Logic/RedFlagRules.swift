@@ -8,6 +8,13 @@ struct RedFlagSymptoms: Hashable, Sendable {
     var chills = false
     /// Recently stopped steroid tablets or injections (not creams).
     var stoppedSystemicSteroids = false
+    /// Self-reported pus-filled bumps over a large area, in case the body map is not up to date.
+    var widespreadPustules = false
+    /// Self-reported redness over most of the body, in case the body map is not up to date.
+    var widespreadRedness = false
+
+    /// Anything answered «yes».
+    var isEmpty: Bool { self == RedFlagSymptoms() }
 }
 
 /// Conditions for the blocking «Seek medical care now» card.
@@ -51,13 +58,14 @@ enum RedFlagRules {
         var flags: [RedFlag] = []
 
         let pustularArea = SeverityCalculator.snapshot(for: zones.filter(\.pustules)).bsa
-        if pustularArea >= Threshold.pustularBSA && (symptoms.fever || symptoms.feelsUnwell) {
+        let widespreadPustules = pustularArea >= Threshold.pustularBSA || symptoms.widespreadPustules
+        if widespreadPustules && (symptoms.fever || symptoms.feelsUnwell) {
             flags.append(.widespreadPustules)
         }
 
         // Redness this widespread is an emergency on its own; chills or peeling only add to it.
         let redArea = SeverityCalculator.snapshot(for: zones.filter { $0.erythema > 0 }).bsa
-        if redArea > Threshold.rednessBSA {
+        if redArea > Threshold.rednessBSA || symptoms.widespreadRedness {
             flags.append(.widespreadRedness)
         }
 
