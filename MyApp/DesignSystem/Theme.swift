@@ -66,12 +66,13 @@ extension Color {
 }
 
 extension View {
-    /// Light, rounded styling plus a sample store and sample SwiftData records — used by previews.
+    /// Light, rounded styling plus sample store, settings and SwiftData records — used by previews.
     func previewSetup(_ store: AppStore = .preview) -> some View {
         environment(store)
             .fontDesign(.rounded)
             .preferredColorScheme(.light)
             #if DEBUG
+            .environment(PreviewData.settings)
             .modelContainer(PreviewData.container)
             #endif
     }

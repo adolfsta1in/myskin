@@ -3,6 +3,7 @@ import SwiftUI
 
 @main struct MyApp: App {
     @State private var store = AppStore()
+    @State private var settings = AppSettings()
     private let modelContainer: ModelContainer
 
     init() {
@@ -18,6 +19,7 @@ import SwiftUI
         WindowGroup {
             RootView()
                 .environment(store)
+                .environment(settings)
         }
         .modelContainer(modelContainer)
     }

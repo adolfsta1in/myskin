@@ -39,11 +39,12 @@ struct MainTabView: View {
 /// Decides between onboarding, privacy lock and the main app.
 struct RootView: View {
     @Environment(AppStore.self) private var store
+    @Environment(AppSettings.self) private var settings
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         Group {
-            if !store.hasCompletedOnboarding {
+            if !settings.hasCompletedOnboarding {
                 OnboardingFlow()
                     .transition(.opacity)
             } else if store.isLocked {
@@ -54,13 +55,13 @@ struct RootView: View {
                     .transition(.opacity)
             }
         }
-        .animation(.smooth, value: store.hasCompletedOnboarding)
+        .animation(.smooth, value: settings.hasCompletedOnboarding)
         .animation(.smooth, value: store.isLocked)
         .fontDesign(.rounded)
         .preferredColorScheme(.light)
         .onChange(of: scenePhase) { _, phase in
             // Re-lock when the app goes to the background.
-            if phase == .background, store.faceIDEnabled, store.hasCompletedOnboarding {
+            if phase == .background, settings.faceIDEnabled, settings.hasCompletedOnboarding {
                 store.isLocked = true
             }
         }

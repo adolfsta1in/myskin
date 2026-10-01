@@ -35,6 +35,7 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
 
 struct OnboardingFlow: View {
     @Environment(AppStore.self) private var store
+    @Environment(AppSettings.self) private var settings
     @State private var step: OnboardingStep
     @State private var isForward = true
 
@@ -89,7 +90,8 @@ struct OnboardingFlow: View {
             if let next = OnboardingStep(rawValue: step.rawValue + 1) {
                 step = next
             } else {
-                store.completeOnboarding()
+                settings.hasCompletedOnboarding = true
+                store.isLocked = false
             }
         }
     }

@@ -161,9 +161,11 @@ struct TreatmentsStep: View {
 
 struct NotificationsStep: View {
     @Environment(AppStore.self) private var store
+    @Environment(AppSettings.self) private var settings
     let next: () -> Void
 
     var body: some View {
+        @Bindable var settings = settings
         @Bindable var store = store
         OnboardingPage(
             title: "Gentle reminders, only if you want them",
@@ -190,15 +192,15 @@ struct NotificationsStep: View {
                 .glassCard(padding: 14)
 
                 VStack(spacing: 14) {
-                    Toggle(isOn: $store.notifyTreatment) {
+                    Toggle(isOn: $settings.doseReminders) {
                         toggleLabel("Treatment reminders", "Creams, tablets and injections")
                     }
                     Divider()
-                    Toggle(isOn: $store.notifyCheckIn) {
+                    Toggle(isOn: $settings.checkInReminder) {
                         toggleLabel("Daily check-in", "A 10-second note about your skin")
                     }
-                    if store.notifyCheckIn {
-                        DatePicker("Time", selection: $store.checkInTime, displayedComponents: .hourAndMinute)
+                    if settings.checkInReminder {
+                        DatePicker("Time", selection: $settings.checkInTime, displayedComponents: .hourAndMinute)
                             .font(.rounded(.subheadline))
                             .foregroundStyle(Theme.inkSoft)
                     }
@@ -209,7 +211,7 @@ struct NotificationsStep: View {
                 }
                 .tint(Theme.accent)
                 .glassCard()
-                .animation(.smooth, value: store.notifyCheckIn)
+                .animation(.smooth, value: settings.checkInReminder)
             }
         } footer: {
             PermissionButtons(allowTitle: "Turn on", onAllow: next, onNotNow: next)
@@ -298,17 +300,17 @@ struct SleepStep: View {
 // MARK: - O11 Privacy
 
 struct PrivacyStep: View {
-    @Environment(AppStore.self) private var store
+    @Environment(AppSettings.self) private var settings
     let next: () -> Void
 
     var body: some View {
-        @Bindable var store = store
+        @Bindable var settings = settings
         OnboardingPage(
             title: "Your skin, your privacy",
             why: "Skin photos are personal. We keep them away from your camera roll."
         ) {
             VStack(spacing: 16) {
-                Toggle(isOn: $store.faceIDEnabled) {
+                Toggle(isOn: $settings.faceIDEnabled) {
                     HStack(spacing: 12) {
                         Image(systemName: "faceid")
                             .font(.title2)
@@ -350,6 +352,7 @@ struct PrivacyStep: View {
 
 struct PlanReadyStep: View {
     @Environment(AppStore.self) private var store
+    @Environment(AppSettings.self) private var settings
     let next: () -> Void
 
     private var focus: String {
@@ -363,8 +366,8 @@ struct PlanReadyStep: View {
                 VStack(alignment: .leading, spacing: 14) {
                     planRow("waveform.path.ecg", "We'll track", "Itch daily · weekly \(store.scoreName)")
                     planRow("target", "Your focus", focus)
-                    planRow("bell", "First reminder", store.notifyCheckIn
-                            ? "Tomorrow at \(store.checkInTime.formatted(date: .omitted, time: .shortened)) · daily check-in"
+                    planRow("bell", "First reminder", settings.checkInReminder
+                            ? "Tomorrow at \(settings.checkInTime.formatted(date: .omitted, time: .shortened)) · daily check-in"
                             : "None — you can add one anytime")
                     planRow("flag.checkered", "Starting point", "≈ \(Int(store.affectedArea.rounded()))% body area")
                 }

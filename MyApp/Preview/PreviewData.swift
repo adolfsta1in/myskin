@@ -15,6 +15,16 @@ enum PreviewData {
         }
     }()
 
+    /// Settings for previews, in their own defaults domain so previews never touch the app's settings.
+    static let settings: AppSettings = {
+        let suite = "MySkin.preview"
+        let defaults = UserDefaults(suiteName: suite) ?? .standard
+        defaults.removePersistentDomain(forName: suite)
+        let settings = AppSettings(defaults: defaults)
+        settings.hasCompletedOnboarding = true
+        return settings
+    }()
+
     /// Empty in-memory container, for empty states.
     static func emptyContainer() -> ModelContainer {
         do {

@@ -253,7 +253,7 @@ MySkinTests/      Swift Testing
 - **Зависимости:** 8.
 - **Готово, когда:** приложение запускается; все `#Preview` и `DesignCanvasView` открываются без ошибок.
 
-### Шаг 10. `AppSettings` и онбординг «один раз»
+### Шаг 10. `AppSettings` и онбординг «один раз» ✅ (критерий в симуляторе не проверен)
 - **Цель:** флаги и настройки переживают перезапуск.
 - **Файлы:** `App/AppSettings.swift` (`@Observable` поверх UserDefaults: `hasCompletedOnboarding`, `faceIDEnabled`, `checkInReminder`, `checkInTime`, `doseReminders`); `RootView` читает флаги отсюда; поля удаляются из `AppStore`.
 - **Зависимости:** 9.

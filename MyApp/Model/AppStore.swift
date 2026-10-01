@@ -4,7 +4,7 @@ import SwiftUI
 @Observable
 final class AppStore {
     // MARK: Flow
-    var hasCompletedOnboarding = false
+    /// Session-only lock state. Persistent flags live in `AppSettings`.
     var isLocked = false
 
     // MARK: Onboarding answers
@@ -13,13 +13,9 @@ final class AppStore {
     var skinNow: Double = 0.35
     var goals: Set<Goal> = []
     var currentTreatments: Set<String> = []
-    var notifyTreatment = true
-    var notifyCheckIn = true
     var notifyForecast = false
-    var checkInTime: Date = Calendar.current.date(bySettingHour: 20, minute: 0, second: 0, of: .now) ?? .now
     var locationAllowed = false
     var healthAllowed = false
-    var faceIDEnabled = true
 
     // MARK: Today
     var todayItch: Double = 3
@@ -152,15 +148,9 @@ final class AppStore {
         }
     }
 
-    func completeOnboarding() {
-        hasCompletedOnboarding = true
-        isLocked = false
-    }
-
-    /// Sample store with onboarding already finished, used by previews and the design canvas.
+    /// Sample store used by previews and the design canvas.
     static var preview: AppStore {
         let store = AppStore()
-        store.hasCompletedOnboarding = true
         store.condition = .eczema
         store.goals = [.triggers, .treatment]
         return store
