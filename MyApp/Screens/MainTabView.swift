@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 enum AppTab: Hashable {
@@ -31,6 +32,39 @@ struct MainTabView: View {
         }
         .tint(Theme.accent)
         .tabBarMinimizeBehavior(.onScrollDown)
+        .modifier(ReminderSync())
+    }
+}
+
+/// Re-plans local reminders whenever treatments, dose marks or reminder settings change,
+/// and each time the app comes to the foreground (so the 7-day dose window keeps moving).
+private struct ReminderSync: ViewModifier {
+    @Environment(AppSettings.self) private var settings
+    @Environment(\.scenePhase) private var scenePhase
+    @Query(filter: #Predicate<Treatment> { $0.endDate == nil }) private var treatments: [Treatment]
+    @Query private var doseLogs: [DoseLog]
+
+    /// Changes whenever the planned reminders could change.
+    private var signature: String {
+        let schedules = treatments.map { "\($0.doseSchedule.hashValue)" }.sorted().joined(separator: ",")
+        return [
+            "\(settings.checkInReminder)", "\(settings.checkInMinutes)", "\(settings.doseReminders)",
+            schedules, "\(doseLogs.count)", "\(scenePhase == .active)",
+        ].joined(separator: "|")
+    }
+
+    func body(content: Content) -> some View {
+        content.task(id: signature) {
+            guard scenePhase == .active else { return }
+            let reminders = ReminderPlan.reminders(
+                now: .now,
+                checkInEnabled: settings.checkInReminder,
+                checkInMinutes: settings.checkInMinutes,
+                dosesEnabled: settings.doseReminders,
+                schedules: treatments.map(\.reminderSchedule)
+            )
+            await NotificationService.sync(reminders)
+        }
     }
 }
 

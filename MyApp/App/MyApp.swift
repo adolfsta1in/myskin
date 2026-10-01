@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import UserNotifications
 
 @main struct MyApp: App {
     @State private var store = AppStore()
@@ -13,6 +14,7 @@ import SwiftUI
             // Never fall back to an empty store: the user would think their diary is gone.
             fatalError("Could not open the data store: \(error)")
         }
+        UNUserNotificationCenter.current().delegate = NotificationPresenter.shared
     }
 
     var body: some Scene {
