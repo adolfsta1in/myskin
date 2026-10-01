@@ -85,7 +85,7 @@ struct DoctorReportView: View {
             }
 
             reportLabel("Weekly score")
-            WeeklyScoreChart(data: store.weeklyScores, height: 110)
+            ScoreTrendChart(data: store.weeklyScores, scale: .dlqi, height: 110)
 
             reportLabel("Before / now")
             HStack(spacing: 8) {

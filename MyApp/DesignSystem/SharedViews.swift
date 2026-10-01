@@ -96,50 +96,97 @@ struct ItchMiniChart: View {
     }
 }
 
-/// Weekly POEM / self-assessment chart with soft severity bands.
-struct WeeklyScoreChart: View {
-    let data: [DayValue]
-    var height: CGFloat = 200
+/// What a trend chart shows: its range and soft bands.
+enum ScoreScale {
+    /// Affected body surface, %.
+    case bsa
+    /// DLQI 0–30.
+    case dlqi
+    /// Itch 0–10.
+    case itch
 
-    private struct Band {
+    struct Band {
         let range: ClosedRange<Double>
         let label: String
         let color: Color
     }
 
-    private let bands: [Band] = [
-        Band(range: 0...7, label: "Clear–mild", color: Theme.intensityCalm),
-        Band(range: 7...16, label: "Moderate", color: Theme.intensityMild),
-        Band(range: 16...28, label: "Severe", color: Theme.intensityModerate),
-    ]
+    var bands: [Band] {
+        switch self {
+        case .bsa: [
+            Band(range: 0...3, label: "Mild", color: Theme.intensityCalm),
+            Band(range: 3...10, label: "Moderate", color: Theme.intensityMild),
+            Band(range: 10...100, label: "Severe", color: Theme.intensityModerate),
+        ]
+        case .dlqi: [
+            Band(range: 0...1, label: "No effect", color: Theme.intensityCalm),
+            Band(range: 1...10, label: "Small–moderate", color: Theme.intensityMild),
+            Band(range: 10...30, label: "Very large", color: Theme.intensityModerate),
+        ]
+        case .itch: [
+            Band(range: 0...3, label: "Low", color: Theme.intensityCalm),
+            Band(range: 3...7, label: "Medium", color: Theme.intensityMild),
+            Band(range: 7...10, label: "High", color: Theme.intensityModerate),
+        ]
+        }
+    }
+
+    /// Y range: fixed for DLQI and itch, BSA grows with the data (at least 0–15 %).
+    func domain(for data: [DayValue]) -> ClosedRange<Double> {
+        switch self {
+        case .bsa: 0...max(15, ((data.map(\.value).max() ?? 0) * 1.2).rounded(.up))
+        case .dlqi: 0...30
+        case .itch: 0...10
+        }
+    }
+
+    func axisValues(for domain: ClosedRange<Double>) -> [Double] {
+        switch self {
+        case .bsa: [0, 3, 10, domain.upperBound]
+        case .dlqi: [0, 10, 20, 30]
+        case .itch: [0, 5, 10]
+        }
+    }
+
+    /// Point color on the 0–10 intensity ramp.
+    func intensity(_ value: Double) -> Double {
+        switch self {
+        case .bsa: min(value, 20) / 2
+        case .dlqi: value / 3
+        case .itch: value
+        }
+    }
+}
+
+/// Line chart over time with soft severity bands (Insights, doctor report).
+struct ScoreTrendChart: View {
+    let data: [DayValue]
+    let scale: ScoreScale
+    var height: CGFloat = 180
 
     var body: some View {
+        let domain = scale.domain(for: data)
         Chart {
-            ForEach(bands, id: \.label) { band in
+            ForEach(scale.bands, id: \.label) { band in
                 RectangleMark(
-                    yStart: .value("From", band.range.lowerBound),
-                    yEnd: .value("To", band.range.upperBound)
+                    yStart: .value("From", min(band.range.lowerBound, domain.upperBound)),
+                    yEnd: .value("To", min(band.range.upperBound, domain.upperBound))
                 )
                 .foregroundStyle(band.color.opacity(0.18))
             }
-            ForEach(data) { week in
-                AreaMark(x: .value("Week", week.date), y: .value("Score", week.value))
-                    .foregroundStyle(
-                        LinearGradient(colors: [Theme.accent.opacity(0.3), Theme.accent.opacity(0.02)], startPoint: .top, endPoint: .bottom)
-                    )
-                    .interpolationMethod(.catmullRom)
-                LineMark(x: .value("Week", week.date), y: .value("Score", week.value))
+            ForEach(data) { point in
+                LineMark(x: .value("Date", point.date), y: .value("Score", point.value))
                     .foregroundStyle(Theme.accent)
                     .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round))
-                    .interpolationMethod(.catmullRom)
-                PointMark(x: .value("Week", week.date), y: .value("Score", week.value))
-                    .foregroundStyle(Theme.intensity(value: week.value / 2.8))
+                    .interpolationMethod(.monotone)
+                PointMark(x: .value("Date", point.date), y: .value("Score", point.value))
+                    .foregroundStyle(Theme.intensity(value: scale.intensity(point.value)))
                     .symbolSize(40)
             }
         }
-        .chartYScale(domain: 0...28)
+        .chartYScale(domain: domain)
         .chartYAxis {
-            AxisMarks(values: [0, 7, 16, 28]) { _ in
+            AxisMarks(values: scale.axisValues(for: domain)) { _ in
                 AxisGridLine().foregroundStyle(Theme.sandDeep.opacity(0.4))
                 AxisValueLabel().foregroundStyle(Theme.inkSoft)
             }
