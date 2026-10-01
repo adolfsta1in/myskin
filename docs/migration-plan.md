@@ -241,7 +241,7 @@ MySkinTests/      Swift Testing
 - **Зависимости:** 5, 6.
 - **Готово, когда:** сборка проходит; тест на in-memory контейнере вставляет и читает по одной записи каждого типа.
 
-### Шаг 8. SwiftData: лечение, дозы, фото, опросники
+### Шаг 8. SwiftData: лечение, дозы, фото, опросники ✅
 - **Цель:** остальные сущности MVP.
 - **Файлы:** `SchemaV1.swift`: `Treatment`, `DoseLog` (связь с Treatment), `Photo` (день, zoneID, fileName, notes), `QuestionnaireResult`; `MigrationPlan.swift` (`VersionedSchema` V1 + пустой план миграций).
 - **Зависимости:** 7.

@@ -7,7 +7,11 @@ struct PersistenceTests {
     /// Fresh in-memory store for each test.
     private func makeContext() throws -> ModelContext {
         let schema = Schema(versionedSchema: SchemaV1.self)
-        let container = try ModelContainer(for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let container = try ModelContainer(
+            for: schema,
+            migrationPlan: MySkinMigrationPlan.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
         return ModelContext(container)
     }
 
@@ -52,5 +56,61 @@ struct PersistenceTests {
         #expect(assessment.palms == 0.5)
         #expect(assessment.erythema == 3)
         #expect(!assessment.pustules)
+    }
+
+    @Test func treatmentOwnsDoseLogs() throws {
+        let context = try makeContext()
+        let treatment = SchemaV1.Treatment(
+            name: "Clobetasol", kind: .ointment, steroidClass: .class1,
+            scheduleKind: .timesPerDay, timesPerDay: 2, zoneIDs: ["front.knee.left"]
+        )
+        context.insert(treatment)
+        context.insert(DoseLog(treatment: treatment, status: .done))
+        context.insert(DoseLog(treatment: treatment, status: .skipped))
+        try context.save()
+
+        let fetched = try #require(try context.fetch(FetchDescriptor<SchemaV1.Treatment>()).first)
+        #expect(fetched.doses.count == 2)
+        #expect(fetched.kind == .ointment)
+        #expect(fetched.steroidClass == .class1)
+        #expect(Set(fetched.doses.map(\.status)) == [.done, .skipped])
+        #expect(try context.fetch(FetchDescriptor<DoseLog>()).allSatisfy { $0.treatment === fetched })
+    }
+
+    @Test func deletingTreatmentDeletesItsDoses() throws {
+        let context = try makeContext()
+        let kept = SchemaV1.Treatment(name: "Adalimumab", kind: .biologic, scheduleKind: .everyNWeeks, interval: 2)
+        let removed = SchemaV1.Treatment(name: "Calcipotriol", kind: .cream, scheduleKind: .timesPerDay)
+        context.insert(kept)
+        context.insert(removed)
+        context.insert(DoseLog(treatment: kept, status: .done, injectionSite: .abdomenLeft))
+        context.insert(DoseLog(treatment: removed, status: .done))
+        context.insert(DoseLog(treatment: removed, status: .done))
+        try context.save()
+
+        context.delete(removed)
+        try context.save()
+
+        let doses = try context.fetch(FetchDescriptor<DoseLog>())
+        #expect(doses.count == 1)
+        #expect(doses.first?.injectionSite == .abdomenLeft)
+        #expect(try context.fetch(FetchDescriptor<SchemaV1.Treatment>()).map(\.name) == ["Adalimumab"])
+    }
+
+    @Test func photoAndQuestionnaireRoundTrip() throws {
+        let context = try makeContext()
+        context.insert(Photo(day: .now, zoneID: "quick.scalp", fileName: "A1B2.jpg"))
+        context.insert(QuestionnaireResult(kind: .pest, answers: [1, 0, 1, 1, 0], score: 3))
+        try context.save()
+
+        let photo = try #require(try context.fetch(FetchDescriptor<Photo>()).first)
+        #expect(photo.zoneID == "quick.scalp")
+        #expect(photo.fileName == "A1B2.jpg")
+
+        let pestKind = QuestionnaireKind.pest.rawValue
+        let results = try context.fetch(FetchDescriptor<QuestionnaireResult>(predicate: #Predicate { $0.kindID == pestKind }))
+        #expect(results.count == 1)
+        #expect(results.first?.score == 3)
+        #expect(results.first?.kind == .pest)
     }
 }

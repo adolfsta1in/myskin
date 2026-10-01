@@ -65,7 +65,7 @@ docs/                  spec, research, current-state, migration-plan
 - `docs/reaserch.md` — медицинский первоисточник. Читать только при сомнениях в медицинском содержании (шкалы, препараты, триггеры).
 
 ## Статус
-- **Текущий шаг: Шаг 8** — SwiftData: лечение, дозы, фото, опросники (этап A).
+- **Текущий шаг: Шаг 9** — подключение контейнера и превью-данные (этап A).
 - Готово: фазы анализа (spec, current-state, migration-plan), этап 0 целиком:
   - Шаг 1 — git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`;
   - Шаг 2 — bundle id `com.adolfsta1in.myskin`, usage descriptions для Face ID и камеры;
@@ -75,5 +75,6 @@ docs/                  spec, research, current-state, migration-plan
     - Шаг 5 — `Model/Domain/DomainEnums.swift` (`nonisolated`, `String` rawValue, `Codable`); `TreatmentKind` перенесён туда из `Models.swift`. Тест фиксирует rawValue.
     - Шаг 6 — `Model/Domain/BodyZone.swift` (`BodySide`, `BodyRegion`, `ZoneShapeKind`, `BodyZone`). Quick-зоны: scalp, face, nails, palms, soles, folds, genitals — все `isSpecialSite`. Ягодицы (`*.pelvis`) — регион legs, как в PASI. Внимание для шага 11: `front.head` («Face» на силуэте) и `quick.face` пересекаются по площади.
     - Шаг 7 — `Model/Persistence/SchemaV1.swift`: модели вложены в `enum SchemaV1: VersionedSchema`, наружу — `typealias`. Enum хранятся строками (`…ID`/`…IDs`) с вычисляемыми типизированными свойствами. `DailyCheckIn.day` — `.unique` (одна запись на день), `ZoneAssessment` — `#Unique([day, zoneID])`; день нормализуется в `startOfDay` в `init`.
+    - Шаг 8 — `Treatment` (расписание: `scheduleKind` + `timesPerDay`/`interval`/`weekday`/`doseMinutes`), `DoseLog` (каскад от `Treatment`), `Photo`, `QuestionnaireResult`; `MigrationPlan.swift` (`MySkinMigrationPlan`, стадий нет). У новой модели **нет** `typealias Treatment` — имя занято демо-структурой; до шага 22 писать `SchemaV1.Treatment`.
 - Замечание по сборке: `BuildProject(buildForTesting:)` не пересобирает `MyApp` перед тестами — сначала обычный `BuildProject`, потом `RunAllTests`.
 - После каждого шага: отметить ✅ в `docs/migration-plan.md` и обновить этот раздел.
