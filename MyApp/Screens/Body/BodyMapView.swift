@@ -1,9 +1,12 @@
+import SwiftData
 import SwiftUI
 
 struct BodyMapView: View {
     @Environment(AppStore.self) private var store
+    @Query private var assessments: [ZoneAssessment]
     @State private var side: BodySide = .front
     @State private var lastTapped: BodyZone?
+    @State private var editingZone: BodyZone?
     @State private var tapCount = 0
 
     var body: some View {
@@ -14,7 +17,7 @@ struct BodyMapView: View {
                         Text("Body map")
                             .font(.rounded(.largeTitle, weight: .bold))
                             .foregroundStyle(Theme.ink)
-                        Text("Tap an area to mark it. Tap again to change intensity.")
+                        Text("Tap an area to rate it.")
                             .font(.rounded(.subheadline))
                             .foregroundStyle(Theme.inkSoft)
                     }
@@ -29,8 +32,8 @@ struct BodyMapView: View {
 
                     VStack(spacing: 12) {
                         BodySilhouette(side: side, intensities: store.zoneIntensity) { zone in
-                            store.cycleIntensity(for: zone.id)
                             lastTapped = zone
+                            editingZone = zone
                             tapCount += 1
                         }
                         // Scale with the screen: compact on iPhone SE/11, larger on Pro Max.
@@ -57,6 +60,9 @@ struct BodyMapView: View {
             }
             .screenScaffold()
             .toolbar(.hidden, for: .navigationBar)
+            .sheet(item: $editingZone) { zone in
+                ZoneAssessmentSheet(zone: zone, current: ZoneAssessmentDraft.latest(zoneID: zone.id, in: assessments)?.score)
+            }
         }
     }
 
@@ -73,7 +79,7 @@ struct BodyMapView: View {
                 ForEach(BodyZone.quickZones) { zone in
                     let level = store.zoneIntensity[zone.id] ?? 0
                     Button {
-                        store.cycleIntensity(for: zone.id)
+                        editingZone = zone
                     } label: {
                         HStack {
                             Circle()
