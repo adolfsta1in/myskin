@@ -2,28 +2,25 @@ import SwiftData
 import SwiftUI
 
 struct TodayView: View {
-    @State private var mode: AppMode
+    @Query private var checkIns: [DailyCheckIn]
+    @Query private var assessments: [ZoneAssessment]
     @State private var isShowingCanvas = false
 
-    init(mode: AppMode = .calm) {
-        _mode = State(initialValue: mode)
+    /// Calm / Flare is computed from the data (`FlareDetector`), never chosen by hand.
+    private var status: FlareStatus {
+        FlareDetector.status(on: .now, checkIns: checkIns, assessments: assessments)
     }
 
     var body: some View {
+        let status = status
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     TodayHeader(onLongPress: { isShowingCanvas = true })
-                    Picker("Mode", selection: $mode) {
-                        Label("Calm", systemImage: "leaf").tag(AppMode.calm)
-                        Label("Flare", systemImage: "flame").tag(AppMode.flare)
-                    }
-                    .pickerStyle(.segmented)
-                    .labelsHidden()
-                    .sensoryFeedback(.selection, trigger: mode)
+                    ModeBanner(status: status)
 
-                    CheckInCard(mode: mode)
-                    if mode == .calm {
+                    CheckInCard(mode: status.mode)
+                    if status.mode == .calm {
                         CalmDaysCard()
                             .transition(.opacity)
                     }
@@ -35,12 +32,89 @@ struct TodayView: View {
             }
             .screenScaffold()
             .toolbar(.hidden, for: .navigationBar)
-            .animation(.smooth, value: mode)
+            .animation(.smooth, value: status.mode)
             #if DEBUG
             .fullScreenCover(isPresented: $isShowingCanvas) {
                 DesignCanvasView()
             }
             #endif
+        }
+    }
+}
+
+// MARK: - Mode
+
+/// Shows the automatic mode; in Flare it explains which rule fired.
+private struct ModeBanner: View {
+    let status: FlareStatus
+    @State private var showsReasons = false
+
+    var body: some View {
+        switch status.mode {
+        case .calm:
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Image(systemName: "leaf")
+                    .foregroundStyle(Theme.sageDeep)
+                Text("Calm mode")
+                    .font(.rounded(.subheadline, weight: .semibold))
+                    .foregroundStyle(Theme.ink)
+                Text("· changes automatically from your check-ins")
+                    .font(.rounded(.subheadline))
+                    .foregroundStyle(Theme.inkSoft)
+            }
+            .accessibilityElement(children: .combine)
+        case .flare:
+            VStack(alignment: .leading, spacing: 10) {
+                Button {
+                    withAnimation(.smooth) { showsReasons.toggle() }
+                } label: {
+                    HStack {
+                        Label("Flare mode · why?", systemImage: "flame")
+                            .font(.rounded(.headline, weight: .semibold))
+                            .foregroundStyle(Theme.ink)
+                        Spacer()
+                        Image(systemName: "chevron.down")
+                            .rotationEffect(.degrees(showsReasons ? 180 : 0))
+                            .foregroundStyle(Theme.inkSoft)
+                    }
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                .accessibilityHint(showsReasons ? "Hides the reasons" : "Shows why Flare mode is on")
+
+                if showsReasons {
+                    VStack(alignment: .leading, spacing: 6) {
+                        if let day = status.signalDay, !Calendar.current.isDateInToday(day) {
+                            Text("Seen on \(day.formatted(.dateTime.weekday(.wide).month().day())):")
+                                .font(.rounded(.footnote, weight: .medium))
+                                .foregroundStyle(Theme.inkSoft)
+                        }
+                        ForEach(status.reasons, id: \.self) { reason in
+                            Label(reason.explanation, systemImage: "circle.fill")
+                                .labelStyle(BulletLabelStyle())
+                        }
+                        Text("Flare mode ends after \(FlareDetector.Threshold.calmDays) days in a row without these signs. If you're worried, discuss it with your doctor.")
+                            .font(.rounded(.footnote))
+                            .foregroundStyle(Theme.inkSoft)
+                            .padding(.top, 4)
+                    }
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                }
+            }
+            .glassCard(tint: Theme.intensityMild.opacity(0.35))
+        }
+    }
+}
+
+private struct BulletLabelStyle: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            configuration.icon
+                .font(.system(size: 5))
+                .foregroundStyle(Theme.inkSoft)
+            configuration.title
+                .font(.rounded(.subheadline))
+                .foregroundStyle(Theme.ink)
         }
     }
 }
@@ -459,6 +533,13 @@ private struct TrendBadge: View {
 }
 
 #Preview("Today · Flare") {
-    TodayView(mode: .flare)
+    TodayView()
+        .modelContainer(PreviewData.flareContainer)
+        .previewSetup()
+}
+
+#Preview("Today · Empty") {
+    TodayView()
+        .modelContainer(PreviewData.emptyContainer())
         .previewSetup()
 }

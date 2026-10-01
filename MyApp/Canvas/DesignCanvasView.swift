@@ -47,7 +47,7 @@ struct DesignCanvasView: View {
                     }
                     row(title: "Main app") {
                         phone("1 · Today · Calm") { MainTabView(selection: .today) }
-                        phone("1 · Today · Flare") { MainTabView(selection: .today, todayMode: .flare) }
+                        phone("1 · Today · Flare") { MainTabView(selection: .today).modelContainer(PreviewData.flareContainer) }
                         phone("2 · Body map") { MainTabView(selection: .body) }
                         phone("Photos") { MainTabView(selection: .photos) }
                         phone("3 · Camera overlay") { CameraOverlayView(zoneName: "Left elbow") }

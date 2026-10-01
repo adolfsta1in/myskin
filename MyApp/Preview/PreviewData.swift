@@ -15,6 +15,17 @@ enum PreviewData {
         }
     }()
 
+    /// Same sample data, but today's check-in has high itch and new spots, so Today is in Flare mode.
+    static let flareContainer: ModelContainer = {
+        do {
+            let container = try AppModelContainer.makeInMemory()
+            populate(container.mainContext, flare: true)
+            return container
+        } catch {
+            fatalError("Preview container failed: \(error)")
+        }
+    }()
+
     /// Settings for previews, in their own defaults domain so previews never touch the app's settings.
     static let settings: AppSettings = {
         let suite = "MySkin.preview"
@@ -34,7 +45,7 @@ enum PreviewData {
         }
     }
 
-    static func populate(_ context: ModelContext, today: Date = .now, calendar: Calendar = .current) {
+    static func populate(_ context: ModelContext, today: Date = .now, flare: Bool = false, calendar: Calendar = .current) {
         let today = calendar.startOfDay(for: today)
         func daysAgo(_ n: Int) -> Date { calendar.date(byAdding: .day, value: -n, to: today) ?? today }
 
@@ -47,7 +58,7 @@ enum PreviewData {
         ))
 
         // Two weeks of check-ins, itch easing off.
-        let itch = [6, 7, 6, 5, 6, 4, 5, 4, 3, 4, 3, 2, 3, 3]
+        let itch = [6, 7, 6, 5, 6, 4, 5, 4, 3, 4, 3, 2, 3, flare ? 8 : 3]
         for (offset, value) in itch.enumerated() {
             let ago = itch.count - 1 - offset
             context.insert(DailyCheckIn(
@@ -57,7 +68,7 @@ enum PreviewData {
                 sleep: 10 - value,
                 mood: value > 5 ? 2 : 4,
                 triggers: ago == 12 ? [.stress] : ago == 10 ? [.alcohol, .stress] : [],
-                newSpots: ago == 12,
+                newSpots: ago == 12 || (flare && ago == 0),
                 calendar: calendar
             ))
         }

@@ -6,17 +6,15 @@ enum AppTab: Hashable {
 
 struct MainTabView: View {
     @State private var selection: AppTab
-    private let todayMode: AppMode
 
-    init(selection: AppTab = .today, todayMode: AppMode = .calm) {
+    init(selection: AppTab = .today) {
         _selection = State(initialValue: selection)
-        self.todayMode = todayMode
     }
 
     var body: some View {
         TabView(selection: $selection) {
             Tab("Today", systemImage: "sun.horizon", value: AppTab.today) {
-                TodayView(mode: todayMode)
+                TodayView()
             }
             Tab("Body", systemImage: "figure.stand", value: AppTab.body) {
                 BodyMapView()

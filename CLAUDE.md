@@ -68,7 +68,7 @@ docs/                  spec, research, current-state, migration-plan
 - `docs/reaserch.md` — медицинский первоисточник. Читать только при сомнениях в медицинском содержании (шкалы, препараты, триггеры).
 
 ## Статус
-- **Текущий шаг: Шаг 19** — Today: автоматический режим.
+- **Текущий шаг: Шаг 20** — Body: лист оценки зоны.
 - Готово: фазы анализа (spec, current-state, migration-plan), этап 0 целиком:
   - Шаг 1 — git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`;
   - Шаг 2 — bundle id `com.adolfsta1in.myskin`, usage descriptions для Face ID и камеры;
@@ -92,6 +92,7 @@ docs/                  spec, research, current-state, migration-plan
   - Этап C:
     - Шаг 17 — `Screens/Today/TodayView.swift` (перенесён в папку), `CheckInCard` работает с `DailyCheckIn` через `@Query` за сегодня; черновик — `Screens/Today/CheckInDraft.swift` (боль/сон/настроение `nil`, пока не тронуты; триггеры из `Trigger` + свои теги из прошлых чек-инов). В Calm детали раскрываются кнопкой, во Flare видны всегда. Убраны несохраняемые чипы «Where is it flaring?» и надпись «Take a photo». Из `AppStore` удалены `todayItch`, `selectedTags`, `tags`, `toggleTag`. Тесты 130/130; критерий проверен в симуляторе (сохранить → перезапуск → значения на месте, «Update check-in»).
     - Шаг 18 — `Logic/TodayStats.swift`: `itchHistory` (14 дней, только дни с чек-ином), `itchTrend` (среднее 7 дней vs предыдущие 7, ≥ 3 чек-инов в каждой половине, порог 1 балл), `calmDaysThisMonth` (дни месяца с чек-ином без сигналов `FlareDetector.signals`; дни без чек-ина не считаются). `ItchChartCard`/`CalmDaysCard` — через `@Query`, пустые состояния. Из `AppStore` удалён `calmDaysThisMonth` (`itchHistory` ещё нужен онбордингу). Development Team прописан и у `MySkinTests`. Тесты 142/142.
+    - Шаг 19 — `Picker` Calm/Flare удалён: `TodayView` считает `FlareDetector.status` из `@Query` (чек-ины + оценки зон), `ModeBanner` — «Calm mode» или раскрывающаяся «Flare mode · why?» со списком `FlareReason.explanation`, днём сигнала и «discuss it with your doctor». По §1.6 при < 3 чек-инов всегда Calm. Параметр `todayMode` убран из `MainTabView`; для превью и канваса — `PreviewData.flareContainer` (сегодня зуд 8 + new spots). `.modelContainer` в превью ставить **до** `previewSetup()` — ближний к view побеждает. Тесты 143/143.
 - Ресурсы: Mac с 8 ГБ RAM — не держать симулятор и превью без нужды, превью рендерить по одному, симулятор запускать только для критерия шага.
 - Известная проблема (не регрессия): превью `DoctorReportView` падает в AttributeGraph (навбар/Liquid Glass) — так же падало и до шага 9.
 - Замечание по сборке: `BuildProject(buildForTesting:)` не пересобирает `MyApp` перед тестами — сначала обычный `BuildProject`, потом `RunAllTests`.

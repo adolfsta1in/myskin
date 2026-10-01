@@ -18,6 +18,26 @@ struct PersistenceTests {
         #expect(try context.fetchCount(FetchDescriptor<SchemaV1.Treatment>()) == 4)
     }
 
+    /// Today's mode comes from stored data: the regular sample is Calm, the flare sample is Flare.
+    @Test func previewDataModes() throws {
+        let calm = try makeContext()
+        PreviewData.populate(calm)
+        let flare = try makeContext()
+        PreviewData.populate(flare, flare: true)
+
+        func status(_ context: ModelContext) throws -> FlareStatus {
+            FlareDetector.status(
+                on: .now,
+                checkIns: try context.fetch(FetchDescriptor<DailyCheckIn>()),
+                assessments: try context.fetch(FetchDescriptor<ZoneAssessment>())
+            )
+        }
+        #expect(try status(calm).mode == .calm)
+        let flareStatus = try status(flare)
+        #expect(flareStatus.mode == .flare)
+        #expect(flareStatus.reasons.contains(.highItch(8)))
+    }
+
     @Test func profileRoundTrip() throws {
         let context = try makeContext()
         context.insert(Profile(psoriasisTypes: [.plaque, .scalp], onsetYear: 2015, goals: [.doctor], baselineSelfRating: 0.4))
