@@ -229,7 +229,7 @@ MySkinTests/      Swift Testing
 - **Зависимости:** 4.
 - **Готово, когда:** тест фиксирует rawValue всех случаев, чтобы их случайно не переименовали.
 
-### Шаг 6. Расширение `BodyZone` под spec
+### Шаг 6. Расширение `BodyZone` под spec ✅
 - **Цель:** особые зоны и регионы для расчёта индекса тяжести.
 - **Файлы:** `Model/Models.swift` → перенести `BodyZone` в `Model/Domain/BodyZone.swift`. Добавить: quick-зоны face, skin folds, genitals; `region` (head / arms / trunk / legs); `isSpecialSite`.
 - **Зависимости:** 5.
