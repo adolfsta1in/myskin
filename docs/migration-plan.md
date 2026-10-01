@@ -235,7 +235,7 @@ MySkinTests/      Swift Testing
 - **Зависимости:** 5.
 - **Готово, когда:** на вкладке Body в «Quick zones» 7 зон; тест проверяет, что у каждой зоны есть регион, а id уникальны.
 
-### Шаг 7. SwiftData: профиль, чек-ин, оценка зоны
+### Шаг 7. SwiftData: профиль, чек-ин, оценка зоны ✅
 - **Цель:** первые сохраняемые сущности.
 - **Файлы:** `Model/Persistence/SchemaV1.swift`: `@Model Profile` (psoriasisTypes, onsetYear, goals, baselineSelfRating, createdAt), `DailyCheckIn` (день, itch, pain, sleep, mood, triggers, customTags, newSpots, note), `ZoneAssessment` (день, zoneID, palms, erythema, induration, scale, pustules).
 - **Зависимости:** 5, 6.
