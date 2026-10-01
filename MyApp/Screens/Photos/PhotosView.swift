@@ -28,7 +28,10 @@ struct PhotosView: View {
                     } else {
                         LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], spacing: 14) {
                             ForEach(zones, id: \.zoneID) { zone in
-                                zoneTile(zoneID: zone.zoneID, latest: zone.latest, count: zone.count)
+                                NavigationLink(value: zone.zoneID) {
+                                    zoneTile(zoneID: zone.zoneID, latest: zone.latest, count: zone.count)
+                                }
+                                .buttonStyle(.plain)
                             }
                         }
                     }
@@ -42,6 +45,9 @@ struct PhotosView: View {
                 .padding(.bottom, 32)
             }
             .screenScaffold()
+            .navigationDestination(for: String.self) { zoneID in
+                ZoneProgressView(zoneID: zoneID)
+            }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     addMenu

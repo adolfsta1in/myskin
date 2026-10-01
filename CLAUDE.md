@@ -68,7 +68,7 @@ docs/                  spec, research, current-state, migration-plan
 - `docs/reaserch.md` — медицинский первоисточник. Читать только при сомнениях в медицинском содержании (шкалы, препараты, триггеры).
 
 ## Статус
-- **Текущий шаг: Шаг 29** — ZoneProgress на реальных фото.
+- **Текущий шаг: Шаг 30** — Онбординг: состав шагов и профиль.
 - Готово: фазы анализа (spec, current-state, migration-plan), этап 0 целиком:
   - Шаг 1 — git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`;
   - Шаг 2 — bundle id `com.adolfsta1in.myskin`, usage descriptions для Face ID и камеры;
@@ -102,6 +102,7 @@ docs/                  spec, research, current-state, migration-plan
     - Шаг 26 — `Services/PhotoStore.swift` (`nonisolated`, `Sendable`): папка `Application Support/Photos` (`.complete`, вне бэкапа), `save(imageData:)` — перекодирование через ImageIO в JPEG ≤ 2048 px **без метаданных** (геолокация не сохраняется), файлы с `.completeFileProtection` и `isExcludedFromBackup`; `data`, `thumbnail`, `delete`, `exists`; имя файла без путей. Тесты на временной папке, класс защиты проверяется. Тесты 182.
     - Шаг 27 — `Screens/Photos/` (туда перенесён `PhotosView`; группы проекта синхронизируются с ФС — файлы, созданные вне Xcode, попадают в таргет сами). `PhotoRecords`: `add` (файл через `PhotoStore` в фоне через `@concurrent`, затем запись `Photo`; при ошибке записи файл удаляется), `delete`, `zonesWithPhotos`; `PhotoStore.shared`; `StoredPhotoImage` — миниатюра, декодируется не на главном потоке. `PhotoImport`: `.photoImport(zoneID:source:)` — системный `photosPicker` (вне процесса, без доступа к медиатеке), `PhotoZonePicker`. Сетка — зоны с фото из `@Query`, пустое состояние; текст о хранении — только то, что реально сделано. Плитки станут ссылками на `ZoneProgressView` в шаге 29. Тесты 185.
     - Шаг 28 — `Screens/Photos/CameraPicker.swift` — обёртка `UIImagePickerController` (.camera, без сохранения в медиатеку); `PhotoSource.camera` показывается только при `CameraPicker.isAvailable` (в симуляторе скрыт). Снимок → `jpegData(0.95)` → `PhotoRecords.add` (перекодирование с учётом ориентации). Удалены `CameraOverlayView` и `GhostOutline` (и из канваса). На устройстве съёмка не проверялась.
+    - Шаг 29 — `Screens/Photos/ZoneProgressView.swift` (перенесён, `init(zoneID:)`): `@Query` фото зоны; шторка при 2+ фото (старое — «before», новое — «now», сброс при изменении числа фото), одно фото — без шторки; лента миниатюр с контекстным меню (before / now / Delete → `PhotoRecords.delete` удаляет файл и запись); таймлайн — фото + `Treatment.startDate` лечений с этой зоной в `zoneIDs`; «Build timelapse» убран; добавление фото в эту зону. Плитки `PhotosView` ведут сюда. Тесты 185/185.
 - Ресурсы: Mac с 8 ГБ RAM — не держать симулятор и превью без нужды, превью рендерить по одному, симулятор запускать только для критерия шага.
 - Известная проблема (не регрессия): превью `DoctorReportView` падает в AttributeGraph (навбар/Liquid Glass) — так же падало и до шага 9.
 - Замечание по сборке: `BuildProject(buildForTesting:)` не пересобирает `MyApp` перед тестами — сначала обычный `BuildProject`, потом `RunAllTests`.

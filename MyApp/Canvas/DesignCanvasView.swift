@@ -51,7 +51,7 @@ struct DesignCanvasView: View {
                         phone("2 · Body map") { MainTabView(selection: .body) }
                         phone("Photos") { MainTabView(selection: .photos) }
                         phone("4 · Zone progress") {
-                            NavigationStack { ZoneProgressView(zone: store.photoZones[0]) }
+                            NavigationStack { ZoneProgressView(zoneID: "back.elbow.left") }
                         }
                         phone("5 · Treatment") { MainTabView(selection: .treatment) }
                         phone("6 · Insights") { MainTabView(selection: .insights) }
