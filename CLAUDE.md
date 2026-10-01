@@ -65,6 +65,6 @@ docs/                  spec, research, current-state, migration-plan
 - `docs/reaserch.md` — медицинский первоисточник. Читать только при сомнениях в медицинском содержании (шкалы, препараты, триггеры).
 
 ## Статус
-- **Текущий шаг: Шаг 2** — bundle id `com.adolfsta1in.myskin` и usage descriptions для Face ID и камеры.
-- Готово: фазы анализа (spec, current-state, migration-plan), Шаг 1 (git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`).
+- **Текущий шаг: Шаг 3** — Swift 6 language mode.
+- Готово: фазы анализа (spec, current-state, migration-plan), Шаг 1 (git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`), Шаг 2 (bundle id `com.adolfsta1in.myskin`, usage descriptions для Face ID и камеры).
 - После каждого шага: отметить ✅ в `docs/migration-plan.md` и обновить этот раздел.

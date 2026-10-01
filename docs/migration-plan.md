@@ -203,7 +203,7 @@ MySkinTests/      Swift Testing
 - **Зависимости:** нет.
 - **Готово, когда:** `git log` показывает коммит «Demo baseline», `git status` чистый, ветка `main` отправлена на GitHub.
 
-### Шаг 2. Идентичность приложения и разрешения в Info.plist
+### Шаг 2. Идентичность приложения и разрешения в Info.plist ✅
 - **Цель:** реальные API (Face ID, камера) не должны падать.
 - **Файлы:** build settings таргета `MyApp`: `PRODUCT_BUNDLE_IDENTIFIER = com.adolfsta1in.myskin`, `INFOPLIST_KEY_NSFaceIDUsageDescription`, `INFOPLIST_KEY_NSCameraUsageDescription`. `DEVELOPMENT_TEAM` не задаём: пока работаем только в симуляторе.
 - **Зависимости:** 1.
