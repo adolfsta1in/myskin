@@ -68,7 +68,7 @@ docs/                  spec, research, current-state, migration-plan
 - `docs/reaserch.md` — медицинский первоисточник. Читать только при сомнениях в медицинском содержании (шкалы, препараты, триггеры).
 
 ## Статус
-- **Текущий шаг: Шаг 15** — `MedicationCatalog`. Критерий шага 10 в симуляторе всё ещё не проверен.
+- **Текущий шаг: Шаг 16** — `DoseScheduler`. Критерий шага 10 в симуляторе всё ещё не проверен.
 - Готово: фазы анализа (spec, current-state, migration-plan), этап 0 целиком:
   - Шаг 1 — git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`;
   - Шаг 2 — bundle id `com.adolfsta1in.myskin`, usage descriptions для Face ID и камеры;
@@ -86,6 +86,7 @@ docs/                  spec, research, current-state, migration-plan
     - Шаг 12 — `Logic/Questionnaires.swift`: `Question`/`QuestionOption`, `Questionnaires.score(kind, answers:)` (ответы — **индексы вариантов**, чтобы «Not relevant» отличался от «Not at all»; неполные/неверные → nil). `DLQI`: 10 вопросов, полосы 0–1/2–5/6–10/11–20/21–30, `isAtGoal` (≤1), `isVeryLargeEffect` (>10). `PEST`: 5 да/нет, ≥3 → ревматолог. Тексты — стандартные английские формулировки; лицензия DLQI (Cardiff University) не оформлена. Тесты 76/76.
     - Шаг 13 — `Logic/FlareDetector.swift`: `status(on:checkIns:zones:)` → `FlareStatus` (`AppMode` + `[FlareReason]` с `explanation` + `signalDay`). День «с признаком» — если сработало любое правило §1.6; Flare, пока признак есть в одном из последних 3 дней (`calmDays`), дни без чек-ина считаются днями без признаков. Зоны — последнее состояние каждой зоны; первая карта не даёт Flare. < 3 чек-инов → Calm. Пороги — `FlareDetector.Threshold`. Тесты 92/92.
     - Шаг 14 — `Logic/RedFlagRules.swift`: `flags(zones:symptoms:isFlare:)` → `[RedFlag]`. Пустулы ≥ 5 % BSA + температура/слабость; покраснение > 75 % BSA (само по себе, озноб не обязателен); ухудшение после отмены системных стероидов при Flare. Симптомы (`RedFlagSymptoms`) в схеме не хранятся — их спросит чек-ин в режиме Flare. PHQ-9 не входит в MVP — не проверяется. В `ZoneScore` добавлено `pustules`. Тесты 102/102.
+    - Шаг 15 — `Model/Domain/MedicationCatalog.swift`: 39 позиций (`Medication`: стабильный `id` для `Treatment.catalogID` — не переименовывать, `kind`, `MedicationCategory`, `steroidClass?`, `TypicalSchedule`, `notes`). Биологики — интервал поддерживающей фазы (стартовые дозы — в `notes`). Классы стероидов (US) и режимы требуют сверки врачом/фармацевтом. Тесты 110/110.
 - Ресурсы: Mac с 8 ГБ RAM — не держать симулятор и превью без нужды, превью рендерить по одному, симулятор запускать только для критерия шага.
 - Известная проблема (не регрессия): превью `DoctorReportView` падает в AttributeGraph (навбар/Liquid Glass) — так же падало и до шага 9.
 - Замечание по сборке: `BuildProject(buildForTesting:)` не пересобирает `MyApp` перед тестами — сначала обычный `BuildProject`, потом `RunAllTests`.
