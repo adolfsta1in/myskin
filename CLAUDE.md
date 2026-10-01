@@ -68,7 +68,7 @@ docs/                  spec, research, current-state, migration-plan
 - `docs/reaserch.md` — медицинский первоисточник. Читать только при сомнениях в медицинском содержании (шкалы, препараты, триггеры).
 
 ## Статус
-- **Текущий шаг: Шаг 22** — Treatment: список из хранилища.
+- **Текущий шаг: Шаг 23** — Treatment: добавление и редактирование.
 - Готово: фазы анализа (spec, current-state, migration-plan), этап 0 целиком:
   - Шаг 1 — git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`;
   - Шаг 2 — bundle id `com.adolfsta1in.myskin`, usage descriptions для Face ID и камеры;
@@ -95,6 +95,7 @@ docs/                  spec, research, current-state, migration-plan
     - Шаг 19 — `Picker` Calm/Flare удалён: `TodayView` считает `FlareDetector.status` из `@Query` (чек-ины + оценки зон), `ModeBanner` — «Calm mode» или раскрывающаяся «Flare mode · why?» со списком `FlareReason.explanation`, днём сигнала и «discuss it with your doctor». По §1.6 при < 3 чек-инов всегда Calm. Параметр `todayMode` убран из `MainTabView`; для превью и канваса — `PreviewData.flareContainer` (сегодня зуд 8 + new spots). `.modelContainer` в превью ставить **до** `previewSetup()` — ближний к view побеждает. Тесты 143/143.
     - Шаг 20 — `Screens/Body/` (туда перенесён `BodyMapView`): `ZoneAssessmentDraft` (площадь в ладонях 0…`zone.area`, шаг 0.1 для зон ≤ 1 %, иначе 0.5; признаки 0–4; пустулы; `save` — upsert записи зоны за день; `latest`), `ZoneAssessmentSheet` (подсказка про тёмную кожу у покраснения, «Clear this area» сохраняет зону чистой — история не стирается), `SignScale` — подписи 0–4. Тап по силуэту и quick-зоне открывает лист. Ногти/пигментация из spec §3 в схеме нет — не собираются. Тесты 148.
     - Шаг 21 — `Logic/BodyMapSummary.swift`: текущая карта = последняя оценка каждой зоны; `previous` — карта до последнего дня оценки («vs previous assessment»); `SeverityCalculator.level` (0–3 по среднему трёх признаков; зона только с площадью/пустулами — 1). `BodyMapView` без `AppStore`: окраска, quick-зоны и карточка (BSA, категория, индекс, изменение, «Elevated» с особыми зонами или PEST ≥ 3 + «discuss systemic treatment with your doctor», дата) из `@Query`; DLQI/PEST — последние результаты. `IntensityLegend`: Clear/Mild/Moderate/Severe. Из `AppStore` удалён `lastWeekArea` (`zoneIntensity`/`affectedArea` ещё нужны онбордингу и отчёту). Тесты 161/161.
+    - Шаг 22 — `Screens/Treatment/TreatmentView.swift` (перенесён): `@Query` по `Treatment`, группы (Creams & ointments = cream/ointment/foam/shampoo, Tablets, Biologics, Phototherapy) + «Stopped»; пустое состояние с «Add treatment». Демо-структура переименована в `DemoTreatment` (её ещё читает `DoctorReportView`), добавлен `typealias Treatment = SchemaV1.Treatment`. `DoseScheduler.summary(for:)` — текст расписания («Twice a day», «Weekly · Monday», «Every 2 weeks»). Календарь биологика и места инъекций временно убраны — вернутся в шаге 25. Тесты 162.
 - Ресурсы: Mac с 8 ГБ RAM — не держать симулятор и превью без нужды, превью рендерить по одному, симулятор запускать только для критерия шага.
 - Известная проблема (не регрессия): превью `DoctorReportView` падает в AttributeGraph (навбар/Liquid Glass) — так же падало и до шага 9.
 - Замечание по сборке: `BuildProject(buildForTesting:)` не пересобирает `MyApp` перед тестами — сначала обычный `BuildProject`, потом `RunAllTests`.

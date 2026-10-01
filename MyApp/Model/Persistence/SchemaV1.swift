@@ -5,6 +5,7 @@ import SwiftData
 typealias Profile = SchemaV1.Profile
 typealias DailyCheckIn = SchemaV1.DailyCheckIn
 typealias ZoneAssessment = SchemaV1.ZoneAssessment
+typealias Treatment = SchemaV1.Treatment
 typealias DoseLog = SchemaV1.DoseLog
 typealias Photo = SchemaV1.Photo
 typealias QuestionnaireResult = SchemaV1.QuestionnaireResult

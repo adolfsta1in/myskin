@@ -125,4 +125,21 @@ struct DoseSchedulerTests {
         #expect(DoseScheduler.doses(on: date(day: 2), schedule: schedule, calendar: calendar).isEmpty)
         #expect(DoseScheduler.nextDose(onOrAfter: date(day: 2), schedule: schedule, calendar: calendar) == nil)
     }
+
+    // MARK: - Summary
+
+    @Test func summaries() {
+        var calendar = calendar
+        calendar.locale = Locale(identifier: "en_US")
+        func summary(_ schedule: DoseSchedule) -> String { DoseScheduler.summary(for: schedule, calendar: calendar) }
+        #expect(summary(DoseSchedule(kind: .timesPerDay, timesPerDay: 1, startDate: start)) == "Once a day")
+        #expect(summary(DoseSchedule(kind: .timesPerDay, timesPerDay: 2, startDate: start)) == "Twice a day")
+        #expect(summary(DoseSchedule(kind: .timesPerDay, timesPerDay: 3, startDate: start)) == "3 times a day")
+        // 1 October 2026 is a Thursday.
+        #expect(summary(DoseSchedule(kind: .weekly, startDate: start)) == "Weekly · Thursday")
+        #expect(summary(DoseSchedule(kind: .weekly, weekday: 2, startDate: start)) == "Weekly · Monday")
+        #expect(summary(DoseSchedule(kind: .everyNDays, interval: 3, startDate: start)) == "Every 3 days")
+        #expect(summary(DoseSchedule(kind: .everyNWeeks, interval: 2, startDate: start)) == "Every 2 weeks")
+        #expect(summary(DoseSchedule(kind: .asNeeded, startDate: start)) == "As needed")
+    }
 }

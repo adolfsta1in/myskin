@@ -39,7 +39,7 @@ final class AppStore {
     let weeklyScores: [DayValue]
     let sleepHistory: [DayValue]
 
-    let treatments: [Treatment]
+    let treatments: [DemoTreatment]
     let insights: [Insight]
     let experiment = Experiment(
         title: "Dairy-free",
@@ -65,10 +65,10 @@ final class AppStore {
         sleepHistory = sleep.enumerated().map { DayValue(date: daysAgo(sleep.count - 1 - $0.offset), value: $0.element) }
 
         treatments = [
-            Treatment(name: "Tacrolimus 0.1% ointment", kind: .ointment, zones: ["Elbows", "Knees"], frequency: "Twice a day", started: daysAgo(46), fingertipUnits: 1),
-            Treatment(name: "Rich emollient cream", kind: .cream, zones: ["Whole body"], frequency: "After every shower", started: daysAgo(120), fingertipUnits: 20),
-            Treatment(name: "Vitamin D3", kind: .pill, zones: [], frequency: "1 tablet · morning", started: daysAgo(60)),
-            Treatment(name: "Adalimumab 40 mg", kind: .biologic, zones: [], frequency: "Every 2 weeks", started: daysAgo(30), nextDoseInDays: 3),
+            DemoTreatment(name: "Tacrolimus 0.1% ointment", kind: .ointment, zones: ["Elbows", "Knees"], frequency: "Twice a day", started: daysAgo(46), fingertipUnits: 1),
+            DemoTreatment(name: "Rich emollient cream", kind: .cream, zones: ["Whole body"], frequency: "After every shower", started: daysAgo(120), fingertipUnits: 20),
+            DemoTreatment(name: "Vitamin D3", kind: .pill, zones: [], frequency: "1 tablet · morning", started: daysAgo(60)),
+            DemoTreatment(name: "Adalimumab 40 mg", kind: .biologic, zones: [], frequency: "Every 2 weeks", started: daysAgo(30), nextDoseInDays: 3),
         ]
 
         insights = [

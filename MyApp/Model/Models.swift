@@ -80,7 +80,8 @@ struct DayValue: Identifiable {
     var id: Date { date }
 }
 
-struct Treatment: Identifiable {
+/// Demo treatment for screens not yet moved to SwiftData (doctor report). Will be removed.
+struct DemoTreatment: Identifiable {
     let id = UUID()
     let name: String
     let kind: TreatmentKind

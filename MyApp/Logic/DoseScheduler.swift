@@ -145,3 +145,30 @@ enum DoseScheduler {
         return nil
     }
 }
+
+// MARK: - Description
+
+extension DoseScheduler {
+    /// Short schedule text for lists, e.g. «Twice a day», «Every 2 weeks», «Weekly · Monday».
+    static func summary(for schedule: DoseSchedule, calendar: Calendar = .current) -> String {
+        switch schedule.kind {
+        case .timesPerDay:
+            switch schedule.timesPerDay {
+            case ...1: return "Once a day"
+            case 2: return "Twice a day"
+            default: return "\(schedule.timesPerDay) times a day"
+            }
+        case .weekly:
+            let weekday = schedule.weekday ?? calendar.component(.weekday, from: schedule.startDate)
+            let names = calendar.standaloneWeekdaySymbols
+            let name = names.indices.contains(weekday - 1) ? names[weekday - 1] : ""
+            return name.isEmpty ? "Once a week" : "Weekly · \(name)"
+        case .everyNDays:
+            return schedule.interval <= 1 ? "Every day" : "Every \(schedule.interval) days"
+        case .everyNWeeks:
+            return schedule.interval <= 1 ? "Every week" : "Every \(schedule.interval) weeks"
+        case .asNeeded:
+            return "As needed"
+        }
+    }
+}
