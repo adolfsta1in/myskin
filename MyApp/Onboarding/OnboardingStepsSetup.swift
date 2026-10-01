@@ -160,13 +160,14 @@ struct TreatmentsStep: View {
 // MARK: - O8 Notifications (soft ask)
 
 struct NotificationsStep: View {
-    @Environment(AppStore.self) private var store
     @Environment(AppSettings.self) private var settings
+    @State private var isAsking = false
     let next: () -> Void
+
+    private var wantsReminders: Bool { settings.doseReminders || settings.checkInReminder }
 
     var body: some View {
         @Bindable var settings = settings
-        @Bindable var store = store
         OnboardingPage(
             title: "Gentle reminders, only if you want them",
             why: "You choose what we remind you about — and you can change it anytime."
@@ -184,7 +185,7 @@ struct NotificationsStep: View {
                             Spacer()
                             Text("now").font(.rounded(.caption)).foregroundStyle(Theme.inkSoft)
                         }
-                        Text("Time for your evening ointment on the elbows.")
+                        Text("Time for your evening routine.")
                             .font(.rounded(.subheadline))
                     }
                     .foregroundStyle(Theme.ink)
@@ -204,18 +205,42 @@ struct NotificationsStep: View {
                             .font(.rounded(.subheadline))
                             .foregroundStyle(Theme.inkSoft)
                     }
-                    Divider()
-                    Toggle(isOn: $store.notifyForecast) {
-                        toggleLabel("Flare forecast", "Heads-up when dry air or pollen is coming")
-                    }
                 }
                 .tint(Theme.accent)
                 .glassCard()
                 .animation(.smooth, value: settings.checkInReminder)
             }
         } footer: {
-            PermissionButtons(allowTitle: "Turn on", onAllow: next, onNotNow: next)
+            PermissionButtons(allowTitle: "Turn on", onAllow: turnOn, onNotNow: notNow)
+                .disabled(isAsking)
+            Text("Reminders never mention your condition or medicines.")
+                .font(.rounded(.footnote))
+                .foregroundStyle(Theme.inkSoft)
         }
+    }
+
+    /// Asks iOS for permission. If it is refused, the toggles are switched off so they match reality.
+    private func turnOn() {
+        guard wantsReminders else {
+            next()
+            return
+        }
+        isAsking = true
+        Task {
+            let granted = await NotificationPermission.request()
+            if !granted {
+                settings.doseReminders = false
+                settings.checkInReminder = false
+            }
+            isAsking = false
+            next()
+        }
+    }
+
+    private func notNow() {
+        settings.doseReminders = false
+        settings.checkInReminder = false
+        next()
     }
 
     private func toggleLabel(_ title: String, _ detail: String) -> some View {

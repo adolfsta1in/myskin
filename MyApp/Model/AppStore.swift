@@ -9,7 +9,6 @@ final class AppStore {
 
     // MARK: Onboarding answers
     var condition: Condition?
-    var notifyForecast = false
 
     // MARK: Body map (zone id → intensity 0...3)
     var zoneIntensity: [String: Int] = [
