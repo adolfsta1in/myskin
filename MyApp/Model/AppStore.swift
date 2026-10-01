@@ -9,13 +9,8 @@ final class AppStore {
 
     // MARK: Onboarding answers
     var condition: Condition?
-    var profile: ProfileKind?
-    var skinNow: Double = 0.35
-    var goals: Set<Goal> = []
     var currentTreatments: Set<String> = []
     var notifyForecast = false
-    var locationAllowed = false
-    var healthAllowed = false
 
     // MARK: Body map (zone id → intensity 0...3)
     var zoneIntensity: [String: Int] = [
@@ -30,7 +25,6 @@ final class AppStore {
     // MARK: History
     let itchHistory: [DayValue]
     let weeklyScores: [DayValue]
-    let sleepHistory: [DayValue]
 
     let treatments: [DemoTreatment]
     let insights: [Insight]
@@ -53,8 +47,6 @@ final class AppStore {
         let poem: [Double] = [16, 17, 15, 18, 14, 13, 14, 12, 11, 10, 9, 9, 8]
         weeklyScores = poem.enumerated().map { DayValue(date: daysAgo((poem.count - 1 - $0.offset) * 7), value: $0.element) }
 
-        let sleep: [Double] = [5.5, 6, 7.5, 7, 5, 6.5, 7.5, 8, 7, 7.5]
-        sleepHistory = sleep.enumerated().map { DayValue(date: daysAgo(sleep.count - 1 - $0.offset), value: $0.element) }
 
         treatments = [
             DemoTreatment(name: "Tacrolimus 0.1% ointment", kind: .ointment, zones: ["Elbows", "Knees"], frequency: "Twice a day", started: daysAgo(46), fingertipUnits: 1),
@@ -124,7 +116,6 @@ final class AppStore {
     static var preview: AppStore {
         let store = AppStore()
         store.condition = .eczema
-        store.goals = [.triggers, .treatment]
         return store
     }
 }

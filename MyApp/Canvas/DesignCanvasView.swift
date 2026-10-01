@@ -11,8 +11,6 @@ struct DesignCanvasView: View {
     @State private var onboardingStore: AppStore = {
         let store = AppStore()
         store.condition = .eczema
-        store.profile = .myself
-        store.goals = [.triggers, .treatment]
         store.currentTreatments = ["Ointment", "Injections", "Tacrolimus"]
         return store
     }()

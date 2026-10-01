@@ -1,5 +1,4 @@
 import SwiftUI
-import Charts
 
 // MARK: - O7 First body map
 
@@ -226,78 +225,7 @@ struct NotificationsStep: View {
     }
 }
 
-// MARK: - O9 Location (soft ask)
-
-struct LocationStep: View {
-    @Environment(AppStore.self) private var store
-    let next: () -> Void
-
-    var body: some View {
-        OnboardingPage(
-            title: "Get a skin forecast",
-            subtitle: "Dry air, heat and pollen often affect skin. We'll warn you a day ahead.",
-            why: "We only use your city to check the weather — never your exact location."
-        ) {
-            SkinForecastCard()
-        } footer: {
-            PermissionButtons(onAllow: {
-                store.locationAllowed = true
-                next()
-            }, onNotNow: next)
-        }
-    }
-}
-
-// MARK: - O10 Sleep (soft ask)
-
-struct SleepStep: View {
-    @Environment(AppStore.self) private var store
-    let next: () -> Void
-
-    var body: some View {
-        OnboardingPage(
-            title: "See how sleep and itch connect",
-            subtitle: "Connect Apple Health and we'll add your sleep automatically — no extra logging.",
-            why: "Poor sleep is one of the most common delayed triggers."
-        ) {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 16) {
-                    Label("Sleep", systemImage: "moon.fill").foregroundStyle(Theme.accent)
-                    Label("Itch", systemImage: "circle.fill").foregroundStyle(Theme.intensityModerate)
-                }
-                .font(.rounded(.caption, weight: .semibold))
-                Chart {
-                    ForEach(store.sleepHistory) { day in
-                        LineMark(x: .value("Day", day.date), y: .value("Value", day.value), series: .value("Series", "Sleep"))
-                            .foregroundStyle(Theme.accent)
-                            .interpolationMethod(.catmullRom)
-                            .lineStyle(StrokeStyle(lineWidth: 3))
-                    }
-                    ForEach(store.itchHistory.suffix(store.sleepHistory.count)) { day in
-                        LineMark(x: .value("Day", day.date), y: .value("Value", day.value), series: .value("Series", "Itch"))
-                            .foregroundStyle(Theme.intensityModerate)
-                            .interpolationMethod(.catmullRom)
-                            .lineStyle(StrokeStyle(lineWidth: 3, dash: [5, 4]))
-                    }
-                }
-                .chartYAxis(.hidden)
-                .chartXAxis(.hidden)
-                .frame(height: 150)
-                Text("Preview · after poor nights, itch often rises 1–2 days later.")
-                    .font(.rounded(.footnote))
-                    .foregroundStyle(Theme.inkSoft)
-            }
-            .glassCard()
-        } footer: {
-            PermissionButtons(allowTitle: "Connect Apple Health", onAllow: {
-                store.healthAllowed = true
-                next()
-            }, onNotNow: next)
-        }
-    }
-}
-
-// MARK: - O11 Privacy
+// MARK: - Privacy
 
 struct PrivacyStep: View {
     @Environment(AppSettings.self) private var settings
@@ -348,28 +276,39 @@ struct PrivacyStep: View {
     }
 }
 
-// MARK: - O12 Plan ready
+// MARK: - Plan ready
 
 struct PlanReadyStep: View {
-    @Environment(AppStore.self) private var store
+    @Environment(OnboardingDraft.self) private var draft
     @Environment(AppSettings.self) private var settings
     let next: () -> Void
 
+    private var forms: String {
+        draft.orderedTypes.isEmpty ? "Not specified — you can add it later" : draft.orderedTypes.map(\.title).formatted(.list(type: .and))
+    }
+
     private var focus: String {
-        let goals = store.goals.isEmpty ? [.journal] : Goal.allCases.filter { store.goals.contains($0) }
+        let goals = draft.goals.isEmpty ? [.journal] : Goal.allCases.filter { draft.goals.contains($0) }
         return goals.map(\.title).joined(separator: ", ")
+    }
+
+    private var startingPoint: String {
+        let snapshot = draft.snapshot
+        guard !draft.zoneLevels.isEmpty else { return "No areas marked yet — use the Body tab anytime" }
+        return "≈ \(snapshot.bsa.formatted(.number.precision(.fractionLength(0...1))))% body area · \(snapshot.category.title.lowercased())"
     }
 
     var body: some View {
         OnboardingPage(title: "Your plan is ready") {
             VStack(spacing: 14) {
                 VStack(alignment: .leading, spacing: 14) {
-                    planRow("waveform.path.ecg", "We'll track", "Itch daily · weekly \(store.scoreName)")
+                    planRow("circle.hexagongrid", "Your psoriasis", forms)
+                    planRow("waveform.path.ecg", "We'll track", "Itch daily · body map when it changes")
                     planRow("target", "Your focus", focus)
                     planRow("bell", "First reminder", settings.checkInReminder
                             ? "Tomorrow at \(settings.checkInTime.formatted(date: .omitted, time: .shortened)) · daily check-in"
                             : "None — you can add one anytime")
-                    planRow("flag.checkered", "Starting point", "≈ \(Int(store.affectedArea.rounded()))% body area")
+                    planRow("flag.checkered", "Starting point", startingPoint)
                 }
                 .glassCard()
 
@@ -392,10 +331,6 @@ struct PlanReadyStep: View {
             }
         } footer: {
             PrimaryButton(title: "Start", action: next)
-            Button("Save a backup to iCloud") {}
-                .font(.rounded(.footnote, weight: .medium))
-                .foregroundStyle(Theme.inkSoft)
-                .buttonStyle(.plain)
         }
     }
 

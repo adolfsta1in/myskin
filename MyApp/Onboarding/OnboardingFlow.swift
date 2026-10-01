@@ -1,34 +1,33 @@
+import SwiftData
 import SwiftUI
 
 enum OnboardingStep: Int, CaseIterable, Identifiable {
-    case welcome, condition, profile, skinNow, goals, insight, bodyMap, treatments, notifications, location, sleep, privacy, plan
+    case welcome, disclaimer, psoriasisProfile, skinNow, goals, insight, bodyMap, treatments, notifications, privacy, plan
 
     var id: Int { rawValue }
 
-    /// Optional steps show a "Skip" button.
+    /// Optional steps show a "Skip" button. The disclaimer can never be skipped.
     var isOptional: Bool {
         switch self {
-        case .skinNow, .goals, .bodyMap, .treatments, .notifications, .location, .sleep, .privacy: true
+        case .psoriasisProfile, .skinNow, .goals, .bodyMap, .treatments, .notifications, .privacy: true
         default: false
         }
     }
 
-    /// Label used on the design canvas (O1…O12; notifications is part of O8).
+    /// Label used on the design canvas.
     var label: String {
         switch self {
         case .welcome: "O1 · Welcome"
-        case .condition: "O2 · Condition"
-        case .profile: "O3 · Who for"
+        case .disclaimer: "O2 · Disclaimer"
+        case .psoriasisProfile: "O3 · Your psoriasis"
         case .skinNow: "O4 · Skin now"
         case .goals: "O5 · Goals"
         case .insight: "O6 · Insight"
         case .bodyMap: "O7 · Body map"
         case .treatments: "O8 · Treatments"
-        case .notifications: "O8 · Notifications"
-        case .location: "O9 · Location"
-        case .sleep: "O10 · Sleep"
-        case .privacy: "O11 · Privacy"
-        case .plan: "O12 · Plan ready"
+        case .notifications: "O9 · Notifications"
+        case .privacy: "O10 · Privacy"
+        case .plan: "O11 · Plan ready"
         }
     }
 }
@@ -36,8 +35,11 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
 struct OnboardingFlow: View {
     @Environment(AppStore.self) private var store
     @Environment(AppSettings.self) private var settings
+    @Environment(\.modelContext) private var modelContext
     @State private var step: OnboardingStep
     @State private var isForward = true
+    @State private var draft = OnboardingDraft()
+    @State private var saveError: String?
 
     init(startAt step: OnboardingStep = .welcome) {
         _step = State(initialValue: step)
@@ -62,37 +64,54 @@ struct OnboardingFlow: View {
                     ))
             }
         }
+        .environment(draft)
         .fontDesign(.rounded)
+        .alert("Couldn't save your answers", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(saveError ?? "")
+        }
     }
 
     @ViewBuilder
     private var content: some View {
         switch step {
         case .welcome: WelcomeStep(next: advance)
-        case .condition: ConditionStep(next: advance)
-        case .profile: ProfileStep(next: advance)
+        case .disclaimer: DisclaimerStep(next: advance)
+        case .psoriasisProfile: PsoriasisProfileStep(next: advance)
         case .skinNow: SkinNowStep(next: advance)
         case .goals: GoalsStep(next: advance)
         case .insight: DelayInsightStep(next: advance)
         case .bodyMap: FirstBodyMapStep(next: advance)
         case .treatments: TreatmentsStep(next: advance)
         case .notifications: NotificationsStep(next: advance)
-        case .location: LocationStep(next: advance)
-        case .sleep: SleepStep(next: advance)
         case .privacy: PrivacyStep(next: advance)
         case .plan: PlanReadyStep(next: advance)
         }
     }
 
     private func advance() {
+        // The disclaimer has to be accepted; Skip is hidden there, this guards the rest.
+        if step == .disclaimer && !draft.hasAcceptedDisclaimer { return }
         isForward = true
-        withAnimation(.smooth(duration: 0.35)) {
-            if let next = OnboardingStep(rawValue: step.rawValue + 1) {
-                step = next
-            } else {
+        if let next = OnboardingStep(rawValue: step.rawValue + 1) {
+            withAnimation(.smooth(duration: 0.35)) { step = next }
+        } else {
+            finish()
+        }
+    }
+
+    /// Saves the answers, then leaves onboarding.
+    private func finish() {
+        do {
+            try draft.save(in: modelContext)
+            withAnimation(.smooth(duration: 0.35)) {
                 settings.hasCompletedOnboarding = true
                 store.isLocked = false
             }
+        } catch {
+            modelContext.rollback()
+            saveError = error.localizedDescription
         }
     }
 
@@ -268,5 +287,6 @@ struct PermissionButtons: View {
 
 #Preview {
     OnboardingFlow()
+        .modelContainer(PreviewData.emptyContainer())
         .previewSetup(AppStore())
 }

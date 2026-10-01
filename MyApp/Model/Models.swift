@@ -35,11 +35,6 @@ enum Condition: String, CaseIterable, Identifiable {
     }
 }
 
-enum ProfileKind: String, CaseIterable, Identifiable {
-    case myself, child
-    var id: String { rawValue }
-}
-
 enum Goal: String, CaseIterable, Identifiable {
     case triggers, treatment, doctor, sleep, journal
 

@@ -48,69 +48,104 @@ struct WelcomeStep: View {
             }
         } footer: {
             PrimaryButton(title: "Get started", action: next)
-            Label("Photos and data stay only on your phone", systemImage: "lock.fill")
+            Label("No account needed. Your diary stays in the app on this phone.", systemImage: "lock.fill")
                 .font(.rounded(.footnote))
                 .foregroundStyle(Theme.inkSoft)
         }
     }
 }
 
-// MARK: - O2 Condition
+// MARK: - O2 Disclaimer
 
-struct ConditionStep: View {
-    @Environment(AppStore.self) private var store
+/// Must be accepted before going on: the app is a diary, not a medical device.
+struct DisclaimerStep: View {
+    @Environment(OnboardingDraft.self) private var draft
     let next: () -> Void
 
+    private let points: [(String, String)] = [
+        ("book.closed", "MySkin is a diary. It helps you notice patterns and talk to your doctor."),
+        ("stethoscope", "It does not diagnose, and it does not prescribe or change treatment."),
+        ("exclamationmark.triangle", "If something worries you — or you feel very unwell — contact your doctor or emergency services."),
+    ]
+
     var body: some View {
-        OnboardingPage(
-            title: "What are you dealing with?",
-            why: "So we can show the score your dermatologist understands."
-        ) {
-            VStack(spacing: 12) {
-                ForEach(Condition.allCases) { condition in
-                    ChoiceCard(
-                        title: condition.title,
-                        subtitle: condition.subtitle,
-                        systemImage: condition.systemImage,
-                        isSelected: store.condition == condition
-                    ) {
-                        withAnimation(.snappy) { store.condition = condition }
+        @Bindable var draft = draft
+        OnboardingPage(title: "Before we start") {
+            VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 14) {
+                    ForEach(points.indices, id: \.self) { index in
+                        let (symbol, text) = points[index]
+                        HStack(alignment: .top, spacing: 12) {
+                            Image(systemName: symbol)
+                                .foregroundStyle(Theme.accent)
+                                .frame(width: 28)
+                            Text(text)
+                                .font(.rounded(.body))
+                                .foregroundStyle(Theme.ink)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                     }
                 }
+                .glassCard()
+
+                Toggle(isOn: $draft.hasAcceptedDisclaimer) {
+                    Text("I understand that MySkin is not medical advice")
+                        .font(.rounded(.body, weight: .medium))
+                        .foregroundStyle(Theme.ink)
+                }
+                .tint(Theme.accent)
+                .glassCard()
             }
         } footer: {
             PrimaryButton(title: "Continue", action: next)
-                .disabled(store.condition == nil)
+                .disabled(!draft.hasAcceptedDisclaimer)
         }
     }
 }
 
-// MARK: - O3 Profile
+// MARK: - O3 Your psoriasis
 
-struct ProfileStep: View {
-    @Environment(AppStore.self) private var store
+struct PsoriasisProfileStep: View {
+    @Environment(OnboardingDraft.self) private var draft
     let next: () -> Void
 
     var body: some View {
+        @Bindable var draft = draft
         OnboardingPage(
-            title: "Who is this diary for?",
-            why: "Children's skin is tracked with age-appropriate wording and scales."
+            title: "Tell us about your psoriasis",
+            subtitle: "Pick every form you have, if you know. It's fine to skip.",
+            why: "Some forms — scalp, nails, folds, palms — matter more for your doctor than their size suggests."
         ) {
-            VStack(spacing: 12) {
-                ChoiceCard(title: "For me", subtitle: "Track your own skin", systemImage: "person", isSelected: store.profile == .myself) {
-                    withAnimation(.snappy) { store.profile = .myself }
+            VStack(alignment: .leading, spacing: 18) {
+                GlassEffectContainer(spacing: 10) {
+                    FlowLayout(spacing: 10) {
+                        ForEach(PsoriasisType.allCases) { type in
+                            TagChip(title: type.title, systemImage: type.systemImage, isSelected: draft.psoriasisTypes.contains(type)) {
+                                withAnimation(.snappy) {
+                                    if draft.psoriasisTypes.contains(type) { draft.psoriasisTypes.remove(type) } else { draft.psoriasisTypes.insert(type) }
+                                }
+                            }
+                        }
+                    }
                 }
-                ChoiceCard(title: "For my child", subtitle: "You'll fill it in together", systemImage: "figure.and.child.holdinghands", isSelected: store.profile == .child) {
-                    withAnimation(.snappy) { store.profile = .child }
+
+                HStack {
+                    Text("When did it start?")
+                        .font(.rounded(.body, weight: .medium))
+                        .foregroundStyle(Theme.ink)
+                    Spacer()
+                    Picker("Year it started", selection: $draft.onsetYear) {
+                        Text("Not sure").tag(Int?.none)
+                        ForEach(OnboardingDraft.onsetYears(), id: \.self) { year in
+                            Text(String(year)).tag(Optional(year))
+                        }
+                    }
+                    .tint(Theme.accent)
                 }
-                Label("You can add more profiles later — for example, one for each child.", systemImage: "person.2")
-                    .font(.rounded(.footnote))
-                    .foregroundStyle(Theme.inkSoft)
-                    .padding(.top, 4)
+                .glassCard(padding: 14)
             }
         } footer: {
             PrimaryButton(title: "Continue", action: next)
-                .disabled(store.profile == nil)
         }
     }
 }
@@ -118,11 +153,11 @@ struct ProfileStep: View {
 // MARK: - O4 Skin now
 
 struct SkinNowStep: View {
-    @Environment(AppStore.self) private var store
+    @Environment(OnboardingDraft.self) private var draft
     let next: () -> Void
 
     private var label: String {
-        switch store.skinNow {
+        switch draft.skinNow {
         case ..<0.2: "Almost clear"
         case ..<0.4: "Mild"
         case ..<0.6: "Moderate"
@@ -132,13 +167,13 @@ struct SkinNowStep: View {
     }
 
     var body: some View {
-        @Bindable var store = store
+        @Bindable var draft = draft
         OnboardingPage(
             title: "How is your skin right now?",
             why: "This becomes your baseline, so progress is measured from where you are today."
         ) {
             VStack(spacing: 24) {
-                SkinMoodIllustration(level: store.skinNow)
+                SkinMoodIllustration(level: draft.skinNow)
                     .frame(height: 220)
                     .frame(maxWidth: .infinity)
                 Text(label)
@@ -147,7 +182,7 @@ struct SkinNowStep: View {
                     .contentTransition(.opacity)
                     .animation(.smooth, value: label)
                 VStack(spacing: 6) {
-                    Slider(value: $store.skinNow, in: 0...1)
+                    Slider(value: $draft.skinNow, in: 0...1)
                         .tint(Theme.accent)
                     HStack {
                         Text("Almost clear")
@@ -197,21 +232,21 @@ struct SkinMoodIllustration: View {
 // MARK: - O5 Goals
 
 struct GoalsStep: View {
-    @Environment(AppStore.self) private var store
+    @Environment(OnboardingDraft.self) private var draft
     let next: () -> Void
 
     var body: some View {
         OnboardingPage(
             title: "What matters most to you?",
             subtitle: "Pick as many as you like.",
-            why: "We'll arrange your Today screen around what you care about."
+            why: "It helps you remember why you're keeping the diary — and what to bring to your doctor."
         ) {
             GlassEffectContainer(spacing: 10) {
                 FlowLayout(spacing: 10) {
                     ForEach(Goal.allCases) { goal in
-                        TagChip(title: goal.title, systemImage: goal.systemImage, isSelected: store.goals.contains(goal)) {
+                        TagChip(title: goal.title, systemImage: goal.systemImage, isSelected: draft.goals.contains(goal)) {
                             withAnimation(.snappy) {
-                                if store.goals.contains(goal) { store.goals.remove(goal) } else { store.goals.insert(goal) }
+                                if draft.goals.contains(goal) { draft.goals.remove(goal) } else { draft.goals.insert(goal) }
                             }
                         }
                     }
@@ -230,19 +265,19 @@ struct DelayInsightStep: View {
 
     var body: some View {
         OnboardingPage(
-            title: "Flares often show up a few days after a trigger",
-            subtitle: "That's why they're so hard to spot on your own. MySkin connects the dots for you."
+            title: "Flares can show up days or weeks after a trigger",
+            subtitle: "That's why links are hard to spot on your own. A short daily note helps you and your doctor see patterns."
         ) {
             VStack(spacing: 20) {
                 HStack(spacing: 0) {
-                    timelineNode("bolt", "Trigger", "Stress, poor sleep, dry air", Theme.accentSoft)
+                    timelineNode("bolt", "Trigger", "Stress, infection, skin injury, cold dry air", Theme.accentSoft)
                     dashedGap
-                    timelineNode("hourglass", "Pause", "2–7 days", Theme.sand)
+                    timelineNode("hourglass", "Pause", "Days to a few weeks", Theme.sand)
                     dashedGap
-                    timelineNode("flame", "Flare", "Itch, redness", Theme.intensityMild)
+                    timelineNode("flame", "Flare", "New patches, itch", Theme.intensityMild)
                 }
                 .padding(.vertical, 12)
-                Text("Logging a few seconds a day is enough to reveal these delayed links.")
+                Text("Logging a few seconds a day makes these delayed links easier to notice.")
                     .font(.rounded(.subheadline))
                     .foregroundStyle(Theme.inkSoft)
                     .multilineTextAlignment(.center)
