@@ -3,14 +3,15 @@ import SwiftUI
 // MARK: - O7 First body map
 
 struct FirstBodyMapStep: View {
-    @Environment(AppStore.self) private var store
+    @Environment(OnboardingDraft.self) private var draft
     @State private var side: BodySide = .front
     let next: () -> Void
 
     var body: some View {
+        let bsa = draft.snapshot.bsa
         OnboardingPage(
             title: "Where is your skin affected?",
-            subtitle: "Tap areas on the body. Tap again to change intensity.",
+            subtitle: "Tap areas on the body. Tap again for more: mild, moderate, severe.",
             why: "Doctors estimate how much skin is involved — this helps you both see change over time."
         ) {
             VStack(spacing: 14) {
@@ -20,18 +21,23 @@ struct FirstBodyMapStep: View {
                 .pickerStyle(.segmented)
                 .labelsHidden()
 
-                BodySilhouette(side: side, intensities: store.zoneIntensity) { zone in
-                    store.cycleIntensity(for: zone.id)
+                BodySilhouette(side: side, intensities: draft.zoneLevels) { zone in
+                    draft.cycleLevel(for: zone.id)
                 }
                 .frame(height: 300)
 
                 FlowLayout(spacing: 8) {
                     ForEach(BodyZone.quickZones) { zone in
-                        TagChip(title: zone.name, isSelected: (store.zoneIntensity[zone.id] ?? 0) > 0) {
-                            store.cycleIntensity(for: zone.id)
+                        let level = draft.zoneLevels[zone.id] ?? 0
+                        TagChip(
+                            title: level == 0 ? zone.name : "\(zone.name) · \(IntensityLegend.label(for: level))",
+                            isSelected: level > 0
+                        ) {
+                            draft.cycleLevel(for: zone.id)
                         }
                     }
                 }
+                IntensityLegend()
             }
             .glassCard(padding: 16)
         } footer: {
@@ -39,18 +45,18 @@ struct FirstBodyMapStep: View {
                 Image(systemName: "flag.checkered")
                     .foregroundStyle(Theme.sageDeep)
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("≈ \(store.affectedArea, format: .number.precision(.fractionLength(0)))% of body area")
+                    Text("≈ \(bsa, format: .number.precision(.fractionLength(0...1)))% of body area")
                         .font(.rounded(.headline, weight: .bold))
                         .foregroundStyle(Theme.ink)
                         .contentTransition(.numericText())
-                    Text("This is your starting point")
+                    Text("A rough start — you can refine each area in the Body tab")
                         .font(.rounded(.subheadline))
                         .foregroundStyle(Theme.inkSoft)
                 }
                 Spacer()
             }
             .glassCard(padding: 14, tint: Theme.sageSoft)
-            .animation(.smooth, value: store.affectedArea)
+            .animation(.smooth, value: bsa)
             PrimaryButton(title: "Continue", action: next)
         }
     }
@@ -59,84 +65,66 @@ struct FirstBodyMapStep: View {
 // MARK: - O8 Treatments
 
 struct TreatmentsStep: View {
-    @Environment(AppStore.self) private var store
+    @Environment(OnboardingDraft.self) private var draft
     @State private var query = ""
     let next: () -> Void
 
-    private let quick: [(String, String)] = [
-        ("Cream", "hand.point.up.left"),
-        ("Ointment", "drop"),
-        ("Tablets", "pills"),
-        ("Injections", "syringe"),
-        ("Phototherapy", "sun.max"),
-        ("Nothing right now", "minus.circle"),
-    ]
+    private var trimmedQuery: String { query.trimmingCharacters(in: .whitespacesAndNewlines) }
 
-    private let catalog = [
-        "Tacrolimus", "Pimecrolimus", "Hydrocortisone", "Clobetasol", "Betamethasone", "Calcipotriol",
-        "Methotrexate", "Ciclosporin", "Dupilumab", "Adalimumab", "Secukinumab", "Ustekinumab", "Apremilast",
-    ]
-
-    private var results: [String] {
-        guard !query.isEmpty else { return [] }
-        return catalog.filter { $0.localizedCaseInsensitiveContains(query) && !store.currentTreatments.contains($0) }
+    private var results: [Medication] {
+        guard !trimmedQuery.isEmpty else { return [] }
+        let chosen = Set(draft.treatments.compactMap(\.catalogID))
+        return TreatmentDraft.search(trimmedQuery).filter { !chosen.contains($0.id) }
     }
 
     var body: some View {
+        @Bindable var draft = draft
         OnboardingPage(
             title: "What are you using right now?",
-            why: "Knowing when a treatment started lets us show whether it's making a difference."
+            subtitle: "Search the list or type your own. Schedules can be adjusted later in Treatment.",
+            why: "Knowing when a treatment started lets you see whether it's making a difference."
         ) {
             VStack(alignment: .leading, spacing: 18) {
-                GlassEffectContainer(spacing: 10) {
-                    FlowLayout(spacing: 10) {
-                        ForEach(quick.indices, id: \.self) { index in
-                            let (title, symbol) = quick[index]
-                            TagChip(title: title, systemImage: symbol, isSelected: store.currentTreatments.contains(title)) {
-                                toggle(title)
-                            }
-                        }
-                    }
-                }
-
                 HStack(spacing: 10) {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(Theme.inkSoft)
-                    TextField("Search, e.g. tacrolimus", text: $query)
+                    TextField("Search, e.g. clobetasol", text: $query)
                         .textFieldStyle(.plain)
                         .font(.rounded(.body))
+                        .submitLabel(.done)
+                        .onSubmit(addCustom)
                 }
                 .padding(14)
                 .glassEffect(.regular, in: .capsule)
 
-                if !results.isEmpty {
+                if !trimmedQuery.isEmpty {
                     VStack(alignment: .leading, spacing: 0) {
-                        ForEach(results.prefix(4), id: \.self) { name in
-                            Button {
-                                toggle(name)
+                        ForEach(results.prefix(5)) { medication in
+                            resultRow(medication.name, detail: medication.kind.title) {
+                                draft.add(medication)
                                 query = ""
-                            } label: {
-                                HStack {
-                                    Text(name).foregroundStyle(Theme.ink)
-                                    Spacer()
-                                    Image(systemName: "plus.circle").foregroundStyle(Theme.accent)
-                                }
-                                .font(.rounded(.body))
-                                .padding(.vertical, 10)
-                                .contentShape(.rect)
                             }
-                            .buttonStyle(.plain)
                         }
+                        resultRow("Add “\(trimmedQuery)”", detail: "Your own medication", action: addCustom)
                     }
                     .glassCard(padding: 14)
                 }
 
-                let named = store.currentTreatments.filter { catalog.contains($0) }.sorted()
-                if !named.isEmpty {
+                if !draft.treatments.isEmpty {
                     FlowLayout(spacing: 8) {
-                        ForEach(named, id: \.self) { name in
-                            TagChip(title: name, systemImage: "xmark", isSelected: true) { toggle(name) }
+                        ForEach(Array(draft.treatments.enumerated()), id: \.offset) { index, treatment in
+                            TagChip(title: treatment.trimmedName, systemImage: "xmark", isSelected: true) {
+                                withAnimation(.snappy) { draft.removeTreatment(at: index) }
+                            }
+                            .accessibilityHint("Removes it")
                         }
+                    }
+                }
+
+                TagChip(title: "Nothing right now", systemImage: "minus.circle", isSelected: draft.hasNoTreatment) {
+                    withAnimation(.snappy) {
+                        draft.hasNoTreatment.toggle()
+                        if draft.hasNoTreatment { draft.treatments = [] }
                     }
                 }
             }
@@ -145,14 +133,27 @@ struct TreatmentsStep: View {
         }
     }
 
-    private func toggle(_ item: String) {
-        withAnimation(.snappy) {
-            if store.currentTreatments.contains(item) {
-                store.currentTreatments.remove(item)
-            } else {
-                store.currentTreatments.insert(item)
+    private func addCustom() {
+        guard !trimmedQuery.isEmpty else { return }
+        withAnimation(.snappy) { draft.addCustom(trimmedQuery) }
+        query = ""
+    }
+
+    private func resultRow(_ title: String, detail: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title).foregroundStyle(Theme.ink)
+                    Text(detail).font(.rounded(.caption)).foregroundStyle(Theme.inkSoft)
+                }
+                Spacer()
+                Image(systemName: "plus.circle").foregroundStyle(Theme.accent)
             }
+            .font(.rounded(.body))
+            .padding(.vertical, 8)
+            .contentShape(.rect)
         }
+        .buttonStyle(.plain)
     }
 }
 

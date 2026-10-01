@@ -9,7 +9,6 @@ final class AppStore {
 
     // MARK: Onboarding answers
     var condition: Condition?
-    var currentTreatments: Set<String> = []
     var notifyForecast = false
 
     // MARK: Body map (zone id → intensity 0...3)
@@ -105,11 +104,6 @@ final class AppStore {
 
     var scoreName: String {
         condition == .psoriasis ? "Self-assessment" : "POEM"
-    }
-
-    func cycleIntensity(for zoneID: String) {
-        let next = ((zoneIntensity[zoneID] ?? 0) + 1) % 4
-        zoneIntensity[zoneID] = next == 0 ? nil : next
     }
 
     /// Sample store used by previews and the design canvas.
