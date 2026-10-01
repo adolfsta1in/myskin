@@ -12,14 +12,15 @@ struct ZoneScore: Hashable, Sendable {
     var erythema: Int = 0
     var induration: Int = 0
     var scale: Int = 0
+    var pustules: Bool = false
 
     /// A zone counts as affected if it has area or any visible sign.
-    var isAffected: Bool { palms > 0 || erythema > 0 || induration > 0 || scale > 0 }
+    var isAffected: Bool { palms > 0 || erythema > 0 || induration > 0 || scale > 0 || pustules }
 }
 
 extension ZoneAssessment {
     var score: ZoneScore {
-        ZoneScore(zoneID: zoneID, palms: palms, erythema: erythema, induration: induration, scale: scale)
+        ZoneScore(zoneID: zoneID, palms: palms, erythema: erythema, induration: induration, scale: scale, pustules: pustules)
     }
 }
 
