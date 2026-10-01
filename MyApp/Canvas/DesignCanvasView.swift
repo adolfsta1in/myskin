@@ -1,4 +1,5 @@
 #if DEBUG
+import SwiftData
 import SwiftUI
 
 /// All screens laid out on one canvas: onboarding row on top, main app row below.
@@ -68,6 +69,7 @@ struct DesignCanvasView: View {
         }
         .fontDesign(.rounded)
         .preferredColorScheme(.light)
+        .modelContainer(PreviewData.container)
     }
 
     private func row<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {

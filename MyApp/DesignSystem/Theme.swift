@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 /// Central palette, spacing and typography for MySkin.
@@ -65,11 +66,14 @@ extension Color {
 }
 
 extension View {
-    /// Light, rounded styling plus a sample store — used by previews.
+    /// Light, rounded styling plus a sample store and sample SwiftData records — used by previews.
     func previewSetup(_ store: AppStore = .preview) -> some View {
         environment(store)
             .fontDesign(.rounded)
             .preferredColorScheme(.light)
+            #if DEBUG
+            .modelContainer(PreviewData.container)
+            #endif
     }
 }
 

@@ -6,13 +6,16 @@ import Testing
 struct PersistenceTests {
     /// Fresh in-memory store for each test.
     private func makeContext() throws -> ModelContext {
-        let schema = Schema(versionedSchema: SchemaV1.self)
-        let container = try ModelContainer(
-            for: schema,
-            migrationPlan: MySkinMigrationPlan.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-        )
-        return ModelContext(container)
+        ModelContext(try AppModelContainer.makeInMemory())
+    }
+
+    @Test func previewDataPopulates() throws {
+        let context = try makeContext()
+        PreviewData.populate(context)
+        try context.save()
+        #expect(try context.fetchCount(FetchDescriptor<Profile>()) == 1)
+        #expect(try context.fetchCount(FetchDescriptor<DailyCheckIn>()) == 14)
+        #expect(try context.fetchCount(FetchDescriptor<SchemaV1.Treatment>()) == 4)
     }
 
     @Test func profileRoundTrip() throws {

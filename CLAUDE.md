@@ -27,8 +27,11 @@
 Текущая (демо):
 ```
 MyApp/
-  MyApp.swift          точка входа, AppStore в environment
-  Model/               AppStore (моки, будет удалён), Models (BodyZone и пр.)
+  App/                 MyApp.swift (точка входа, AppStore + modelContainer)
+  Model/               AppStore (моки, будет удалён), Models (остатки демо)
+    Domain/            DomainEnums, BodyZone
+    Persistence/       SchemaV1, MigrationPlan, AppModelContainer
+  Preview/             PreviewData (только DEBUG)
   Screens/             MainTabView+RootView, Today, BodyMap, Photos, ZoneProgress,
                        Treatment, Insights, DoctorReport, PrivacyLock
   Onboarding/          OnboardingFlow, OnboardingStepsIntro, OnboardingStepsSetup
@@ -65,7 +68,7 @@ docs/                  spec, research, current-state, migration-plan
 - `docs/reaserch.md` — медицинский первоисточник. Читать только при сомнениях в медицинском содержании (шкалы, препараты, триггеры).
 
 ## Статус
-- **Текущий шаг: Шаг 9** — подключение контейнера и превью-данные (этап A).
+- **Текущий шаг: Шаг 10** — `AppSettings` и онбординг «один раз» (этап A).
 - Готово: фазы анализа (spec, current-state, migration-plan), этап 0 целиком:
   - Шаг 1 — git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`;
   - Шаг 2 — bundle id `com.adolfsta1in.myskin`, usage descriptions для Face ID и камеры;
@@ -76,5 +79,7 @@ docs/                  spec, research, current-state, migration-plan
     - Шаг 6 — `Model/Domain/BodyZone.swift` (`BodySide`, `BodyRegion`, `ZoneShapeKind`, `BodyZone`). Quick-зоны: scalp, face, nails, palms, soles, folds, genitals — все `isSpecialSite`. Ягодицы (`*.pelvis`) — регион legs, как в PASI. Внимание для шага 11: `front.head` («Face» на силуэте) и `quick.face` пересекаются по площади.
     - Шаг 7 — `Model/Persistence/SchemaV1.swift`: модели вложены в `enum SchemaV1: VersionedSchema`, наружу — `typealias`. Enum хранятся строками (`…ID`/`…IDs`) с вычисляемыми типизированными свойствами. `DailyCheckIn.day` — `.unique` (одна запись на день), `ZoneAssessment` — `#Unique([day, zoneID])`; день нормализуется в `startOfDay` в `init`.
     - Шаг 8 — `Treatment` (расписание: `scheduleKind` + `timesPerDay`/`interval`/`weekday`/`doseMinutes`), `DoseLog` (каскад от `Treatment`), `Photo`, `QuestionnaireResult`; `MigrationPlan.swift` (`MySkinMigrationPlan`, стадий нет). У новой модели **нет** `typealias Treatment` — имя занято демо-структурой; до шага 22 писать `SchemaV1.Treatment`.
+    - Шаг 9 — `App/MyApp.swift` (`.modelContainer`), `Model/Persistence/AppModelContainer.swift` (`makePersistent`: `Application Support/Store/MySkin.store`, без CloudKit, папка и файлы с `.completeUnlessOpen` — чтобы открытая SQLite могла дописать при блокировке; `makeInMemory` для превью и тестов). `Preview/PreviewData.swift` (DEBUG): профиль, 14 чек-инов, оценки зон, 4 лечения с дозами, DLQI/PEST; фото нет. `previewSetup` и `DesignCanvasView` подключают `PreviewData.container`. При ошибке открытия хранилища — `fatalError` (без тихого пустого хранилища).
+- Известная проблема (не регрессия): превью `DoctorReportView` падает в AttributeGraph (навбар/Liquid Glass) — так же падало и до шага 9.
 - Замечание по сборке: `BuildProject(buildForTesting:)` не пересобирает `MyApp` перед тестами — сначала обычный `BuildProject`, потом `RunAllTests`.
 - После каждого шага: отметить ✅ в `docs/migration-plan.md` и обновить этот раздел.
