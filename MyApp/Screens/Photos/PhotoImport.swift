@@ -4,24 +4,27 @@ import SwiftUI
 
 /// Where a new zone photo comes from.
 enum PhotoSource: Identifiable {
+    case camera
     case library
 
     var id: Self { self }
 
     var title: String {
         switch self {
+        case .camera: "Take photo"
         case .library: "Choose from library"
         }
     }
 
     var systemImage: String {
         switch self {
+        case .camera: "camera"
         case .library: "photo.on.rectangle"
         }
     }
 
-    /// Sources this device offers.
-    static var available: [PhotoSource] { [.library] }
+    /// Sources this device offers; the camera is hidden where there is none (simulator).
+    static var available: [PhotoSource] { CameraPicker.isAvailable ? [.camera, .library] : [.library] }
 }
 
 /// Presents the photo picker for `zoneID` and stores the chosen image in `PhotoStore` + `Photo`.
@@ -44,6 +47,17 @@ struct PhotoImportModifier: ViewModifier {
                 matching: .images,
                 preferredItemEncoding: .compatible
             )
+            .fullScreenCover(isPresented: Binding(get: { source == .camera }, set: { if !$0 { source = nil } })) {
+                CameraPicker(
+                    onCapture: { image in
+                        source = nil
+                        guard let zoneID, let data = image.jpegData(compressionQuality: 0.95) else { return }
+                        Task { await importData(data, zoneID: zoneID) }
+                    },
+                    onCancel: { source = nil }
+                )
+                .ignoresSafeArea()
+            }
             .onChange(of: item) { _, newItem in
                 guard let newItem, let zoneID else { return }
                 item = nil
@@ -69,6 +83,16 @@ struct PhotoImportModifier: ViewModifier {
         defer { isSaving = false }
         do {
             guard let data = try await item.loadTransferable(type: Data.self) else { throw PhotoStore.PhotoError.unreadableImage }
+            try await save(data, zoneID: zoneID)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func importData(_ data: Data, zoneID: String) async {
+        isSaving = true
+        defer { isSaving = false }
+        do {
             try await save(data, zoneID: zoneID)
         } catch {
             errorMessage = error.localizedDescription

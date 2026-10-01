@@ -49,9 +49,6 @@ struct ZoneProgressView: View {
         .screenScaffold()
         .navigationTitle(zone.name)
         .navigationBarTitleDisplayMode(.inline)
-        .fullScreenCover(isPresented: $isShowingCamera) {
-            CameraOverlayView(zoneName: zone.name)
-        }
     }
 
     private var beforePhoto: PhotoEntry? { zone.photos.indices.contains(beforeIndex) ? zone.photos[beforeIndex] : nil }

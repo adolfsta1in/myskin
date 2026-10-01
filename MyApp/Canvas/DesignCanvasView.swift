@@ -50,7 +50,6 @@ struct DesignCanvasView: View {
                         phone("1 · Today · Flare") { MainTabView(selection: .today).modelContainer(PreviewData.flareContainer) }
                         phone("2 · Body map") { MainTabView(selection: .body) }
                         phone("Photos") { MainTabView(selection: .photos) }
-                        phone("3 · Camera overlay") { CameraOverlayView(zoneName: "Left elbow") }
                         phone("4 · Zone progress") {
                             NavigationStack { ZoneProgressView(zone: store.photoZones[0]) }
                         }
