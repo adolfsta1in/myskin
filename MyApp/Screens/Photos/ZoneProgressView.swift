@@ -70,6 +70,17 @@ struct ZoneProgressView: View {
         .screenScaffold()
         .navigationTitle(zoneName)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Menu {
+                    ForEach(PhotoSource.available) { option in
+                        Button(option.title, systemImage: option.systemImage) { source = option }
+                    }
+                } label: {
+                    Label("Add photo", systemImage: "plus")
+                }
+            }
+        }
         .photoImport(zoneID: zoneID, source: $source)
         .onAppear(perform: resetSelection)
         .onChange(of: photos.count) { resetSelection() }
@@ -179,7 +190,7 @@ struct ZoneProgressView: View {
 
     private var photoStrip: some View {
         VStack(alignment: .leading, spacing: 10) {
-            SectionHeader(title: "All photos", subtitle: "Tap to set “before”, long-press to set “now”")
+            SectionHeader(title: "All photos", subtitle: "Tap to set “before”. Touch and hold to set “now” or delete.")
             ScrollView(.horizontal) {
                 HStack(spacing: 10) {
                     ForEach(Array(photos.enumerated()), id: \.element.persistentModelID) { index, photo in
@@ -195,7 +206,6 @@ struct ZoneProgressView: View {
                                 .foregroundStyle(Theme.inkSoft)
                         }
                         .onTapGesture { withAnimation(.smooth) { beforeIndex = index } }
-                        .onLongPressGesture { withAnimation(.smooth) { afterIndex = index } }
                         .contextMenu {
                             Button("Set as before", systemImage: "arrow.left.to.line") { beforeIndex = index }
                             Button("Set as now", systemImage: "arrow.right.to.line") { afterIndex = index }

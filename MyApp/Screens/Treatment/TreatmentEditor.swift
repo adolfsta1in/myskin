@@ -77,7 +77,7 @@ private struct MedicationRow: View {
 
     private var detail: String {
         var parts = [medication.kind.title]
-        if let steroidClass = medication.steroidClass { parts.append("Class \(steroidClass.number)") }
+        if let steroidClass = medication.steroidClass { parts.append(steroidClass.title.components(separatedBy: " · ").first ?? steroidClass.title) }
         return parts.joined(separator: " · ")
     }
 }

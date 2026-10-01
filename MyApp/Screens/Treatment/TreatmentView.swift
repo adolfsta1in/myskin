@@ -183,7 +183,8 @@ private struct TreatmentCard: View {
     private var subtitle: String {
         var parts = [treatment.kind.title, DoseScheduler.summary(for: treatment.doseSchedule)]
         if let steroidClass = treatment.steroidClass {
-            parts.append("Class \(steroidClass.number)")
+            // Same wording as the editor: «Class I», not «Class 1».
+            parts.append(steroidClass.title.components(separatedBy: " · ").first ?? steroidClass.title)
         }
         return parts.joined(separator: " · ")
     }

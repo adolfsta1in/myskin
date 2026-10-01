@@ -7,8 +7,15 @@ struct CameraPicker: UIViewControllerRepresentable {
     let onCapture: (UIImage) -> Void
     let onCancel: () -> Void
 
-    /// False in the simulator and on devices without a camera.
-    static var isAvailable: Bool { UIImagePickerController.isSourceTypeAvailable(.camera) }
+    /// False in the simulator and on devices without a camera. The simulator check is explicit:
+    /// newer simulators can report a camera source that has no real camera behind it.
+    static var isAvailable: Bool {
+        #if targetEnvironment(simulator)
+        false
+        #else
+        UIImagePickerController.isSourceTypeAvailable(.camera)
+        #endif
+    }
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
