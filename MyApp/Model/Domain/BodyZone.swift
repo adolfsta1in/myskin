@@ -71,7 +71,8 @@ struct BodyZone: Identifiable, Hashable {
         }
 
         var zones: [BodyZone] = [
-            BodyZone(id: "\(prefix).head", name: side == .front ? "Face" : "Back of head", rect: CGRect(x: 78, y: 6, width: 44, height: 54), kind: .ellipse, area: 4.5, region: .head),
+            // The face is a special site; the back of the head is covered by `quick.scalp`.
+            BodyZone(id: "\(prefix).head", name: side == .front ? "Face" : "Back of head", rect: CGRect(x: 78, y: 6, width: 44, height: 54), kind: .ellipse, area: 4.5, region: .head, isSpecialSite: side == .front),
             BodyZone(id: "\(prefix).neck", name: "Neck", rect: CGRect(x: 90, y: 56, width: 20, height: 20), kind: .rounded, area: 1, region: .head),
             BodyZone(id: "\(prefix).torso.upper", name: side == .front ? "Chest" : "Upper back", rect: CGRect(x: 62, y: 74, width: 76, height: 68), kind: .rounded, area: 9, region: .trunk),
             BodyZone(id: "\(prefix).torso.lower", name: side == .front ? "Abdomen" : "Lower back", rect: CGRect(x: 65, y: 144, width: 70, height: 56), kind: .rounded, area: 9, region: .trunk),

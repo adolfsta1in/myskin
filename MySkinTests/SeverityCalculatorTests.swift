@@ -111,6 +111,16 @@ struct SeverityCalculatorTests {
         #expect(scalp.specialSiteIDs == ["quick.scalp"])
     }
 
+    @Test func faceOnSilhouetteIsSpecialSite() {
+        let face = SeverityCalculator.snapshot(for: [ZoneScore(zoneID: "front.head", palms: 0.5, erythema: 1)])
+        #expect(face.specialSiteIDs == ["front.head"])
+        #expect(face.category == .moderate)
+
+        let backOfHead = SeverityCalculator.snapshot(for: [ZoneScore(zoneID: "back.head", palms: 0.5, erythema: 1)])
+        #expect(backOfHead.specialSiteIDs.isEmpty)
+        #expect(backOfHead.category == .mild)
+    }
+
     @Test func nailsWithoutAreaStillCountAsSpecialSite() {
         let snapshot = SeverityCalculator.snapshot(for: [ZoneScore(zoneID: "quick.nails", palms: 0, scale: 1)])
         #expect(snapshot.specialSiteIDs == ["quick.nails"])
