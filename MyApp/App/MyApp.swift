@@ -19,6 +19,8 @@ import UserNotifications
             fatalError("Could not open the data store: \(error)")
         }
         UNUserNotificationCenter.current().delegate = NotificationPresenter.shared
+        // Shared files (PDF, CSV) from the last session.
+        ExportFolder.clear()
     }
 
     var body: some Scene {

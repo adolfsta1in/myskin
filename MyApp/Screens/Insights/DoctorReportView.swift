@@ -13,6 +13,7 @@ struct DoctorReportView: View {
     @State private var period: ReportPeriod = .threeMonths
     /// Thumbnails for the before / now photos, loaded before they are drawn (also for the PDF).
     @State private var images: [String: UIImage] = [:]
+    @State private var isSharing = false
 
     enum ReportPeriod: String, CaseIterable, Identifiable {
         case oneMonth = "Last month"
@@ -66,8 +67,10 @@ struct DoctorReportView: View {
                     }
                     .buttonStyle(.glass)
 
-                    ShareLink(item: ReportText.make(report), subject: Text("MySkin report")) {
-                        Label("Share", systemImage: "square.and.arrow.up")
+                    Button {
+                        isSharing = true
+                    } label: {
+                        Label("Share PDF", systemImage: "square.and.arrow.up")
                             .font(.rounded(.headline, weight: .semibold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 6)
@@ -82,6 +85,13 @@ struct DoctorReportView: View {
         .screenScaffold()
         .navigationTitle("Doctor report")
         .navigationBarTitleDisplayMode(.inline)
+        .healthDataShare(isPresented: $isSharing) {
+            try ReportRenderer.makePDF(
+                report: report,
+                weeklyItch: Trends.weeklyItch(checkIns: checkIns.map(\.sample), from: report.start, to: report.end),
+                images: images
+            )
+        }
         .task(id: report.photos.flatMap { [$0.before, $0.now] }) {
             await loadImages(for: report.photos)
         }
@@ -287,27 +297,6 @@ struct ReportPaper: View {
             .font(.rounded(.caption2, weight: .bold))
             .foregroundStyle(Theme.inkSoft)
             .padding(.top, 4)
-    }
-}
-
-// MARK: - Text summary
-
-enum ReportText {
-    static func make(_ report: DoctorReport) -> String {
-        var lines = ["MySkin report · \(report.start.formatted(date: .abbreviated, time: .omitted)) – \(report.end.formatted(date: .abbreviated, time: .omitted))"]
-        if let now = report.severityNow {
-            let before = report.severityBefore.map { "\($0.bsa.formatted(.number.precision(.fractionLength(0...1))))% → " } ?? ""
-            lines.append("Body area: \(before)\(now.bsa.formatted(.number.precision(.fractionLength(0...1))))% · \(now.category.title)")
-        }
-        if let itch = report.itchNow {
-            let before = report.itchBefore.map { "\($0.formatted(.number.precision(.fractionLength(1)))) → " } ?? ""
-            lines.append("Average itch: \(before)\(itch.formatted(.number.precision(.fractionLength(1))))")
-        }
-        if let dlqi = report.dlqiLatest { lines.append("DLQI: \(dlqi) of 30") }
-        if let pest = report.pestLatest { lines.append("PEST: \(pest) of 5") }
-        if !report.treatments.isEmpty { lines.append("Treatments: \(report.treatments.map(\.name).joined(separator: ", "))") }
-        lines.append("Self-reported diary data, not a diagnosis.")
-        return lines.joined(separator: "\n")
     }
 }
 
