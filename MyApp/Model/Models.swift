@@ -163,29 +163,6 @@ struct DayValue: Identifiable {
     var id: Date { date }
 }
 
-enum TreatmentKind: String {
-    case cream, ointment, pill, biologic, phototherapy
-
-    var title: String {
-        switch self {
-        case .cream: "Cream"
-        case .ointment: "Ointment"
-        case .pill: "Tablets"
-        case .biologic: "Biologic"
-        case .phototherapy: "Phototherapy"
-        }
-    }
-
-    var systemImage: String {
-        switch self {
-        case .cream, .ointment: "hand.point.up.left"
-        case .pill: "pills"
-        case .biologic: "syringe"
-        case .phototherapy: "sun.max"
-        }
-    }
-}
-
 struct Treatment: Identifiable {
     let id = UUID()
     let name: String

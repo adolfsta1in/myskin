@@ -223,7 +223,7 @@ MySkinTests/      Swift Testing
 
 ## Этап A. Модель данных и хранение
 
-### Шаг 5. Доменные перечисления
+### Шаг 5. Доменные перечисления ✅
 - **Цель:** стабильные строковые типы вместо отображаемых имён.
 - **Файлы:** `Model/Domain/DomainEnums.swift`: `PsoriasisType`, `Trigger`, `TreatmentKind` (+ shampoo/foam), `SteroidClass` (I–VII), `ScheduleKind`, `QuestionnaireKind`, `DoseStatus`. Все `String`, `Codable`, `CaseIterable`, с `title` и `systemImage`.
 - **Зависимости:** 4.

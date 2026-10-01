@@ -65,10 +65,13 @@ docs/                  spec, research, current-state, migration-plan
 - `docs/reaserch.md` — медицинский первоисточник. Читать только при сомнениях в медицинском содержании (шкалы, препараты, триггеры).
 
 ## Статус
-- **Текущий шаг: Шаг 5** — доменные перечисления (начало этапа A).
+- **Текущий шаг: Шаг 6** — расширение `BodyZone` (этап A).
 - Готово: фазы анализа (spec, current-state, migration-plan), этап 0 целиком:
   - Шаг 1 — git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`;
   - Шаг 2 — bundle id `com.adolfsta1in.myskin`, usage descriptions для Face ID и камеры;
   - Шаг 3 — Swift 6; `Shape`-типы помечены `nonisolated`, т. к. по умолчанию всё на MainActor;
   - Шаг 4 — таргет `MySkinTests` (Swift Testing, Swift 6, MainActor по умолчанию, хост — `MyApp`, доступен `@testable import MyApp`), подключён к схеме `MyApp`; тесты запускаются через `RunAllTests` / ⌘U.
+  - Этап A:
+    - Шаг 5 — `Model/Domain/DomainEnums.swift` (`nonisolated`, `String` rawValue, `Codable`); `TreatmentKind` перенесён туда из `Models.swift`. Тест фиксирует rawValue.
+- Замечание по сборке: `BuildProject(buildForTesting:)` не пересобирает `MyApp` перед тестами — сначала обычный `BuildProject`, потом `RunAllTests`.
 - После каждого шага: отметить ✅ в `docs/migration-plan.md` и обновить этот раздел.
