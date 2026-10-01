@@ -10,4 +10,10 @@ enum NotificationPermission {
             return false
         }
     }
+
+    /// True if reminders can be delivered, without showing any dialog.
+    static func isAllowed() async -> Bool {
+        let status = await UNUserNotificationCenter.current().notificationSettings().authorizationStatus
+        return status == .authorized || status == .provisional
+    }
 }

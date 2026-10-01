@@ -5,6 +5,7 @@ struct TodayView: View {
     @Query private var checkIns: [DailyCheckIn]
     @Query private var assessments: [ZoneAssessment]
     @State private var isShowingCanvas = false
+    @State private var isShowingSettings = false
     /// Questionnaire opened from a due card. The sheet lives here, so it stays open
     /// when the card disappears after the result is saved.
     @State private var takingQuestionnaire: QuestionnaireKind?
@@ -28,7 +29,7 @@ struct TodayView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
-                    TodayHeader(onLongPress: { isShowingCanvas = true })
+                    TodayHeader(onLongPress: { isShowingCanvas = true }, onSettings: { isShowingSettings = true })
                     ModeBanner(status: status)
                     if !mapFlags.isEmpty {
                         RedFlagCard { shownFlags = mapFlags }
@@ -52,6 +53,9 @@ struct TodayView: View {
             .screenScaffold()
             .toolbar(.hidden, for: .navigationBar)
             .animation(.smooth, value: status.mode)
+            .sheet(isPresented: $isShowingSettings) {
+                SettingsView()
+            }
             .sheet(item: $takingQuestionnaire) { kind in
                 QuestionnaireView(kind: kind)
             }
@@ -175,6 +179,7 @@ private struct RedFlagCard: View {
 
 private struct TodayHeader: View {
     var onLongPress: () -> Void
+    var onSettings: () -> Void
 
     private var greeting: String {
         switch Calendar.current.component(.hour, from: .now) {
@@ -185,15 +190,27 @@ private struct TodayHeader: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(Date.now.formatted(.dateTime.weekday(.wide).month(.wide).day()))
-                .font(.rounded(.subheadline, weight: .medium))
-                .foregroundStyle(Theme.inkSoft)
-            Text(greeting)
-                .font(.rounded(.largeTitle, weight: .bold))
-                .foregroundStyle(Theme.ink)
-                // Hidden entry point to the design canvas (debug builds only).
-                .onLongPressGesture(perform: onLongPress)
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(Date.now.formatted(.dateTime.weekday(.wide).month(.wide).day()))
+                    .font(.rounded(.subheadline, weight: .medium))
+                    .foregroundStyle(Theme.inkSoft)
+                Text(greeting)
+                    .font(.rounded(.largeTitle, weight: .bold))
+                    .foregroundStyle(Theme.ink)
+                    // Hidden entry point to the design canvas (debug builds only).
+                    .onLongPressGesture(perform: onLongPress)
+            }
+            Spacer()
+            Button(action: onSettings) {
+                Image(systemName: "gearshape")
+                    .font(.title3)
+                    .foregroundStyle(Theme.ink)
+                    .frame(width: 44, height: 44)
+            }
+            .buttonStyle(.glass)
+            .buttonBorderShape(.circle)
+            .accessibilityLabel("Settings")
         }
         .padding(.top, 12)
     }
