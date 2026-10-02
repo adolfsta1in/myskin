@@ -11,6 +11,8 @@ struct SettingsView: View {
     @Query(sort: \Profile.createdAt) private var profiles: [Profile]
     @State private var isNotificationsDenied = false
     @State private var isAskingPermission = false
+    /// Covers the form while «Delete all data» runs, so half-deleted screens never flash.
+    @State private var isDeleting = false
 
     var body: some View {
         NavigationStack {
@@ -24,7 +26,7 @@ struct SettingsView: View {
                 } footer: {
                     Text("When on, MySkin locks each time you leave the app and hides its content in the app switcher.")
                 }
-                DataSection()
+                DataSection(isDeleting: $isDeleting)
                 aboutSection
             }
             .font(.rounded(.body))
@@ -35,6 +37,17 @@ struct SettingsView: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }
+                }
+            }
+            .overlay {
+                if isDeleting {
+                    ZStack {
+                        WarmBackground()
+                        ProgressView("Deleting your data…")
+                            .font(.rounded(.body))
+                            .tint(Theme.accent)
+                    }
+                    .transition(.opacity)
                 }
             }
             .alert("Notifications are off", isPresented: $isNotificationsDenied) {
@@ -157,6 +170,7 @@ private struct DataSection: View {
     @Environment(AppLock.self) private var lock
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Binding var isDeleting: Bool
     @State private var isExporting = false
     @State private var isConfirmingDelete = false
     @State private var isConfirmingDeleteAgain = false
@@ -194,14 +208,20 @@ private struct DataSection: View {
     }
 
     private func deleteAll() {
-        do {
-            try DataReset.deleteAll(context: modelContext, photoStore: PhotoStore.shared, settings: settings)
-            lock.isLocked = false
-            Task { await NotificationService.removeAll() }
-            dismiss()
-        } catch {
-            modelContext.rollback()
-            deleteError = error.localizedDescription
+        withAnimation(.smooth(duration: 0.2)) { isDeleting = true }
+        Task {
+            // Let the cover appear before the screens underneath empty out.
+            try? await Task.sleep(for: .milliseconds(250))
+            do {
+                try DataReset.deleteAll(context: modelContext, photoStore: PhotoStore.shared, settings: settings)
+                lock.isLocked = false
+                await NotificationService.removeAll()
+                dismiss()
+            } catch {
+                modelContext.rollback()
+                isDeleting = false
+                deleteError = error.localizedDescription
+            }
         }
     }
 }

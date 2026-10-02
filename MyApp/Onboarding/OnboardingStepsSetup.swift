@@ -40,7 +40,8 @@ struct FirstBodyMapStep: View {
                 IntensityLegend()
             }
             .glassCard(padding: 16)
-        } footer: {
+
+            // In the content, not the floating footer: there it covered the quick zones and the legend.
             HStack(spacing: 12) {
                 Image(systemName: "flag.checkered")
                     .foregroundStyle(Theme.sageDeep)
@@ -57,6 +58,7 @@ struct FirstBodyMapStep: View {
             }
             .glassCard(padding: 14, tint: Theme.sageSoft)
             .animation(.smooth, value: bsa)
+        } footer: {
             PrimaryButton(title: "Continue", action: next)
         }
     }
@@ -67,6 +69,7 @@ struct FirstBodyMapStep: View {
 struct TreatmentsStep: View {
     @Environment(OnboardingDraft.self) private var draft
     @State private var query = ""
+    @FocusState private var isSearching: Bool
     let next: () -> Void
 
     private var trimmedQuery: String { query.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -89,6 +92,7 @@ struct TreatmentsStep: View {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(Theme.inkSoft)
                     TextField("Search, e.g. clobetasol", text: $query)
+                        .focused($isSearching)
                         .textFieldStyle(.plain)
                         .font(.rounded(.body))
                         .submitLabel(.done)
@@ -129,7 +133,10 @@ struct TreatmentsStep: View {
                 }
             }
         } footer: {
-            PrimaryButton(title: "Continue", action: next)
+            // Hidden while typing: above the keyboard it covered the search results.
+            if !isSearching {
+                PrimaryButton(title: "Continue", action: next)
+            }
         }
     }
 
@@ -185,7 +192,7 @@ struct NotificationsStep: View {
                             Spacer()
                             Text("now").font(.rounded(.caption)).foregroundStyle(Theme.inkSoft)
                         }
-                        Text("Time for your evening routine.")
+                        Text(ReminderPlan.checkInBody)
                             .font(.rounded(.subheadline))
                     }
                     .foregroundStyle(Theme.ink)
@@ -346,8 +353,8 @@ struct PlanReadyStep: View {
     }
 
     private var focus: String {
-        let goals = draft.goals.isEmpty ? [.journal] : Goal.allCases.filter { draft.goals.contains($0) }
-        return goals.map(\.title).joined(separator: ", ")
+        guard !draft.goals.isEmpty else { return "None chosen" }
+        return Goal.allCases.filter { draft.goals.contains($0) }.map(\.title).joined(separator: ", ")
     }
 
     private var startingPoint: String {
@@ -407,4 +414,18 @@ struct PlanReadyStep: View {
             }
         }
     }
+}
+
+#Preview("Body map step") {
+    FirstBodyMapStep(next: {})
+        .environment(OnboardingDraft())
+        .background(WarmBackground())
+        .previewSetup()
+}
+
+#Preview("Treatments step") {
+    TreatmentsStep(next: {})
+        .environment(OnboardingDraft())
+        .background(WarmBackground())
+        .previewSetup()
 }

@@ -117,7 +117,8 @@ struct PhotoZonePicker: View {
     let onPick: (BodyZone) -> Void
 
     private var sections: [(title: String, zones: [BodyZone])] {
-        let quickIDs = Set(BodyZone.quickZones.map(\.id))
+        // `front.head` («Face» on the silhouette) would duplicate the special «Face» area.
+        let quickIDs = Set(BodyZone.quickZones.map(\.id) + ["front.head"])
         return [
             ("Special areas", BodyZone.quickZones),
             ("Front", BodyZone.all.filter { $0.id.hasPrefix("front.") && !quickIDs.contains($0.id) }),
