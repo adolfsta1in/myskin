@@ -12,20 +12,19 @@ extension View {
 private struct HealthDataShare: ViewModifier {
     @Binding var isAsking: Bool
     let makeFiles: () throws -> [URL]
-    @State private var files: SharedFiles?
     @State private var error: String?
-
-    struct SharedFiles: Identifiable {
-        let id = UUID()
-        let urls: [URL]
-    }
 
     func body(content: Content) -> some View {
         content
             .alert("This contains health data", isPresented: $isAsking) {
                 Button("Continue") {
                     do {
-                        files = SharedFiles(urls: try makeFiles())
+                        let files = try makeFiles()
+                        // Let the alert finish closing before presenting over the screen.
+                        Task {
+                            try? await Task.sleep(for: .milliseconds(350))
+                            ShareSheet.present(files)
+                        }
                     } catch {
                         self.error = error.localizedDescription
                     }
@@ -33,10 +32,6 @@ private struct HealthDataShare: ViewModifier {
                 Button("Cancel", role: .cancel) {}
             } message: {
                 Text("Only share it with people you trust, such as your doctor. Once it leaves MySkin, the app can't protect it.")
-            }
-            .sheet(item: $files) { files in
-                ActivityView(items: files.urls)
-                    .presentationDetents([.medium, .large])
             }
             .alert("Couldn't export", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
                 Button("OK", role: .cancel) {}
@@ -46,13 +41,18 @@ private struct HealthDataShare: ViewModifier {
     }
 }
 
-/// System share sheet for files.
-private struct ActivityView: UIViewControllerRepresentable {
-    let items: [Any]
+/// System share sheet, presented by UIKit over the top-most screen. Wrapping it in a SwiftUI sheet made
+/// its own dismissal close the sheet underneath too (e.g. Settings).
+private enum ShareSheet {
+    static func present(_ items: [URL]) {
+        let scene = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first { $0.activationState == .foregroundActive }
+        guard var top = scene?.keyWindow?.rootViewController else { return }
+        while let presented = top.presentedViewController, !presented.isBeingDismissed { top = presented }
 
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: items, applicationActivities: nil)
+        let controller = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        controller.popoverPresentationController?.sourceView = top.view
+        top.present(controller, animated: true)
     }
-
-    func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
 }

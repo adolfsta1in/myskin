@@ -84,8 +84,10 @@ enum CSV {
         return "\"\(field.replacingOccurrences(of: "\"", with: "\"\""))\""
     }
 
-    static func day(_ date: Date) -> String { date.formatted(.iso8601.year().month().day()) }
-    static func time(_ date: Date) -> String { date.formatted(.iso8601) }
+    /// Local calendar day, e.g. `2026-10-02` (ISO 8601 formatting defaults to UTC, which shifts the day).
+    static func day(_ date: Date) -> String { date.formatted(Date.ISO8601FormatStyle(timeZone: .current).year().month().day()) }
+    /// Local time with its offset, e.g. `2026-10-02T01:56:53+06:00`.
+    static func time(_ date: Date) -> String { date.formatted(Date.ISO8601FormatStyle(timeZone: .current)) }
     static func optional(_ value: Int?) -> String { value.map(String.init) ?? "" }
     static func number(_ value: Double) -> String { value.formatted(.number.precision(.fractionLength(0...2)).grouping(.never).locale(Locale(identifier: "en_US_POSIX"))) }
 }

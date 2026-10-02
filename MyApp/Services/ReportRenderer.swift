@@ -47,7 +47,7 @@ enum ReportRenderer {
     }
 
     static func fileDate(_ date: Date) -> String {
-        date.formatted(.iso8601.year().month().day())
+        CSV.day(date)
     }
 }
 

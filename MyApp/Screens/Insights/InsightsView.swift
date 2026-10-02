@@ -46,6 +46,7 @@ struct InsightsView: View {
                         data: itch,
                         scale: .itch,
                         format: { $0.formatted(.number.precision(.fractionLength(1))) },
+                        pointDate: { "week of \($0.formatted(date: .abbreviated, time: .omitted))" },
                         emptyText: "Check in daily and your itch trend will appear here."
                     )
                     TrendCard(
@@ -114,6 +115,8 @@ private struct TrendCard: View {
     let data: [DayValue]
     let scale: ScoreScale
     let format: (Double) -> String
+    /// How a point's date reads; weekly series show the week, not a single day.
+    var pointDate: (Date) -> String = { "on \($0.formatted(date: .abbreviated, time: .omitted))" }
     let emptyText: String
 
     var body: some View {
@@ -129,7 +132,7 @@ private struct TrendCard: View {
             if data.count > 1 {
                 ScoreTrendChart(data: data, scale: scale)
             } else if let only = data.first {
-                Text("One entry so far: \(format(only.value)) on \(only.date.formatted(date: .abbreviated, time: .omitted)).")
+                Text("One entry so far: \(format(only.value)), \(pointDate(only.date)).")
                     .font(.rounded(.subheadline))
                     .foregroundStyle(Theme.inkSoft)
             } else {

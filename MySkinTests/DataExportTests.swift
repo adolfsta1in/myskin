@@ -20,6 +20,15 @@ struct DataExportTests {
         #expect(CSV.number(1200) == "1200")
     }
 
+    @Test func datesUseTheLocalDay() throws {
+        // Just after local midnight: in UTC this can still be the previous day.
+        let midnight = Calendar.current.startOfDay(for: .now).addingTimeInterval(60)
+        let parts = Calendar.current.dateComponents([.year, .month, .day], from: midnight)
+        let expected = String(format: "%04d-%02d-%02d", try #require(parts.year), try #require(parts.month), try #require(parts.day))
+        #expect(CSV.day(midnight) == expected)
+        #expect(CSV.time(midnight).hasPrefix(expected))
+    }
+
     @Test func tablesCoverTheDiary() throws {
         let context = try filledContext()
         let tables = try DataExport.tables(in: context)
