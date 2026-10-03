@@ -17,6 +17,7 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                aboutYouSection
                 profileSection
                 remindersSection
                 Section {
@@ -65,6 +66,35 @@ struct SettingsView: View {
     // MARK: Profile
 
     private var profile: Profile? { profiles.first }
+
+    private var aboutYouSection: some View {
+        Section("About you") {
+            TextField("First name", text: Binding(
+                get: { profile?.name ?? "" },
+                // Trimmed only when shown, so typing a space between names isn't undone.
+                set: { name in updateProfile { $0.name = String(name.prefix(ProfileInfo.maxNameLength)) } }
+            ))
+            .textContentType(.givenName)
+            Picker("Sex", selection: Binding(
+                get: { profile?.sex },
+                set: { sex in updateProfile { $0.sex = sex } }
+            )) {
+                Text("Not set").tag(Sex?.none)
+                ForEach(Sex.allCases) { sex in
+                    Text(sex.title).tag(Optional(sex))
+                }
+            }
+            Picker("Age", selection: Binding(
+                get: { profile?.birthYear.map { ProfileInfo.age(birthYear: $0) } },
+                set: { age in updateProfile { $0.birthYear = age.map { ProfileInfo.birthYear(age: $0) } } }
+            )) {
+                Text("Not set").tag(Int?.none)
+                ForEach(ProfileInfo.ages, id: \.self) { age in
+                    Text(String(age)).tag(Optional(age))
+                }
+            }
+        }
+    }
 
     private var profileSection: some View {
         Section("Your psoriasis") {

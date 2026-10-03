@@ -2,14 +2,14 @@ import SwiftData
 import SwiftUI
 
 enum OnboardingStep: Int, CaseIterable, Identifiable {
-    case welcome, disclaimer, psoriasisProfile, skinNow, goals, insight, bodyMap, treatments, notifications, privacy, plan
+    case welcome, disclaimer, aboutYou, psoriasisProfile, skinNow, goals, insight, bodyMap, treatments, notifications, privacy, plan
 
     var id: Int { rawValue }
 
     /// Optional steps show a "Skip" button. The disclaimer can never be skipped.
     var isOptional: Bool {
         switch self {
-        case .psoriasisProfile, .skinNow, .goals, .bodyMap, .treatments, .notifications, .privacy: true
+        case .aboutYou, .psoriasisProfile, .skinNow, .goals, .bodyMap, .treatments, .notifications, .privacy: true
         default: false
         }
     }
@@ -19,15 +19,16 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
         switch self {
         case .welcome: "O1 · Welcome"
         case .disclaimer: "O2 · Disclaimer"
-        case .psoriasisProfile: "O3 · Your psoriasis"
-        case .skinNow: "O4 · Skin now"
-        case .goals: "O5 · Goals"
-        case .insight: "O6 · Insight"
-        case .bodyMap: "O7 · Body map"
-        case .treatments: "O8 · Treatments"
-        case .notifications: "O9 · Notifications"
-        case .privacy: "O10 · Privacy"
-        case .plan: "O11 · Plan ready"
+        case .aboutYou: "O3 · About you"
+        case .psoriasisProfile: "O4 · Your psoriasis"
+        case .skinNow: "O5 · Skin now"
+        case .goals: "O6 · Goals"
+        case .insight: "O7 · Insight"
+        case .bodyMap: "O8 · Body map"
+        case .treatments: "O9 · Treatments"
+        case .notifications: "O10 · Notifications"
+        case .privacy: "O11 · Privacy"
+        case .plan: "O12 · Plan ready"
         }
     }
 }
@@ -77,6 +78,7 @@ struct OnboardingFlow: View {
         switch step {
         case .welcome: WelcomeStep(next: advance)
         case .disclaimer: DisclaimerStep(next: advance)
+        case .aboutYou: AboutYouStep(next: advance)
         case .psoriasisProfile: PsoriasisProfileStep(next: advance)
         case .skinNow: SkinNowStep(next: advance)
         case .goals: GoalsStep(next: advance)

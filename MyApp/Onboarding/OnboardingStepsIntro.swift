@@ -103,7 +103,68 @@ struct DisclaimerStep: View {
     }
 }
 
-// MARK: - O3 Your psoriasis
+// MARK: - O3 About you
+
+struct AboutYouStep: View {
+    @Environment(OnboardingDraft.self) private var draft
+    @FocusState private var isNameFocused: Bool
+    let next: () -> Void
+
+    var body: some View {
+        @Bindable var draft = draft
+        OnboardingPage(
+            title: "A little about you",
+            subtitle: "All optional.",
+            why: "Your name is only for the greeting. Age and sex help your doctor read the report."
+        ) {
+            VStack(alignment: .leading, spacing: 18) {
+                TextField("Your first name", text: $draft.name)
+                    .font(.rounded(.body))
+                    .textContentType(.givenName)
+                    .submitLabel(.done)
+                    .focused($isNameFocused)
+                    .glassCard(padding: 14)
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Sex")
+                        .font(.rounded(.body, weight: .medium))
+                        .foregroundStyle(Theme.ink)
+                    GlassEffectContainer(spacing: 10) {
+                        FlowLayout(spacing: 10) {
+                            ForEach(Sex.allCases) { sex in
+                                TagChip(title: sex.title, isSelected: draft.sex == sex) {
+                                    withAnimation(.snappy) { draft.sex = draft.sex == sex ? nil : sex }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                HStack {
+                    Text("Age")
+                        .font(.rounded(.body, weight: .medium))
+                        .foregroundStyle(Theme.ink)
+                    Spacer()
+                    Picker("Age", selection: $draft.age) {
+                        Text("Not set").tag(Int?.none)
+                        ForEach(ProfileInfo.ages, id: \.self) { age in
+                            Text(String(age)).tag(Optional(age))
+                        }
+                    }
+                    .tint(Theme.accent)
+                }
+                .glassCard(padding: 14)
+            }
+        } footer: {
+            // Hidden while typing so the keyboard doesn't push it over the fields.
+            if !isNameFocused {
+                PrimaryButton(title: "Continue", action: next)
+            }
+        }
+    }
+}
+
+// MARK: - O4 Your psoriasis
 
 struct PsoriasisProfileStep: View {
     @Environment(OnboardingDraft.self) private var draft
@@ -150,7 +211,7 @@ struct PsoriasisProfileStep: View {
     }
 }
 
-// MARK: - O4 Skin now
+// MARK: - O5 Skin now
 
 struct SkinNowStep: View {
     @Environment(OnboardingDraft.self) private var draft
@@ -229,7 +290,7 @@ struct SkinMoodIllustration: View {
     }
 }
 
-// MARK: - O5 Goals
+// MARK: - O6 Goals
 
 struct GoalsStep: View {
     @Environment(OnboardingDraft.self) private var draft
@@ -258,7 +319,7 @@ struct GoalsStep: View {
     }
 }
 
-// MARK: - O6 Delay insight
+// MARK: - O7 Delay insight
 
 struct DelayInsightStep: View {
     let next: () -> Void

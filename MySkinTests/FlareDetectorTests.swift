@@ -54,7 +54,7 @@ struct FlareDetectorTests {
     }
 
     @Test func draftAtSevenIsFlareBeforeSaving() {
-        let result = status(checkIns(-3...(-1), itch: 2), draft: CheckInSample(day: today, itch: 7))
+        let result = status(checkIns(-3...(-1), itch: 5), draft: CheckInSample(day: today, itch: 7))
         #expect(result.mode == .flare)
         #expect(result.reasons == [.highItch(7)])
     }

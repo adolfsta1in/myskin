@@ -180,15 +180,12 @@ private struct RedFlagCard: View {
 // MARK: - Header
 
 private struct TodayHeader: View {
+    @Query(sort: \Profile.createdAt) private var profiles: [Profile]
     var onLongPress: () -> Void
     var onSettings: () -> Void
 
     private var greeting: String {
-        switch Calendar.current.component(.hour, from: .now) {
-        case 5..<12: "Good morning"
-        case 12..<18: "Good afternoon"
-        default: "Good evening"
-        }
+        ProfileInfo.greeting(hour: Calendar.current.component(.hour, from: .now), name: profiles.first?.name ?? "")
     }
 
     var body: some View {
@@ -200,6 +197,8 @@ private struct TodayHeader: View {
                 Text(greeting)
                     .font(.rounded(.largeTitle, weight: .bold))
                     .foregroundStyle(Theme.ink)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.7)
                     // Hidden entry point to the design canvas (debug builds only).
                     .onLongPressGesture(perform: onLongPress)
             }

@@ -1,6 +1,6 @@
 import SwiftUI
 
-// MARK: - O7 First body map
+// MARK: - O8 First body map
 
 struct FirstBodyMapStep: View {
     @Environment(OnboardingDraft.self) private var draft
@@ -64,7 +64,7 @@ struct FirstBodyMapStep: View {
     }
 }
 
-// MARK: - O8 Treatments
+// MARK: - O9 Treatments
 
 struct TreatmentsStep: View {
     @Environment(OnboardingDraft.self) private var draft
@@ -164,7 +164,7 @@ struct TreatmentsStep: View {
     }
 }
 
-// MARK: - O8 Notifications (soft ask)
+// MARK: - O10 Notifications (soft ask)
 
 struct NotificationsStep: View {
     @Environment(AppSettings.self) private var settings

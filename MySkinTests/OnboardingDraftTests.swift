@@ -83,3 +83,37 @@ struct OnboardingDraftTests {
         #expect(draft.treatments.count == 1)
     }
 }
+
+struct ProfileInfoTests {
+    private let now: Date = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .gmt
+        return calendar.date(from: DateComponents(year: 2026, month: 10, day: 3, hour: 12)) ?? .now
+    }()
+
+    @Test func greetingUsesTheName() {
+        #expect(ProfileInfo.greeting(hour: 8, name: "  Anna ") == "Good morning, Anna")
+        #expect(ProfileInfo.greeting(hour: 14, name: "") == "Good afternoon")
+        #expect(ProfileInfo.greeting(hour: 23, name: "   ") == "Good evening")
+    }
+
+    @Test func ageRoundTripsThroughBirthYear() {
+        let year = ProfileInfo.birthYear(age: 34, now: now)
+        #expect(year == 1992)
+        #expect(ProfileInfo.age(birthYear: year, now: now) == 34)
+    }
+
+    @Test func aboutYouIsSaved() throws {
+        let context = ModelContext(try AppModelContainer.makeInMemory())
+        let draft = OnboardingDraft()
+        draft.name = " Anna "
+        draft.sex = .female
+        draft.age = 34
+        try draft.save(in: context, date: now)
+
+        let profile = try #require(try context.fetch(FetchDescriptor<Profile>()).first)
+        #expect(profile.name == "Anna")
+        #expect(profile.sex == .female)
+        #expect(profile.birthYear == 1992)
+    }
+}

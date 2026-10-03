@@ -7,6 +7,9 @@ import SwiftData
 @Observable
 final class OnboardingDraft {
     var hasAcceptedDisclaimer = false
+    var name = ""
+    var sex: Sex?
+    var age: Int?
     var psoriasisTypes: Set<PsoriasisType> = []
     var onsetYear: Int?
     /// Self-rated skin, 0 (clear) … 1 (very bad).
@@ -77,6 +80,9 @@ final class OnboardingDraft {
         let profiles = try context.fetch(FetchDescriptor<Profile>())
         let profile = profiles.first ?? Profile(createdAt: date)
         if profiles.isEmpty { context.insert(profile) }
+        profile.name = ProfileInfo.cleanName(name)
+        profile.sex = sex
+        profile.birthYear = age.map { ProfileInfo.birthYear(age: $0, now: date) }
         profile.psoriasisTypes = orderedTypes
         profile.onsetYear = onsetYear
         profile.goals = Goal.allCases.filter(goals.contains)
