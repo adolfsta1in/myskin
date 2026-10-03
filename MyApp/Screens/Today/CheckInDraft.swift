@@ -39,6 +39,11 @@ struct CheckInDraft: Equatable {
         )
     }
 
+    /// The fields `FlareDetector` reads, for the live mode while editing.
+    func sample(day: Date) -> CheckInSample {
+        CheckInSample(day: day, itch: itch, newSpots: newSpots)
+    }
+
     func apply(to checkIn: DailyCheckIn) {
         checkIn.itch = itch
         checkIn.pain = pain

@@ -47,6 +47,34 @@ struct FlareDetectorTests {
         #expect(status(checkIns(-6...0, itch: 2)) == .calm)
     }
 
+    // MARK: - Unsaved draft
+
+    private func status(_ checkIns: [CheckInSample], draft: CheckInSample) -> FlareStatus {
+        status(FlareDetector.checkIns(checkIns, replacingWith: draft, calendar: calendar))
+    }
+
+    @Test func draftAtSevenIsFlareBeforeSaving() {
+        let result = status(checkIns(-3...(-1), itch: 2), draft: CheckInSample(day: today, itch: 7))
+        #expect(result.mode == .flare)
+        #expect(result.reasons == [.highItch(7)])
+    }
+
+    @Test func draftBelowSevenReplacesSavedHighItch() {
+        // Saved 8 today, slider moved back to 6: Calm without saving.
+        let saved = checkIns(-3...(-1), itch: 5) + [CheckInSample(day: today, itch: 8)]
+        #expect(status(saved, draft: CheckInSample(day: today, itch: 6)) == .calm)
+    }
+
+    @Test func draftNewSpotsIsFlare() {
+        let result = status([], draft: CheckInSample(day: today, itch: 0, newSpots: true))
+        #expect(result.reasons == [.newSpots])
+    }
+
+    @Test func noDraftKeepsStoredCheckIns() {
+        let saved = [CheckInSample(day: today, itch: 8)]
+        #expect(FlareDetector.checkIns(saved, replacingWith: nil, calendar: calendar) == saved)
+    }
+
     // MARK: - Itch
 
     @Test func highItchTodayIsFlare() {

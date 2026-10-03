@@ -11,10 +11,13 @@ struct TodayView: View {
     @State private var takingQuestionnaire: QuestionnaireKind?
     /// Red flags on the full-screen warning; empty when it is closed.
     @State private var shownFlags: [RedFlag] = []
+    /// Today's check-in as it is being edited, so the mode reacts before it is saved.
+    @State private var draftSample: CheckInSample?
 
     /// Calm / Flare is computed from the data (`FlareDetector`), never chosen by hand.
     private var status: FlareStatus {
-        FlareDetector.status(on: .now, checkIns: checkIns, assessments: assessments)
+        let samples = FlareDetector.checkIns(checkIns.map(\.sample), replacingWith: draftSample)
+        return FlareDetector.status(on: .now, checkIns: samples, zones: assessments.map(\.datedScore))
     }
 
     /// Latest assessment of each zone.
@@ -35,7 +38,7 @@ struct TodayView: View {
                         RedFlagCard { shownFlags = mapFlags }
                     }
 
-                    CheckInCard(mode: status.mode) { symptoms in
+                    CheckInCard(mode: status.mode, onDraftChange: { draftSample = $0 }) { symptoms in
                         let flags = RedFlagRules.flags(zones: currentZones, symptoms: symptoms, isFlare: status.mode == .flare)
                         if !flags.isEmpty { shownFlags = flags }
                     }
@@ -224,6 +227,8 @@ private struct CheckInCard: View {
     @Query private var todayCheckIns: [DailyCheckIn]
     @Query(sort: \DailyCheckIn.day, order: .reverse) private var allCheckIns: [DailyCheckIn]
     let mode: AppMode
+    /// Reports itch and «new spots» while they are edited, before saving.
+    let onDraftChange: (CheckInSample) -> Void
     /// Called after a successful save with the flare safety answers.
     let onSaved: (RedFlagSymptoms) -> Void
     private let day: Date
@@ -236,8 +241,14 @@ private struct CheckInCard: View {
     @State private var saveCount = 0
     @State private var saveError: String?
 
-    init(mode: AppMode, day: Date = .now, onSaved: @escaping (RedFlagSymptoms) -> Void = { _ in }) {
+    init(
+        mode: AppMode,
+        day: Date = .now,
+        onDraftChange: @escaping (CheckInSample) -> Void = { _ in },
+        onSaved: @escaping (RedFlagSymptoms) -> Void = { _ in }
+    ) {
         self.mode = mode
+        self.onDraftChange = onDraftChange
         self.onSaved = onSaved
         let start = Calendar.current.startOfDay(for: day)
         self.day = start
@@ -356,6 +367,10 @@ private struct CheckInCard: View {
                 draft.symptoms = symptoms
                 showsDetails = existing.pain != nil || existing.sleep != nil || existing.mood != nil || !existing.note.isEmpty
             }
+        }
+        // Not reported until the draft changes, so a stored check-in isn't hidden by the empty draft at launch.
+        .onChange(of: draft.sample(day: day)) { _, sample in
+            onDraftChange(sample)
         }
         .alert("Add a tag", isPresented: $isAddingTag) {
             TextField("e.g. Hot shower", text: $newTag)

@@ -113,6 +113,18 @@ enum FlareDetector {
         status(on: date, checkIns: checkIns.map(\.sample), zones: assessments.map(\.datedScore), calendar: calendar)
     }
 
+    /// Check-ins with an unsaved draft in place of the stored check-in of its day,
+    /// so the mode follows the itch slider before the check-in is saved.
+    static func checkIns(
+        _ checkIns: [CheckInSample],
+        replacingWith draft: CheckInSample?,
+        calendar: Calendar = .current
+    ) -> [CheckInSample] {
+        guard let draft else { return checkIns }
+        let day = calendar.startOfDay(for: draft.day)
+        return checkIns.filter { calendar.startOfDay(for: $0.day) != day } + [draft]
+    }
+
     /// Flare signals seen on one day.
     static func signals(
         on date: Date,
