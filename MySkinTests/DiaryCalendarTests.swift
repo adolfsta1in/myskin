@@ -40,4 +40,22 @@ struct DiaryCalendarTests {
         #expect(marks[start(2)] == DayMark(hasCheckIn: true, dosesDone: 2))
         #expect(marks[start(5)] == DayMark(hasCheckIn: true, hasFlareSign: true, hasPhoto: true))
     }
+
+    @Test func monthSeriesKeepsOnlyLoggedValues() throws {
+        let series = DiaryCalendar.series(
+            month: day(15),
+            entries: [
+                CalendarEntry(day: day(3), itch: 6, pain: 2, sleep: nil, humidity: 40, uvIndex: 3),
+                CalendarEntry(day: day(1), itch: 2),
+                CalendarEntry(day: day(30, month: 9), itch: 9),
+            ],
+            calendar: calendar
+        )
+        #expect(series.itch.map(\.value) == [2, 6])
+        #expect(series.pain.count == 1)
+        #expect(series.sleep.isEmpty)
+        #expect(series.hasWeather)
+        #expect(series.averageItch == 4)
+        #expect(try #require(series.highestItch).value == 6)
+    }
 }

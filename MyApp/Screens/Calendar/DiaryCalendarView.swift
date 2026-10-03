@@ -1,8 +1,10 @@
+import Charts
 import SwiftData
 import SwiftUI
 
 /// Month view of the diary: dots show what was logged; tapping a day shows its check-in,
-/// assessed areas, doses and photos.
+/// assessed areas, doses and photos. Charts below show the month at a glance;
+/// tapping a chart selects that day too.
 struct DiaryCalendarView: View {
     @Query private var checkIns: [DailyCheckIn]
     @Query private var assessments: [ZoneAssessment]
@@ -21,9 +23,11 @@ struct DiaryCalendarView: View {
             photoDays: photos.map(\.day),
             doseDays: doses.filter { $0.status == .done }.map(\.timestamp)
         )
+        let series = DiaryCalendar.series(month: month, entries: checkIns.map(\.calendarEntry))
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 monthCard(marks)
+                MonthCharts(series: series, month: month, selectedDay: $selectedDay)
                 DayDetail(
                     day: selectedDay,
                     checkIn: checkIns.first { calendar.isDate($0.day, inSameDayAs: selectedDay) },
@@ -136,6 +140,234 @@ struct DiaryCalendarView: View {
     private func shiftMonth(_ value: Int) {
         guard let next = calendar.date(byAdding: .month, value: value, to: month) else { return }
         withAnimation(.snappy) { month = next }
+    }
+}
+
+// MARK: - Charts
+
+/// Itch, pain and sleep for the shown month, plus weather if it was saved.
+private struct MonthCharts: View {
+    let series: MonthSeries
+    let month: Date
+    @Binding var selectedDay: Date
+    @State private var picked: Date?
+
+    private var monthDomain: ClosedRange<Date> {
+        let calendar = Calendar.current
+        guard let interval = calendar.dateInterval(of: .month, for: month) else { return month...month }
+        return interval.start...interval.end
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            symptomsCard
+            if series.hasWeather {
+                weatherCard
+            }
+        }
+        // Tapping a chart selects that day in the calendar.
+        .onChange(of: picked) { _, date in
+            guard let date, date <= .now else { return }
+            withAnimation(.snappy) { selectedDay = Calendar.current.startOfDay(for: date) }
+        }
+    }
+
+    // MARK: Symptoms
+
+    private var symptomsCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            SectionHeader(title: "This month", systemImage: "chart.bar.xaxis")
+            if series.itch.isEmpty {
+                Text("No check-ins this month yet. Your itch, pain and sleep will appear here.")
+                    .font(.rounded(.subheadline))
+                    .foregroundStyle(Theme.inkSoft)
+            } else {
+                HStack(spacing: 10) {
+                    stat("Days logged", "\(series.daysLogged)")
+                    stat("Average itch", series.averageItch.map { $0.formatted(.number.precision(.fractionLength(1))) } ?? "–")
+                    stat("Highest", series.highestItch.map { "\(Int($0.value)) · \($0.date.formatted(.dateTime.day().month(.abbreviated)))" } ?? "–")
+                }
+
+                Chart {
+                    ForEach(series.itch) { day in
+                        BarMark(
+                            x: .value("Day", day.date, unit: .day),
+                            y: .value("Itch", day.value),
+                            width: .ratio(0.6)
+                        )
+                        .foregroundStyle(Theme.intensity(value: day.value).gradient)
+                        .cornerRadius(4)
+                        .opacity(isSelected(day.date) ? 1 : 0.75)
+                    }
+                    ForEach(series.pain) { day in
+                        LineMark(x: .value("Day", day.date, unit: .day), y: .value("Value", day.value), series: .value("Series", "Pain"))
+                            .foregroundStyle(Theme.intensitySevere)
+                            .lineStyle(StrokeStyle(lineWidth: 2))
+                            .interpolationMethod(.monotone)
+                        PointMark(x: .value("Day", day.date, unit: .day), y: .value("Value", day.value))
+                            .foregroundStyle(Theme.intensitySevere)
+                            .symbolSize(18)
+                    }
+                    ForEach(series.sleep) { day in
+                        LineMark(x: .value("Day", day.date, unit: .day), y: .value("Value", day.value), series: .value("Series", "Sleep"))
+                            .foregroundStyle(Theme.accent)
+                            .lineStyle(StrokeStyle(lineWidth: 2, dash: [4, 3]))
+                            .interpolationMethod(.monotone)
+                        PointMark(x: .value("Day", day.date, unit: .day), y: .value("Value", day.value))
+                            .foregroundStyle(Theme.accent)
+                            .symbolSize(18)
+                    }
+                    RuleMark(x: .value("Selected", selectedDay, unit: .day))
+                        .foregroundStyle(Theme.ink.opacity(0.25))
+                        .lineStyle(StrokeStyle(lineWidth: 1))
+                }
+                .chartXScale(domain: monthDomain)
+                .chartYScale(domain: 0...10)
+                .chartYAxis {
+                    AxisMarks(values: [0, 5, 10]) { _ in
+                        AxisGridLine().foregroundStyle(Theme.sandDeep.opacity(0.4))
+                        AxisValueLabel().foregroundStyle(Theme.inkSoft)
+                    }
+                }
+                .chartXAxis {
+                    AxisMarks(values: .stride(by: .day, count: 7)) { _ in
+                        AxisValueLabel(format: .dateTime.day())
+                            .foregroundStyle(Theme.inkSoft)
+                    }
+                }
+                .chartXSelection(value: $picked)
+                .frame(height: 170)
+                .accessibilityLabel("Itch, pain and sleep this month")
+
+                HStack(spacing: 14) {
+                    legend(Theme.intensityModerate, "Itch", isLine: false)
+                    if !series.pain.isEmpty { legend(Theme.intensitySevere, "Pain", isLine: true) }
+                    if !series.sleep.isEmpty { legend(Theme.accent, "Sleep", isLine: true) }
+                    Spacer()
+                    Text("Tap a day")
+                }
+                .font(.rounded(.caption))
+                .foregroundStyle(Theme.inkSoft)
+            }
+        }
+        .glassCard()
+    }
+
+    // MARK: Weather
+
+    private var weatherCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            SectionHeader(title: "Weather on check-in days", systemImage: "cloud.sun")
+            if !series.uvIndex.isEmpty {
+                Text("UV index")
+                    .font(.rounded(.caption, weight: .semibold))
+                    .foregroundStyle(Theme.inkSoft)
+                Chart(series.uvIndex) { day in
+                    BarMark(
+                        x: .value("Day", day.date, unit: .day),
+                        y: .value("UV", day.value),
+                        width: .ratio(0.6)
+                    )
+                    .foregroundStyle(Self.uvColor(day.value).gradient)
+                    .cornerRadius(4)
+                }
+                .chartXScale(domain: monthDomain)
+                .chartYScale(domain: 0...11)
+                .chartYAxis {
+                    AxisMarks(values: [0, 3, 6, 8, 11]) { _ in
+                        AxisGridLine().foregroundStyle(Theme.sandDeep.opacity(0.4))
+                        AxisValueLabel().foregroundStyle(Theme.inkSoft)
+                    }
+                }
+                .chartXAxis {
+                    AxisMarks(values: .stride(by: .day, count: 7)) { _ in
+                        AxisValueLabel(format: .dateTime.day()).foregroundStyle(Theme.inkSoft)
+                    }
+                }
+                .chartXSelection(value: $picked)
+                .frame(height: 110)
+                .accessibilityLabel("UV index on check-in days")
+            }
+            if !series.humidity.isEmpty {
+                Text("Humidity, %")
+                    .font(.rounded(.caption, weight: .semibold))
+                    .foregroundStyle(Theme.inkSoft)
+                Chart(series.humidity) { day in
+                    AreaMark(x: .value("Day", day.date, unit: .day), y: .value("Humidity", day.value))
+                        .foregroundStyle(Theme.accentSoft.gradient)
+                        .interpolationMethod(.monotone)
+                    LineMark(x: .value("Day", day.date, unit: .day), y: .value("Humidity", day.value))
+                        .foregroundStyle(Theme.accent)
+                        .interpolationMethod(.monotone)
+                    PointMark(x: .value("Day", day.date, unit: .day), y: .value("Humidity", day.value))
+                        .foregroundStyle(Theme.accent)
+                        .symbolSize(18)
+                }
+                .chartXScale(domain: monthDomain)
+                .chartYScale(domain: 0...100)
+                .chartYAxis {
+                    AxisMarks(values: [0, 50, 100]) { _ in
+                        AxisGridLine().foregroundStyle(Theme.sandDeep.opacity(0.4))
+                        AxisValueLabel().foregroundStyle(Theme.inkSoft)
+                    }
+                }
+                .chartXAxis {
+                    AxisMarks(values: .stride(by: .day, count: 7)) { _ in
+                        AxisValueLabel(format: .dateTime.day()).foregroundStyle(Theme.inkSoft)
+                    }
+                }
+                .chartXSelection(value: $picked)
+                .frame(height: 110)
+                .accessibilityLabel("Humidity on check-in days")
+            }
+            Text("Shown next to your itch, so you can spot patterns yourself. It doesn't mean one causes the other.")
+                .font(.rounded(.caption))
+                .foregroundStyle(Theme.inkSoft)
+        }
+        .glassCard(tint: Theme.accentSoft)
+    }
+
+    // MARK: Helpers
+
+    private func isSelected(_ date: Date) -> Bool {
+        Calendar.current.isDate(date, inSameDayAs: selectedDay)
+    }
+
+    private func stat(_ title: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.rounded(.caption))
+                .foregroundStyle(Theme.inkSoft)
+            Text(value)
+                .font(.rounded(.subheadline, weight: .bold))
+                .foregroundStyle(Theme.ink)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.white.opacity(0.45), in: .rect(cornerRadius: 14))
+        .accessibilityElement(children: .combine)
+    }
+
+    private func legend(_ color: Color, _ title: String, isLine: Bool) -> some View {
+        HStack(spacing: 4) {
+            if isLine {
+                Capsule().fill(color).frame(width: 12, height: 3)
+            } else {
+                RoundedRectangle(cornerRadius: 2).fill(color).frame(width: 8, height: 10)
+            }
+            Text(title)
+        }
+    }
+
+    private static func uvColor(_ index: Double) -> Color {
+        switch UVLevel(index: index) {
+        case .low: Theme.intensityCalm
+        case .moderate: Theme.intensityMild
+        case .high: Theme.intensityModerate
+        case .veryHigh, .extreme: Theme.intensitySevere
+        }
     }
 }
 

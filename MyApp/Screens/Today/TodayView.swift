@@ -49,7 +49,13 @@ struct TodayView: View {
                     WeatherCard()
                     RemindersCard()
                     QuestionnaireDueCards { takingQuestionnaire = $0 }
-                    ItchChartCard()
+                    NavigationLink {
+                        DiaryCalendarView()
+                    } label: {
+                        ItchChartCard()
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint("Opens the diary calendar")
                 }
                 .padding(.horizontal, Theme.screenPadding)
             }
@@ -973,6 +979,10 @@ private struct ItchChartCard: View {
                 if let trend = TodayStats.itchTrend(endingOn: .now, checkIns: samples) {
                     TrendBadge(trend: trend)
                 }
+                // The card opens the diary calendar.
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(Theme.inkSoft)
             }
             if history.count >= TodayStats.Threshold.minChartPoints {
                 ItchMiniChart(data: history)

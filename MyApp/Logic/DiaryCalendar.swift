@@ -12,6 +12,36 @@ struct DayMark: Equatable, Sendable {
     var isEmpty: Bool { self == DayMark() }
 }
 
+/// Check-in fields the month charts use.
+struct CalendarEntry: Hashable, Sendable {
+    let day: Date
+    let itch: Int
+    var pain: Int?
+    var sleep: Int?
+    var humidity: Double?
+    var uvIndex: Double?
+}
+
+extension DailyCheckIn {
+    var calendarEntry: CalendarEntry {
+        CalendarEntry(day: day, itch: itch, pain: pain, sleep: sleep, humidity: humidity, uvIndex: uvIndex)
+    }
+}
+
+/// One month of check-ins as chart series, oldest first. Days without a value are left out.
+struct MonthSeries {
+    var itch: [DayValue] = []
+    var pain: [DayValue] = []
+    var sleep: [DayValue] = []
+    var humidity: [DayValue] = []
+    var uvIndex: [DayValue] = []
+
+    var daysLogged: Int { itch.count }
+    var averageItch: Double? { itch.isEmpty ? nil : itch.map(\.value).reduce(0, +) / Double(itch.count) }
+    var highestItch: DayValue? { itch.max { $0.value < $1.value } }
+    var hasWeather: Bool { !humidity.isEmpty || !uvIndex.isEmpty }
+}
+
 /// Month grid and per-day marks for the diary calendar.
 enum DiaryCalendar {
     /// Days of the month as grid cells, with nil padding before the first day so that
@@ -72,6 +102,26 @@ enum DiaryCalendar {
             }
         }
         return marks
+    }
+
+    static func series(month date: Date, entries: [CalendarEntry], calendar: Calendar = .current) -> MonthSeries {
+        guard let interval = calendar.dateInterval(of: .month, for: date) else { return MonthSeries() }
+        // One entry per day (the store guarantees it; keep the last if not).
+        var byDay: [Date: CalendarEntry] = [:]
+        for entry in entries {
+            let day = calendar.startOfDay(for: entry.day)
+            if interval.contains(day) { byDay[day] = entry }
+        }
+        var series = MonthSeries()
+        for day in byDay.keys.sorted() {
+            guard let entry = byDay[day] else { continue }
+            series.itch.append(DayValue(date: day, value: Double(entry.itch)))
+            if let pain = entry.pain { series.pain.append(DayValue(date: day, value: Double(pain))) }
+            if let sleep = entry.sleep { series.sleep.append(DayValue(date: day, value: Double(sleep))) }
+            if let humidity = entry.humidity { series.humidity.append(DayValue(date: day, value: humidity)) }
+            if let uv = entry.uvIndex { series.uvIndex.append(DayValue(date: day, value: uv)) }
+        }
+        return series
     }
 
     /// Whether `date` is in the same day as `day`.

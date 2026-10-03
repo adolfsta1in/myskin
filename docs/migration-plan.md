@@ -534,6 +534,9 @@ MySkinTests/      Swift Testing
 ### Шаг 53.1. Карточка погоды: голубой стиль ✅
 - Карточка на `Theme.accentSoft`, сверху UV за день крупно + место (MapKit `MKReverseGeocodingRequest`, город) и температура, шкала UV, плитки «Humidity» и «UV now», заметки отдельным блоком. Новых цветов нет.
 
+### Шаг 52.1. Календарь: графики и вход с Today ✅
+- Карточка «Itch · last 14 days» на Today открывает календарь. В календаре под месяцем — «This month»: дней с чек-ином, средний и максимальный зуд, график (зуд — столбцы, боль и сон — линии), тап по графику выбирает день; «Weather on check-in days» — UV и влажность, если погода сохранялась. `DiaryCalendar.series` + тест.
+
 ### Шаг 54. Supabase: проект и вход
 - **Цель:** пакет `supabase-swift`, конфигурация (URL + anon key из xcconfig, не в git), экран входа: Apple, Google, email + пароль.
 - **Зависимости:** —. Нужно от пользователя: проект Supabase, провайдеры Apple/Google в Supabase, OAuth client id Google.
