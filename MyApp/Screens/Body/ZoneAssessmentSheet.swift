@@ -3,6 +3,7 @@ import SwiftUI
 
 /// Assessment form for one body zone: area in palms, redness / thickness / scaling 0–4, pustules.
 /// Saves today's record for the zone; «Clear this area» records it as clear.
+/// Photos of the zone can be added here too; they show up in Photos under the same area.
 struct ZoneAssessmentSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
@@ -12,6 +13,10 @@ struct ZoneAssessmentSheet: View {
 
     @State private var draft: ZoneAssessmentDraft
     @State private var saveError: String?
+    @Query private var photos: [Photo]
+    @State private var photoSource: PhotoSource?
+    /// Zone the photos are filed under (silhouette «Face» → special «Face»).
+    private let photoZoneID: String
 
     /// - Parameter current: the zone's latest stored state, if any.
     init(zone: BodyZone, current: ZoneScore?) {
@@ -20,6 +25,9 @@ struct ZoneAssessmentSheet: View {
         initial = draft
         wasAssessed = current?.isAffected ?? false
         _draft = State(initialValue: draft)
+        let photoZoneID = PhotoRecords.photoZone(for: zone).id
+        self.photoZoneID = photoZoneID
+        _photos = Query(filter: #Predicate<Photo> { $0.zoneID == photoZoneID })
     }
 
     var body: some View {
@@ -29,6 +37,7 @@ struct ZoneAssessmentSheet: View {
                     areaCard
                     signsCard
                     pustulesCard
+                    photosCard
                     if wasAssessed || !draft.isClear {
                         Button("Clear this area", systemImage: "eraser", role: .destructive) {
                             draft = ZoneAssessmentDraft()
@@ -53,6 +62,7 @@ struct ZoneAssessmentSheet: View {
                         .disabled(draft == initial && wasAssessed)
                 }
             }
+            .photoImport(zoneID: photoZoneID, source: $photoSource)
             .alert("Couldn't save", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
                 Button("OK", role: .cancel) {}
             } message: {
@@ -117,6 +127,35 @@ struct ZoneAssessmentSheet: View {
             }
         }
         .tint(Theme.accent)
+        .glassCard()
+    }
+
+    private var photosCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionHeader(
+                title: "Photos",
+                subtitle: photos.isEmpty
+                    ? "A photo now makes it easier to see change later."
+                    : "\(photos.count) \(photos.count == 1 ? "photo" : "photos") of this area"
+            )
+            HStack(spacing: 10) {
+                ForEach(PhotoSource.available) { option in
+                    Button(option.title, systemImage: option.systemImage) { photoSource = option }
+                        .font(.rounded(.subheadline, weight: .semibold))
+                        .buttonStyle(.glass)
+                }
+            }
+            if !photos.isEmpty {
+                NavigationLink {
+                    ZoneProgressView(zoneID: photoZoneID)
+                } label: {
+                    Label("See progress", systemImage: "rectangle.split.2x1")
+                        .font(.rounded(.subheadline, weight: .medium))
+                        .foregroundStyle(Theme.accent)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .glassCard()
     }
 
