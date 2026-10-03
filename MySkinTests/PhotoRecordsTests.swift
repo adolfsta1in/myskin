@@ -55,6 +55,13 @@ struct PhotoRecordsTests {
         #expect(try FileManager.default.contentsOfDirectory(atPath: store.directory.path(percentEncoded: false)).isEmpty)
     }
 
+    @Test func silhouetteFaceIsFiledAsSpecialFace() throws {
+        let head = try #require(BodyZone.zone(id: "front.head"))
+        let elbow = try #require(BodyZone.zone(id: "front.elbow.left"))
+        #expect(PhotoRecords.photoZone(for: head).id == "quick.face")
+        #expect(PhotoRecords.photoZone(for: elbow).id == "front.elbow.left")
+    }
+
     @Test func zonesAreGroupedNewestFirst() {
         let old = Photo(day: .now.addingTimeInterval(-86_400 * 3), zoneID: "quick.scalp", fileName: "a.jpg")
         let mid = Photo(day: .now.addingTimeInterval(-86_400), zoneID: "back.elbow.left", fileName: "b.jpg")

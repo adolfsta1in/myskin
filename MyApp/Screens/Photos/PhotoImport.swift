@@ -111,37 +111,67 @@ extension View {
     }
 }
 
-/// Zone list for a new photo, special areas first.
+/// Body map for choosing the area of a new photo: tap the silhouette or a special area.
+/// Areas that already have photos are tinted.
 struct PhotoZonePicker: View {
     @Environment(\.dismiss) private var dismiss
+    @Query private var photos: [Photo]
+    @State private var side: BodySide = .front
     let onPick: (BodyZone) -> Void
 
-    private var sections: [(title: String, zones: [BodyZone])] {
-        // `front.head` («Face» on the silhouette) would duplicate the special «Face» area.
-        let quickIDs = Set(BodyZone.quickZones.map(\.id) + ["front.head"])
-        return [
-            ("Special areas", BodyZone.quickZones),
-            ("Front", BodyZone.all.filter { $0.id.hasPrefix("front.") && !quickIDs.contains($0.id) }),
-            ("Back", BodyZone.all.filter { $0.id.hasPrefix("back.") && !quickIDs.contains($0.id) }),
-        ]
+    /// Level 1 tint on zones with photos, so the user sees what's already covered.
+    private var covered: [String: Int] {
+        var levels: [String: Int] = [:]
+        for photo in photos { levels[photo.zoneID] = 1 }
+        // The silhouette's face shows photos filed under the special «Face» area.
+        if levels["quick.face"] != nil { levels["front.head"] = 1 }
+        return levels
     }
 
     var body: some View {
+        let covered = covered
         NavigationStack {
-            List {
-                ForEach(sections, id: \.title) { section in
-                    Section(section.title) {
-                        ForEach(section.zones) { zone in
-                            Button(zone.name) {
-                                dismiss()
-                                onPick(zone)
+            ScrollView {
+                VStack(spacing: 18) {
+                    Picker("Side", selection: $side) {
+                        ForEach(BodySide.allCases) { Text($0.title).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+
+                    VStack(spacing: 10) {
+                        BodySilhouette(side: side, intensities: covered) { zone in
+                            pick(zone)
+                        }
+                        .containerRelativeFrame(.vertical) { height, _ in min(max(height * 0.5, 300), 460) }
+                        .id(side)
+                        .transition(.opacity)
+                        Text("Tap the area you're photographing")
+                            .font(.rounded(.footnote, weight: .medium))
+                            .foregroundStyle(Theme.inkSoft)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .glassCard()
+                    .animation(.smooth, value: side)
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        SectionHeader(title: "Special areas", subtitle: "Hard to point at on the map")
+                        GlassEffectContainer(spacing: 8) {
+                            FlowLayout(spacing: 8) {
+                                ForEach(BodyZone.quickZones) { zone in
+                                    TagChip(title: zone.name, systemImage: covered[zone.id] == nil ? nil : "photo", isSelected: false) {
+                                        pick(zone)
+                                    }
+                                }
                             }
-                            .foregroundStyle(Theme.ink)
                         }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .glassCard()
                 }
+                .padding(.horizontal, Theme.screenPadding)
+                .padding(.bottom, 24)
             }
-            .scrollContentBackground(.hidden)
             .background(WarmBackground())
             .navigationTitle("Which area?")
             .navigationBarTitleDisplayMode(.inline)
@@ -152,5 +182,10 @@ struct PhotoZonePicker: View {
             }
         }
         .fontDesign(.rounded)
+    }
+
+    private func pick(_ zone: BodyZone) {
+        dismiss()
+        onPick(PhotoRecords.photoZone(for: zone))
     }
 }
