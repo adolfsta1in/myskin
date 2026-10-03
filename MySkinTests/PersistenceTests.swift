@@ -15,7 +15,7 @@ struct PersistenceTests {
         try context.save()
         #expect(try context.fetchCount(FetchDescriptor<Profile>()) == 1)
         #expect(try context.fetchCount(FetchDescriptor<DailyCheckIn>()) == 14)
-        #expect(try context.fetchCount(FetchDescriptor<SchemaV1.Treatment>()) == 4)
+        #expect(try context.fetchCount(FetchDescriptor<Treatment>()) == 4)
     }
 
     /// Today's mode comes from stored data: the regular sample is Calm, the flare sample is Flare.
@@ -83,7 +83,7 @@ struct PersistenceTests {
 
     @Test func treatmentOwnsDoseLogs() throws {
         let context = try makeContext()
-        let treatment = SchemaV1.Treatment(
+        let treatment = Treatment(
             name: "Clobetasol", kind: .ointment, steroidClass: .class1,
             scheduleKind: .timesPerDay, timesPerDay: 2, zoneIDs: ["front.knee.left"]
         )
@@ -92,7 +92,7 @@ struct PersistenceTests {
         context.insert(DoseLog(treatment: treatment, status: .skipped))
         try context.save()
 
-        let fetched = try #require(try context.fetch(FetchDescriptor<SchemaV1.Treatment>()).first)
+        let fetched = try #require(try context.fetch(FetchDescriptor<Treatment>()).first)
         #expect(fetched.doses.count == 2)
         #expect(fetched.kind == .ointment)
         #expect(fetched.steroidClass == .class1)
@@ -102,8 +102,8 @@ struct PersistenceTests {
 
     @Test func deletingTreatmentDeletesItsDoses() throws {
         let context = try makeContext()
-        let kept = SchemaV1.Treatment(name: "Adalimumab", kind: .biologic, scheduleKind: .everyNWeeks, interval: 2)
-        let removed = SchemaV1.Treatment(name: "Calcipotriol", kind: .cream, scheduleKind: .timesPerDay)
+        let kept = Treatment(name: "Adalimumab", kind: .biologic, scheduleKind: .everyNWeeks, interval: 2)
+        let removed = Treatment(name: "Calcipotriol", kind: .cream, scheduleKind: .timesPerDay)
         context.insert(kept)
         context.insert(removed)
         context.insert(DoseLog(treatment: kept, status: .done, injectionSite: .abdomenLeft))
@@ -117,7 +117,7 @@ struct PersistenceTests {
         let doses = try context.fetch(FetchDescriptor<DoseLog>())
         #expect(doses.count == 1)
         #expect(doses.first?.injectionSite == .abdomenLeft)
-        #expect(try context.fetch(FetchDescriptor<SchemaV1.Treatment>()).map(\.name) == ["Adalimumab"])
+        #expect(try context.fetch(FetchDescriptor<Treatment>()).map(\.name) == ["Adalimumab"])
     }
 
     @Test func photoAndQuestionnaireRoundTrip() throws {

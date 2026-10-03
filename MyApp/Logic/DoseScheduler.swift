@@ -18,7 +18,7 @@ struct DoseSchedule: Hashable, Sendable {
     var endDate: Date? = nil
 }
 
-extension SchemaV1.Treatment {
+extension Treatment {
     var doseSchedule: DoseSchedule {
         DoseSchedule(
             kind: scheduleKind, timesPerDay: timesPerDay, interval: interval, weekday: weekday,

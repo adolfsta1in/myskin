@@ -3,6 +3,11 @@ import Testing
 
 /// Raw values are stored on disk. These tests fail if a case is renamed or removed by accident.
 struct DomainEnumsTests {
+    @Test func profileEnumRawValues() {
+        #expect(Sex.allCases.map(\.rawValue) == ["female", "male", "other"])
+        #expect(ArthritisStatus.allCases.map(\.rawValue) == ["diagnosed", "suspected", "no", "unsure"])
+    }
+
     @Test func psoriasisTypeRawValues() {
         #expect(PsoriasisType.allCases.map(\.rawValue) == [
             "plaque", "guttate", "inverse", "pustular", "palmoplantar", "nail", "scalp", "genital",

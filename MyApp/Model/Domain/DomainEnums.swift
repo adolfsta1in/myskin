@@ -4,6 +4,38 @@ import Foundation
 // add new cases freely, but never rename or remove existing raw values.
 // `nonisolated` so the types can be used from pure logic and SwiftData off the main actor.
 
+// MARK: - Profile
+
+nonisolated enum Sex: String, Codable, CaseIterable, Identifiable, Sendable {
+    case female, male, other
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .female: "Female"
+        case .male: "Male"
+        case .other: "Other"
+        }
+    }
+}
+
+/// What the user knows about psoriatic arthritis. `diagnosed` skips the PEST screening.
+nonisolated enum ArthritisStatus: String, Codable, CaseIterable, Identifiable, Sendable {
+    case diagnosed, suspected, no, unsure
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .diagnosed: "Yes, a doctor diagnosed it"
+        case .suspected: "I think I might have it"
+        case .no: "No"
+        case .unsure: "I'm not sure"
+        }
+    }
+}
+
 // MARK: - Psoriasis type
 
 nonisolated enum PsoriasisType: String, Codable, CaseIterable, Identifiable, Sendable {

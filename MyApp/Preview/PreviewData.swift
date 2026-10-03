@@ -88,22 +88,22 @@ enum PreviewData {
         }
 
         // Treatment plan.
-        let ointment = SchemaV1.Treatment(
+        let ointment = Treatment(
             name: "Clobetasol 0.05% ointment", catalogID: "clobetasol", kind: .ointment, steroidClass: .class1,
             scheduleKind: .timesPerDay, timesPerDay: 2, doseMinutes: [8 * 60, 21 * 60], fingertipUnits: 1,
             zoneIDs: ["back.elbow.left", "back.elbow.right", "front.knee.left", "front.knee.right"],
             startDate: daysAgo(20)
         )
-        let shampoo = SchemaV1.Treatment(
+        let shampoo = Treatment(
             name: "Coal tar shampoo", kind: .shampoo,
             scheduleKind: .everyNDays, interval: 2, doseMinutes: [20 * 60],
             zoneIDs: ["quick.scalp"], startDate: daysAgo(46)
         )
-        let biologic = SchemaV1.Treatment(
+        let biologic = Treatment(
             name: "Adalimumab 40 mg", catalogID: "adalimumab", kind: .biologic,
             scheduleKind: .everyNWeeks, interval: 2, doseMinutes: [9 * 60], startDate: daysAgo(30)
         )
-        let emollient = SchemaV1.Treatment(
+        let emollient = Treatment(
             name: "Rich emollient cream", kind: .cream, scheduleKind: .asNeeded, startDate: daysAgo(120)
         )
         [ointment, shampoo, biologic, emollient].forEach(context.insert)
