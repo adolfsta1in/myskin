@@ -551,6 +551,7 @@ private struct CalmDaysCard: View {
 }
 
 /// Humidity and UV where the user is (Open-Meteo). Asks for location only when tapped.
+/// Sky-blue card: UV first (it matters most for psoriasis), then humidity and temperature.
 private struct WeatherCard: View {
     @Environment(WeatherModel.self) private var weather: WeatherModel?
     @Environment(\.openURL) private var openURL
@@ -558,11 +559,10 @@ private struct WeatherCard: View {
 
     var body: some View {
         if let weather {
-            VStack(alignment: .leading, spacing: 12) {
-                SectionHeader(title: "Weather", systemImage: "cloud.sun")
+            VStack(alignment: .leading, spacing: 14) {
                 content(weather)
             }
-            .glassCard()
+            .glassCard(tint: Theme.accentSoft)
             .task(id: scenePhase) {
                 if scenePhase == .active { await weather.refresh() }
             }
@@ -573,86 +573,227 @@ private struct WeatherCard: View {
     private func content(_ weather: WeatherModel) -> some View {
         switch weather.state {
         case .needsPermission:
-            Text("See humidity and UV where you are. Dry air and strong sun can affect psoriasis.")
-                .font(.rounded(.subheadline))
-                .foregroundStyle(Theme.inkSoft)
-            Button("Show weather", systemImage: "location") {
+            prompt(
+                systemImage: "cloud.sun.fill",
+                title: "Weather for your skin",
+                text: "See humidity and UV where you are. Dry air and strong sun can affect psoriasis."
+            )
+            Button {
                 Task { await weather.refresh(askPermission: true) }
+            } label: {
+                Label("Show weather", systemImage: "location.fill")
+                    .font(.rounded(.subheadline, weight: .semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 2)
             }
-            .font(.rounded(.subheadline, weight: .semibold))
-            .buttonStyle(.glass)
+            .buttonStyle(.glassProminent)
+            .tint(Theme.accent)
             Text("Uses your approximate location, sent to Open-Meteo to get the weather. It isn't stored.")
                 .font(.rounded(.caption))
                 .foregroundStyle(Theme.inkSoft)
         case .denied:
-            Text("Location is off for MySkin, so weather can't be shown.")
-                .font(.rounded(.subheadline))
-                .foregroundStyle(Theme.inkSoft)
+            prompt(
+                systemImage: "location.slash",
+                title: "Weather is off",
+                text: "Location is off for MySkin, so humidity and UV can't be shown."
+            )
             Button("Open Settings") {
                 if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
             }
             .font(.rounded(.subheadline, weight: .semibold))
             .tint(Theme.accent)
         case .loading:
-            ProgressView()
-                .frame(maxWidth: .infinity, minHeight: 60)
-        case .failed:
-            HStack {
-                Text("Couldn't load the weather.")
+            HStack(spacing: 12) {
+                ProgressView()
+                    .tint(Theme.accent)
+                Text("Checking the weather…")
                     .font(.rounded(.subheadline))
                     .foregroundStyle(Theme.inkSoft)
-                Spacer()
-                Button("Try again") { Task { await weather.refresh() } }
-                    .font(.rounded(.subheadline, weight: .semibold))
-                    .tint(Theme.accent)
             }
+            .frame(maxWidth: .infinity, minHeight: 72)
+        case .failed:
+            prompt(systemImage: "cloud.fill", title: "Weather", text: "Couldn't load the weather.")
+            Button("Try again") { Task { await weather.refresh() } }
+                .font(.rounded(.subheadline, weight: .semibold))
+                .tint(Theme.accent)
         case .loaded(let reading):
-            HStack(spacing: 10) {
-                metric(
-                    title: "Humidity",
-                    value: "\(Int(reading.humidity.rounded())) %",
-                    detail: WeatherInfo.humidityTitle(reading.humidity),
-                    systemImage: "humidity"
-                )
-                metric(
-                    title: "UV today",
-                    value: reading.uvIndexMax.formatted(.number.precision(.fractionLength(0))),
-                    detail: UVLevel(index: reading.uvIndexMax).title,
-                    systemImage: "sun.max"
-                )
-                metric(
-                    title: "Now",
-                    value: Measurement(value: reading.temperature, unit: UnitTemperature.celsius)
-                        .formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(0)))),
-                    detail: "Air",
-                    systemImage: "thermometer.medium"
-                )
-            }
-            ForEach(WeatherInfo.notes(for: reading), id: \.self) { note in
-                Text(note)
-                    .font(.rounded(.footnote))
-                    .foregroundStyle(Theme.inkSoft)
-            }
-            Text("Saved with today's check-in. Weather data by Open-Meteo.com")
-                .font(.rounded(.caption2))
-                .foregroundStyle(Theme.inkSoft)
+            loaded(reading)
         }
     }
 
-    private func metric(title: String, value: String, detail: String, systemImage: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Label(title, systemImage: systemImage)
-                .font(.rounded(.caption, weight: .medium))
-                .foregroundStyle(Theme.inkSoft)
-            Text(value)
-                .font(.rounded(.title3, weight: .bold))
-                .foregroundStyle(Theme.ink)
-            Text(detail)
-                .font(.rounded(.caption))
+    // MARK: Loaded
+
+    private func loaded(_ reading: WeatherReading) -> some View {
+        let uv = UVLevel(index: reading.uvIndexMax)
+        return VStack(alignment: .leading, spacing: 14) {
+            // Hero: today's UV and the temperature now.
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Label("UV today", systemImage: "sun.max.fill")
+                        .font(.rounded(.subheadline, weight: .semibold))
+                        .foregroundStyle(Theme.accent)
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Text(reading.uvIndexMax.formatted(.number.precision(.fractionLength(0))))
+                            .font(.rounded(.largeTitle, weight: .bold))
+                            .foregroundStyle(Theme.ink)
+                            .contentTransition(.numericText())
+                        Text(uv.title)
+                            .font(.rounded(.subheadline, weight: .semibold))
+                            .foregroundStyle(Theme.ink)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 3)
+                            .background(Self.color(for: uv).opacity(0.55), in: .capsule)
+                    }
+                }
+                Spacer()
+                VStack(alignment: .trailing, spacing: 4) {
+                    Image(systemName: "thermometer.medium")
+                        .font(.subheadline)
+                        .foregroundStyle(Theme.accent)
+                    Text(Measurement(value: reading.temperature, unit: UnitTemperature.celsius)
+                        .formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(0)))))
+                        .font(.rounded(.title2, weight: .bold))
+                        .foregroundStyle(Theme.ink)
+                    Text("now")
+                        .font(.rounded(.caption))
+                        .foregroundStyle(Theme.inkSoft)
+                }
+                .accessibilityElement(children: .combine)
+            }
+
+            UVScale(index: reading.uvIndexMax)
+
+            HStack(spacing: 10) {
+                tile(
+                    systemImage: "humidity.fill",
+                    title: "Humidity",
+                    value: "\(Int(reading.humidity.rounded())) %",
+                    detail: WeatherInfo.humidityTitle(reading.humidity)
+                )
+                tile(
+                    systemImage: "sun.min",
+                    title: "UV now",
+                    value: reading.uvIndex.formatted(.number.precision(.fractionLength(0))),
+                    detail: UVLevel(index: reading.uvIndex).title
+                )
+            }
+
+            let notes = WeatherInfo.notes(for: reading)
+            if !notes.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(notes, id: \.self) { note in
+                        Label(note, systemImage: "info.circle")
+                            .font(.rounded(.footnote))
+                            .foregroundStyle(Theme.ink)
+                    }
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(.white.opacity(0.45), in: .rect(cornerRadius: 16))
+            }
+
+            Text("Saved with today's check-in · Weather data by Open-Meteo.com")
+                .font(.rounded(.caption2))
                 .foregroundStyle(Theme.inkSoft)
         }
+        .accessibilityElement(children: .contain)
+    }
+
+    private func tile(systemImage: String, title: String, value: String, detail: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: systemImage)
+                .font(.title3)
+                .foregroundStyle(Theme.accent)
+                .frame(width: 36, height: 36)
+                .background(.white.opacity(0.6), in: .circle)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .font(.rounded(.caption, weight: .medium))
+                    .foregroundStyle(Theme.inkSoft)
+                Text(value)
+                    .font(.rounded(.headline, weight: .bold))
+                    .foregroundStyle(Theme.ink)
+                Text(detail)
+                    .font(.rounded(.caption))
+                    .foregroundStyle(Theme.inkSoft)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.white.opacity(0.45), in: .rect(cornerRadius: 18))
         .accessibilityElement(children: .combine)
+    }
+
+    private func prompt(systemImage: String, title: String, text: String) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: systemImage)
+                .font(.title2)
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(Theme.accent)
+                .frame(width: 48, height: 48)
+                .background(.white.opacity(0.6), in: .circle)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.rounded(.headline, weight: .semibold))
+                    .foregroundStyle(Theme.ink)
+                Text(text)
+                    .font(.rounded(.subheadline))
+                    .foregroundStyle(Theme.inkSoft)
+            }
+        }
+    }
+
+    /// UV bands in the app's calm → severe palette.
+    fileprivate static func color(for level: UVLevel) -> Color {
+        switch level {
+        case .low: Theme.intensityCalm
+        case .moderate: Theme.intensityMild
+        case .high: Theme.intensityModerate
+        case .veryHigh, .extreme: Theme.intensitySevere
+        }
+    }
+}
+
+/// 0–11+ UV bar with a marker at today's maximum.
+private struct UVScale: View {
+    let index: Double
+    private static let maxIndex = 11.0
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            GeometryReader { geo in
+                let fraction = min(max(index / Self.maxIndex, 0), 1)
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(LinearGradient(
+                            colors: [Theme.intensityCalm, Theme.intensityMild, Theme.intensityModerate, Theme.intensitySevere],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ))
+                        .frame(height: 8)
+                    Circle()
+                        .fill(.white)
+                        .overlay(Circle().stroke(Theme.ink.opacity(0.7), lineWidth: 2))
+                        .frame(width: 16, height: 16)
+                        .offset(x: fraction * (geo.size.width - 16))
+                }
+                .frame(maxHeight: .infinity)
+            }
+            .frame(height: 16)
+            HStack {
+                Text("Low")
+                Spacer()
+                Text("Moderate")
+                Spacer()
+                Text("High")
+                Spacer()
+                Text("Extreme")
+            }
+            .font(.rounded(.caption2))
+            .foregroundStyle(Theme.inkSoft)
+        }
+        .accessibilityHidden(true)
     }
 }
 
