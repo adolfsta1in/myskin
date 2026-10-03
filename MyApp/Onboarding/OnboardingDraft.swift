@@ -10,6 +10,7 @@ final class OnboardingDraft {
     var name = ""
     var sex: Sex?
     var age: Int?
+    var arthritis: ArthritisStatus?
     var psoriasisTypes: Set<PsoriasisType> = []
     var onsetYear: Int?
     /// Self-rated skin, 0 (clear) … 1 (very bad).
@@ -83,6 +84,7 @@ final class OnboardingDraft {
         profile.name = ProfileInfo.cleanName(name)
         profile.sex = sex
         profile.birthYear = age.map { ProfileInfo.birthYear(age: $0, now: date) }
+        profile.arthritisStatus = arthritis
         profile.psoriasisTypes = orderedTypes
         profile.onsetYear = onsetYear
         profile.goals = Goal.allCases.filter(goals.contains)

@@ -47,9 +47,17 @@ struct DoctorReport {
         var id: String { zoneID }
     }
 
+    /// Who the report is about; every field is optional.
+    struct Patient: Equatable {
+        var age: Int?
+        var sex: Sex?
+        var arthritis: ArthritisStatus?
+    }
+
     let start: Date
     let end: Date
     let psoriasisTypes: [PsoriasisType]
+    let patient: Patient
     /// Body map at the start of the period (or its first assessment day, if the map started later) and now.
     /// `severityBefore` is nil when there is only one map state to show.
     let severityBefore: SeveritySnapshot?
@@ -90,6 +98,7 @@ struct DoctorReport {
         periodDays: Int,
         endingOn date: Date,
         psoriasisTypes: [PsoriasisType],
+        patient: Patient = Patient(),
         checkIns: [DailyCheckInSample],
         zones: [DatedZoneScore],
         results: [(kind: QuestionnaireKind, date: Date, score: Int)],
@@ -111,7 +120,7 @@ struct DoctorReport {
         let mapNow = Trends.map(on: date, zones: zones, calendar: calendar)
         let dlqiLatestEver = results.filter { $0.kind == .dlqi && $0.date <= date }.max { $0.date < $1.date }?.score
         let pest = results.filter { $0.kind == .pest && $0.date <= date }.max { $0.date < $1.date }?.score
-        let arthritis = pest.map(PEST.suggestsRheumatologist) ?? false
+        let arthritis = ArthritisRules.isSuspected(status: patient.arthritis, pestScore: pest)
         let severityBefore = mapBefore.isEmpty ? nil : SeverityCalculator.snapshot(for: mapBefore, arthritisSuspected: arthritis)
         let severityNow = mapNow.isEmpty ? nil : SeverityCalculator.snapshot(for: mapNow, dlqi: dlqiLatestEver, arthritisSuspected: arthritis)
 
@@ -154,6 +163,7 @@ struct DoctorReport {
             start: start,
             end: date,
             psoriasisTypes: psoriasisTypes,
+            patient: patient,
             severityBefore: severityBefore,
             severityNow: severityNow,
             itchBefore: itchBefore,

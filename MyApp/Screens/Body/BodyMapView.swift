@@ -4,6 +4,7 @@ import SwiftUI
 struct BodyMapView: View {
     @Query private var assessments: [ZoneAssessment]
     @Query(sort: \QuestionnaireResult.date, order: .reverse) private var questionnaires: [QuestionnaireResult]
+    @Query(sort: \Profile.createdAt) private var profiles: [Profile]
     @State private var side: BodySide = .front
     @State private var lastTapped: BodyZone?
     @State private var editingZone: BodyZone?
@@ -16,7 +17,7 @@ struct BodyMapView: View {
         return BodyMapSummary.make(
             zones: assessments.map(\.datedScore),
             dlqi: dlqi,
-            arthritisSuspected: pest.map(PEST.suggestsRheumatologist) ?? false
+            arthritisSuspected: ArthritisRules.isSuspected(status: profiles.first?.arthritisStatus, pestScore: pest)
         )
     }
 
@@ -182,7 +183,8 @@ struct BodyMapView: View {
     /// Special site or suspected arthritis (spec §2.2): a hint to talk to the doctor, not a diagnosis.
     private func elevatedNote(_ snapshot: SeveritySnapshot) -> some View {
         let names = snapshot.specialSiteIDs.compactMap { BodyZone.zone(id: $0)?.name }
-        let reason = names.isEmpty ? "Your joint answers" : "Special area: \(names.formatted(.list(type: .and)))"
+        let joints = profiles.first?.arthritisStatus == .diagnosed ? "Psoriatic arthritis" : "Your joint answers"
+        let reason = names.isEmpty ? joints : "Special area: \(names.formatted(.list(type: .and)))"
         return HStack(alignment: .firstTextBaseline, spacing: 8) {
             Image(systemName: "exclamationmark.circle")
                 .foregroundStyle(Theme.intensitySevere)

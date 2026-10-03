@@ -211,7 +211,46 @@ struct PsoriasisProfileStep: View {
     }
 }
 
-// MARK: - O5 Skin now
+// MARK: - O5 Joints
+
+/// Psoriatic arthritis. People who already know answer here; the others get the PEST card on Today.
+struct JointsStep: View {
+    @Environment(OnboardingDraft.self) private var draft
+    let next: () -> Void
+
+    private func systemImage(_ status: ArthritisStatus) -> String {
+        switch status {
+        case .diagnosed: "stethoscope"
+        case .suspected: "figure.walk"
+        case .no: "checkmark.seal"
+        case .unsure: "questionmark.circle"
+        }
+    }
+
+    var body: some View {
+        OnboardingPage(
+            title: "Do you have psoriatic arthritis?",
+            subtitle: "Joint pain, swelling or morning stiffness can be part of psoriasis.",
+            why: "If you're not sure, the app will offer a short joint questionnaire (PEST) after setup."
+        ) {
+            VStack(spacing: 12) {
+                ForEach(ArthritisStatus.allCases) { status in
+                    ChoiceCard(
+                        title: status.title,
+                        systemImage: systemImage(status),
+                        isSelected: draft.arthritis == status
+                    ) {
+                        withAnimation(.snappy) { draft.arthritis = draft.arthritis == status ? nil : status }
+                    }
+                }
+            }
+        } footer: {
+            PrimaryButton(title: "Continue", action: next)
+        }
+    }
+}
+
+// MARK: - O6 Skin now
 
 struct SkinNowStep: View {
     @Environment(OnboardingDraft.self) private var draft
@@ -290,7 +329,7 @@ struct SkinMoodIllustration: View {
     }
 }
 
-// MARK: - O6 Goals
+// MARK: - O7 Goals
 
 struct GoalsStep: View {
     @Environment(OnboardingDraft.self) private var draft
@@ -319,7 +358,7 @@ struct GoalsStep: View {
     }
 }
 
-// MARK: - O7 Delay insight
+// MARK: - O8 Delay insight
 
 struct DelayInsightStep: View {
     let next: () -> Void

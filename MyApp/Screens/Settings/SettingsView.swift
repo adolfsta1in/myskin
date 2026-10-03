@@ -114,6 +114,15 @@ struct SettingsView: View {
                     Text(String(year)).tag(Optional(year))
                 }
             }
+            Picker("Psoriatic arthritis", selection: Binding(
+                get: { profile?.arthritisStatus },
+                set: { status in updateProfile { $0.arthritisStatus = status } }
+            )) {
+                Text("Not set").tag(ArthritisStatus?.none)
+                ForEach(ArthritisStatus.allCases) { status in
+                    Text(status.title).tag(Optional(status))
+                }
+            }
         }
     }
 

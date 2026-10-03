@@ -23,15 +23,22 @@ enum QuestionnaireSchedule {
 
     /// Questionnaires due on `now`, in `QuestionnaireKind.allCases` order.
     /// `results` are (kind, date) pairs of stored results in any order.
-    static func due(now: Date, results: [(kind: QuestionnaireKind, date: Date)], calendar: Calendar = .current) -> [QuestionnaireKind] {
+    /// PEST is left out once arthritis is diagnosed (`ArthritisRules.needsPEST`).
+    static func due(
+        now: Date,
+        results: [(kind: QuestionnaireKind, date: Date)],
+        arthritis: ArthritisStatus? = nil,
+        calendar: Calendar = .current
+    ) -> [QuestionnaireKind] {
         QuestionnaireKind.allCases.filter { kind in
+            if kind == .pest && !ArthritisRules.needsPEST(arthritis) { return false }
             let last = results.filter { $0.kind == kind }.map(\.date).max()
             return isDue(kind, lastTaken: last, now: now, calendar: calendar)
         }
     }
 
-    static func due(now: Date, results: [QuestionnaireResult], calendar: Calendar = .current) -> [QuestionnaireKind] {
-        due(now: now, results: results.map { ($0.kind, $0.date) }, calendar: calendar)
+    static func due(now: Date, results: [QuestionnaireResult], arthritis: ArthritisStatus? = nil, calendar: Calendar = .current) -> [QuestionnaireKind] {
+        due(now: now, results: results.map { ($0.kind, $0.date) }, arthritis: arthritis, calendar: calendar)
     }
 
     /// Card text on Today.

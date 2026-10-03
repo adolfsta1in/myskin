@@ -495,7 +495,7 @@ MySkinTests/      Swift Testing
 - **Зависимости:** 46.
 - **Готово, когда:** имя из онбординга видно в шапке Today, правка в настройках сразу меняет приветствие; всё необязательно.
 
-### Шаг 48. Онбординг: псориатический артрит
+### Шаг 48. Онбординг: псориатический артрит ✅
 - **Цель:** «Diagnosed / I suspect it / No / Not sure». Diagnosed — PEST не предлагается (скрининг не нужен), Elevated на карте учитывает артрит; остальные — карточка PEST на Today после онбординга.
 - **Файлы:** онбординг, `QuestionnaireSchedule`, `BodyMapSummary`/`SeverityCalculator` (`arthritisSuspected`), `SettingsView`.
 - **Зависимости:** 46, 34.

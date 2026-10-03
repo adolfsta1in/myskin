@@ -34,6 +34,11 @@ struct DoctorReportView: View {
             periodDays: period.days,
             endingOn: .now,
             psoriasisTypes: profiles.first?.psoriasisTypes ?? [],
+            patient: DoctorReport.Patient(
+                age: profiles.first?.birthYear.map { ProfileInfo.age(birthYear: $0) },
+                sex: profiles.first?.sex,
+                arthritis: profiles.first?.arthritisStatus
+            ),
             checkIns: checkIns.map(\.reportSample),
             zones: assessments.map(\.datedScore),
             results: results.map(\.trendPoint),
@@ -148,6 +153,9 @@ struct ReportPaper: View {
                 line(report.pestLatest.map {
                     "PEST (joints): \($0) of 5\(PEST.suggestsRheumatologist($0) ? " · suggests a rheumatology referral" : "")"
                 } ?? "PEST (joints): not taken")
+                if let arthritis = ArthritisRules.reportText(report.patient.arthritis) {
+                    line(arthritis)
+                }
             }
 
             label("Treatment")
@@ -201,6 +209,12 @@ struct ReportPaper: View {
         .padding(20)
     }
 
+    /// «Age 34 · Female», or nil if neither was given.
+    private var patientLine: String? {
+        let parts = [report.patient.age.map { "Age \($0)" }, report.patient.sex?.title].compactMap(\.self)
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
+    }
+
     private var header: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
@@ -209,6 +223,11 @@ struct ReportPaper: View {
                 Text("\(report.start.formatted(.dateTime.month(.abbreviated).day())) – \(report.end.formatted(.dateTime.month(.abbreviated).day().year()))")
                     .font(.rounded(.caption))
                     .foregroundStyle(Theme.inkSoft)
+                if let patient = patientLine {
+                    Text(patient)
+                        .font(.rounded(.caption))
+                        .foregroundStyle(Theme.inkSoft)
+                }
             }
             Spacer()
             Text(report.psoriasisTypes.isEmpty ? "Psoriasis" : "Psoriasis · \(report.psoriasisTypes.map(\.title).joined(separator: ", "))")

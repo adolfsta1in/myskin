@@ -2,14 +2,14 @@ import SwiftData
 import SwiftUI
 
 enum OnboardingStep: Int, CaseIterable, Identifiable {
-    case welcome, disclaimer, aboutYou, psoriasisProfile, skinNow, goals, insight, bodyMap, treatments, notifications, privacy, plan
+    case welcome, disclaimer, aboutYou, psoriasisProfile, joints, skinNow, goals, insight, bodyMap, treatments, notifications, privacy, plan
 
     var id: Int { rawValue }
 
     /// Optional steps show a "Skip" button. The disclaimer can never be skipped.
     var isOptional: Bool {
         switch self {
-        case .aboutYou, .psoriasisProfile, .skinNow, .goals, .bodyMap, .treatments, .notifications, .privacy: true
+        case .aboutYou, .psoriasisProfile, .joints, .skinNow, .goals, .bodyMap, .treatments, .notifications, .privacy: true
         default: false
         }
     }
@@ -21,14 +21,15 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
         case .disclaimer: "O2 · Disclaimer"
         case .aboutYou: "O3 · About you"
         case .psoriasisProfile: "O4 · Your psoriasis"
-        case .skinNow: "O5 · Skin now"
-        case .goals: "O6 · Goals"
-        case .insight: "O7 · Insight"
-        case .bodyMap: "O8 · Body map"
-        case .treatments: "O9 · Treatments"
-        case .notifications: "O10 · Notifications"
-        case .privacy: "O11 · Privacy"
-        case .plan: "O12 · Plan ready"
+        case .joints: "O5 · Joints"
+        case .skinNow: "O6 · Skin now"
+        case .goals: "O7 · Goals"
+        case .insight: "O8 · Insight"
+        case .bodyMap: "O9 · Body map"
+        case .treatments: "O10 · Treatments"
+        case .notifications: "O11 · Notifications"
+        case .privacy: "O12 · Privacy"
+        case .plan: "O13 · Plan ready"
         }
     }
 }
@@ -80,6 +81,7 @@ struct OnboardingFlow: View {
         case .disclaimer: DisclaimerStep(next: advance)
         case .aboutYou: AboutYouStep(next: advance)
         case .psoriasisProfile: PsoriasisProfileStep(next: advance)
+        case .joints: JointsStep(next: advance)
         case .skinNow: SkinNowStep(next: advance)
         case .goals: GoalsStep(next: advance)
         case .insight: DelayInsightStep(next: advance)

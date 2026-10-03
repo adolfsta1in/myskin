@@ -651,10 +651,11 @@ private struct RemindersCard: View {
 /// «Time for …» cards for questionnaires that are due (`QuestionnaireSchedule`); a card goes away once taken.
 private struct QuestionnaireDueCards: View {
     @Query private var results: [QuestionnaireResult]
+    @Query(sort: \Profile.createdAt) private var profiles: [Profile]
     let onTake: (QuestionnaireKind) -> Void
 
     var body: some View {
-        let due = QuestionnaireSchedule.due(now: .now, results: results)
+        let due = QuestionnaireSchedule.due(now: .now, results: results, arthritis: profiles.first?.arthritisStatus)
         ForEach(due) { kind in
             let neverTaken = !results.contains { $0.kind == kind }
             Button {

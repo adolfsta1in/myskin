@@ -12,6 +12,22 @@ struct QuestionnaireScheduleTests {
         #expect(QuestionnaireSchedule.due(now: now, results: none, calendar: calendar) == [.dlqi, .pest])
     }
 
+    @Test func diagnosedArthritisSkipsPEST() {
+        let none: [(kind: QuestionnaireKind, date: Date)] = []
+        #expect(QuestionnaireSchedule.due(now: now, results: none, arthritis: .diagnosed, calendar: calendar) == [.dlqi])
+        for status in [ArthritisStatus.suspected, .no, .unsure] {
+            #expect(QuestionnaireSchedule.due(now: now, results: none, arthritis: status, calendar: calendar) == [.dlqi, .pest])
+        }
+    }
+
+    @Test func arthritisRaisesSeverityWhenKnownOrScreenedPositive() {
+        #expect(ArthritisRules.isSuspected(status: .diagnosed, pestScore: nil))
+        #expect(ArthritisRules.isSuspected(status: .suspected, pestScore: 0))
+        #expect(!ArthritisRules.isSuspected(status: .no, pestScore: 1))
+        #expect(ArthritisRules.isSuspected(status: .unsure, pestScore: 3))
+        #expect(!ArthritisRules.isSuspected(status: nil, pestScore: nil))
+    }
+
     @Test func takenTodayIsNotDue() {
         let results: [(kind: QuestionnaireKind, date: Date)] = [(.dlqi, now), (.pest, now)]
         #expect(QuestionnaireSchedule.due(now: now, results: results, calendar: calendar).isEmpty)

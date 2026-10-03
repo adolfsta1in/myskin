@@ -109,11 +109,13 @@ struct ProfileInfoTests {
         draft.name = " Anna "
         draft.sex = .female
         draft.age = 34
+        draft.arthritis = .unsure
         try draft.save(in: context, date: now)
 
         let profile = try #require(try context.fetch(FetchDescriptor<Profile>()).first)
         #expect(profile.name == "Anna")
         #expect(profile.sex == .female)
         #expect(profile.birthYear == 1992)
+        #expect(profile.arthritisStatus == .unsure)
     }
 }
