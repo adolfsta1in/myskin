@@ -244,6 +244,8 @@ private struct CheckInCard: View {
     @State private var showsDetails = false
     @State private var isAddingTag = false
     @State private var newTag = ""
+    @State private var isAddingFood = false
+    @State private var newFood = ""
     @State private var isSaved = false
     @State private var saveCount = 0
     @State private var saveError: String?
@@ -268,6 +270,12 @@ private struct CheckInCard: View {
     private var customTags: [String] {
         let known = CheckInDraft.knownTags(from: allCheckIns)
         return known + draft.customTags.filter { !known.contains($0) }
+    }
+
+    /// Earlier custom foods plus the ones picked today.
+    private var customFoods: [String] {
+        let known = CheckInDraft.knownFoods(from: allCheckIns)
+        return known + draft.customFoods.filter { !known.contains($0) }
     }
 
     private var itchDescription: String {
@@ -343,6 +351,30 @@ private struct CheckInCard: View {
                 }
             }
 
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Food today")
+                    .font(.rounded(.subheadline, weight: .medium))
+                    .foregroundStyle(Theme.ink)
+                GlassEffectContainer(spacing: 8) {
+                    FlowLayout(spacing: 8) {
+                        ForEach(Food.allCases) { food in
+                            TagChip(title: food.title, systemImage: food.systemImage, isSelected: draft.foods.contains(food)) {
+                                draft.toggle(food)
+                            }
+                        }
+                        ForEach(customFoods, id: \.self) { food in
+                            TagChip(title: food, systemImage: "fork.knife.circle", isSelected: draft.customFoods.contains(food)) {
+                                draft.toggleCustomFood(food)
+                            }
+                        }
+                        TagChip(title: "None of these", systemImage: "xmark.circle", isSelected: draft.isNoFood) {
+                            draft.markNoFood()
+                        }
+                        TagChip(title: "Add food", systemImage: "plus") { isAddingFood = true }
+                    }
+                }
+            }
+
             if mode == .flare || showsDetails {
                 details
                     .transition(.opacity.combined(with: .move(edge: .top)))
@@ -387,6 +419,15 @@ private struct CheckInCard: View {
                 newTag = ""
             }
             Button("Cancel", role: .cancel) { newTag = "" }
+        }
+        .alert("Add a food", isPresented: $isAddingFood) {
+            TextField("e.g. Eggs", text: $newFood)
+                .submitLabel(.done)
+            Button("Add") {
+                draft.addCustomFood(newFood, known: customFoods)
+                newFood = ""
+            }
+            Button("Cancel", role: .cancel) { newFood = "" }
         }
         .alert("Couldn't save", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
             Button("OK", role: .cancel) {}

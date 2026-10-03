@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 
-/// First persisted schema (frozen). The app uses `SchemaV2`; this copy is only
+/// First persisted schema (frozen). The app uses the latest schema; this copy is only
 /// needed to migrate stores created by earlier builds.
 ///
 /// Enums are stored as their string raw values (`…ID` / `…IDs` fields) so that

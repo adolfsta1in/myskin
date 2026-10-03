@@ -18,6 +18,9 @@ struct DataExportTests {
         #expect(CSV.escape("two\nlines") == "\"two\nlines\"")
         #expect(CSV.number(0.5) == "0.5")
         #expect(CSV.number(1200) == "1200")
+        #expect(CSV.food(nil) == "")
+        #expect(CSV.food([]) == "none")
+        #expect(CSV.food(["dairy", "coffee"]) == "dairy;coffee")
     }
 
     @Test func datesUseTheLocalDay() throws {
@@ -50,7 +53,7 @@ struct DataExportTests {
         let urls = try DataExport.writeCSV(from: try filledContext(), folder: folder)
         #expect(urls.count == 5)
         let text = try String(contentsOf: urls[0], encoding: .utf8)
-        #expect(text.hasPrefix("date,itch,pain,sleep,mood,new_spots,triggers,custom_tags,note\r\n"))
+        #expect(text.hasPrefix("date,itch,pain,sleep,mood,new_spots,triggers,custom_tags,food,custom_foods,note\r\n"))
     }
 
     @Test func deleteAllEmptiesEverything() async throws {

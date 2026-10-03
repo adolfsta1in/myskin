@@ -24,10 +24,11 @@ enum DataExport {
         return [
             Table(
                 name: "check-ins",
-                header: ["date", "itch", "pain", "sleep", "mood", "new_spots", "triggers", "custom_tags", "note"],
+                header: ["date", "itch", "pain", "sleep", "mood", "new_spots", "triggers", "custom_tags", "food", "custom_foods", "note"],
                 rows: checkIns.map {
                     [CSV.day($0.day), "\($0.itch)", CSV.optional($0.pain), CSV.optional($0.sleep), CSV.optional($0.mood),
-                     $0.newSpots ? "yes" : "no", $0.triggerIDs.joined(separator: ";"), $0.customTags.joined(separator: ";"), $0.note]
+                     $0.newSpots ? "yes" : "no", $0.triggerIDs.joined(separator: ";"), $0.customTags.joined(separator: ";"),
+                     CSV.food($0.foodIDs), $0.customFoods.joined(separator: ";"), $0.note]
                 }
             ),
             Table(
@@ -89,6 +90,11 @@ enum CSV {
     /// Local time with its offset, e.g. `2026-10-02T01:56:53+06:00`.
     static func time(_ date: Date) -> String { date.formatted(Date.ISO8601FormatStyle(timeZone: .current)) }
     static func optional(_ value: Int?) -> String { value.map(String.init) ?? "" }
+    /// Food raw values; empty when food wasn't logged, `none` when nothing was picked.
+    static func food(_ ids: [String]?) -> String {
+        guard let ids else { return "" }
+        return ids.isEmpty ? "none" : ids.joined(separator: ";")
+    }
     static func number(_ value: Double) -> String { value.formatted(.number.precision(.fractionLength(0...2)).grouping(.never).locale(Locale(identifier: "en_US_POSIX"))) }
 }
 

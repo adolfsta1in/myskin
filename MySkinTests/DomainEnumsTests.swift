@@ -20,6 +20,12 @@ struct DomainEnumsTests {
         ])
     }
 
+    @Test func foodRawValues() {
+        #expect(Food.allCases.map(\.rawValue) == [
+            "dairy", "gluten", "sugar", "redMeat", "processed", "nightshades", "spicy", "coffee",
+        ])
+    }
+
     @Test func treatmentKindRawValues() {
         #expect(TreatmentKind.allCases.map(\.rawValue) == [
             "cream", "ointment", "shampoo", "foam", "pill", "biologic", "phototherapy",

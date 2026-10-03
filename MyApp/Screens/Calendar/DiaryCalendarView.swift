@@ -409,6 +409,10 @@ private struct DayDetail: View {
             if checkIn.newSpots { row("New or spreading spots", "Yes") }
             let tags = checkIn.triggers.map(\.title) + checkIn.customTags
             if !tags.isEmpty { row("Possible triggers", tags.joined(separator: ", ")) }
+            if checkIn.foodIDs != nil {
+                let foods = checkIn.foods.map(\.title) + checkIn.customFoods
+                row("Food", foods.isEmpty ? "None of these" : foods.joined(separator: ", "))
+            }
             if let humidity = checkIn.humidity { row("Humidity", "\(Int(humidity.rounded())) %") }
             if let uv = checkIn.uvIndex { row("UV index", uv.formatted(.number.precision(.fractionLength(0...1)))) }
             if let temperature = checkIn.temperature {

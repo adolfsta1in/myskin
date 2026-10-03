@@ -61,7 +61,7 @@ enum PreviewData {
         let itch = [6, 7, 6, 5, 6, 4, 5, 4, 3, 4, 3, 2, 3, flare ? 8 : 3]
         for (offset, value) in itch.enumerated() {
             let ago = itch.count - 1 - offset
-            context.insert(DailyCheckIn(
+            let checkIn = DailyCheckIn(
                 day: daysAgo(ago),
                 itch: value,
                 pain: max(value - 3, 0),
@@ -70,7 +70,13 @@ enum PreviewData {
                 triggers: ago == 12 ? [.stress] : ago == 10 ? [.alcohol, .stress] : [],
                 newSpots: ago == 12 || (flare && ago == 0),
                 calendar: calendar
-            ))
+            )
+            // Food on most days: dairy every few days, coffee often, nothing logged on the rest.
+            if ago % 4 != 3 {
+                checkIn.foodIDs = ([ago % 3 == 0 ? Food.dairy : nil, ago % 2 == 0 ? .coffee : nil].compactMap { $0 }).map(\.rawValue)
+                checkIn.customFoods = ago == 5 ? ["Eggs"] : []
+            }
+            context.insert(checkIn)
         }
 
         // Body map: a week ago and today.

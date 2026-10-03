@@ -1,18 +1,10 @@
 import Foundation
 import SwiftData
 
-// Current model types. Screens use these aliases, so a new schema version only changes the alias targets.
-typealias Profile = SchemaV2.Profile
-typealias DailyCheckIn = SchemaV2.DailyCheckIn
-typealias ZoneAssessment = SchemaV2.ZoneAssessment
-typealias Treatment = SchemaV2.Treatment
-typealias DoseLog = SchemaV2.DoseLog
-typealias Photo = SchemaV2.Photo
-typealias QuestionnaireResult = SchemaV2.QuestionnaireResult
-
-/// Current schema. Changes from V1: profile name, sex, birth year and arthritis status;
+/// Second persisted schema (frozen). The app uses `SchemaV3`; this copy is only
+/// needed to migrate stores created by earlier builds.
+/// Changes from V1: profile name, sex, birth year and arthritis status;
 /// weather on the check-in; `syncID` on every record that is synced to the cloud.
-/// Never change models here after release — add `SchemaV3` and a migration stage instead.
 ///
 /// Enums are stored as their string raw values (`…ID` / `…IDs` fields) so that
 /// predicates work and stored data does not depend on Swift type names.

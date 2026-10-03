@@ -3,7 +3,7 @@ import SwiftData
 
 /// Builds the SwiftData containers used by the app, previews and tests.
 enum AppModelContainer {
-    static let schema = Schema(versionedSchema: SchemaV2.self)
+    static let schema = Schema(versionedSchema: SchemaV3.self)
 
     /// On-disk store in `Application Support/Store`, local only (no CloudKit).
     ///

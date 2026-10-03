@@ -104,6 +104,42 @@ nonisolated enum Trigger: String, Codable, CaseIterable, Identifiable, Sendable 
     }
 }
 
+// MARK: - Food
+
+/// Foods some people link to their flares. Logged in the check-in for the user's own patterns;
+/// alcohol stays a `Trigger`.
+nonisolated enum Food: String, Codable, CaseIterable, Identifiable, Sendable {
+    case dairy, gluten, sugar, redMeat, processed, nightshades, spicy, coffee
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .dairy: "Dairy"
+        case .gluten: "Gluten / wheat"
+        case .sugar: "Sugar & sweets"
+        case .redMeat: "Red meat"
+        case .processed: "Processed / fast food"
+        case .nightshades: "Nightshades (tomato, pepper)"
+        case .spicy: "Spicy food"
+        case .coffee: "Coffee"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .dairy: "waterbottle"
+        case .gluten: "laurel.leading"
+        case .sugar: "birthday.cake"
+        case .redMeat: "fork.knife"
+        case .processed: "takeoutbag.and.cup.and.straw"
+        case .nightshades: "carrot"
+        case .spicy: "flame"
+        case .coffee: "cup.and.saucer"
+        }
+    }
+}
+
 // MARK: - Treatment kind
 
 nonisolated enum TreatmentKind: String, Codable, CaseIterable, Identifiable, Sendable {
