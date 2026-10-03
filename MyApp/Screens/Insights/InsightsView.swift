@@ -34,6 +34,13 @@ struct InsightsView: View {
                     .buttonStyle(.plain)
 
                     NavigationLink {
+                        DiaryCalendarView()
+                    } label: {
+                        LinkCard(systemImage: "calendar", title: "Diary calendar", subtitle: "What happened on each day, with photos")
+                    }
+                    .buttonStyle(.plain)
+
+                    NavigationLink {
                         QuestionnaireHistoryView()
                     } label: {
                         LinkCard(systemImage: "list.clipboard", title: "Questionnaires", subtitle: "DLQI and PEST · scores over time")
