@@ -588,7 +588,7 @@ private struct WeatherCard: View {
             }
             .buttonStyle(.glassProminent)
             .tint(Theme.accent)
-            Text("Uses your approximate location, sent to Open-Meteo to get the weather. It isn't stored.")
+            Text("Uses your approximate location, sent to Open-Meteo for the weather and to Apple for the place name. It isn't stored.")
                 .font(.rounded(.caption))
                 .foregroundStyle(Theme.inkSoft)
         case .denied:
@@ -647,9 +647,20 @@ private struct WeatherCard: View {
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 4) {
-                    Image(systemName: "thermometer.medium")
-                        .font(.subheadline)
-                        .foregroundStyle(Theme.accent)
+                    HStack(spacing: 8) {
+                        if let place = weather?.placeName {
+                            Label(place, systemImage: "location.fill")
+                                .font(.rounded(.caption, weight: .medium))
+                                .foregroundStyle(Theme.inkSoft)
+                                .labelStyle(PlaceLabelStyle())
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                                .frame(maxWidth: 140, alignment: .trailing)
+                        }
+                        Image(systemName: "thermometer.medium")
+                            .font(.subheadline)
+                            .foregroundStyle(Theme.accent)
+                    }
                     Text(Measurement(value: reading.temperature, unit: UnitTemperature.celsius)
                         .formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(0)))))
                         .font(.rounded(.title2, weight: .bold))
@@ -751,6 +762,18 @@ private struct WeatherCard: View {
         case .moderate: Theme.intensityMild
         case .high: Theme.intensityModerate
         case .veryHigh, .extreme: Theme.intensitySevere
+        }
+    }
+}
+
+/// Small location arrow before the place name.
+private struct PlaceLabelStyle: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: 3) {
+            configuration.icon
+                .font(.system(size: 9))
+                .foregroundStyle(Theme.accent)
+            configuration.title
         }
     }
 }

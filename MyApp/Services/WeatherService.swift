@@ -1,5 +1,6 @@
 import CoreLocation
 import Foundation
+import MapKit
 import Observation
 import UIKit
 
@@ -63,6 +64,8 @@ final class WeatherModel {
 
     private(set) var state: State
     private(set) var updatedAt: Date?
+    /// City (or area) name for the card, from Apple's reverse geocoder; nil if unknown.
+    private(set) var placeName: String?
     private let provider: any WeatherProvider
 
     /// Readings younger than this are reused.
@@ -94,11 +97,19 @@ final class WeatherModel {
             )
             state = .loaded(reading)
             updatedAt = .now
+            placeName = await Self.placeName(for: location)
         } catch LocationProvider.LocationError.denied {
             state = LocationProvider.status == .notDetermined ? .needsPermission : .denied
         } catch {
             state = .failed
         }
+    }
+
+    /// Name isn't required: on any failure the card just shows no place.
+    private static func placeName(for location: CLLocation) async -> String? {
+        guard let request = MKReverseGeocodingRequest(location: location),
+              let item = try? await request.mapItems.first else { return nil }
+        return item.addressRepresentations?.cityName ?? item.name
     }
 
     private func withTimeout<T: Sendable>(seconds: Double, _ work: @escaping @Sendable () async throws -> T) async throws -> T {
