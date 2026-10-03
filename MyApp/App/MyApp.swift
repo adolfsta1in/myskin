@@ -5,6 +5,7 @@ import UserNotifications
 @main struct MyApp: App {
     @State private var settings: AppSettings
     @State private var lock: AppLock
+    @State private var weather = WeatherModel()
     private let modelContainer: ModelContainer
 
     init() {
@@ -27,6 +28,7 @@ import UserNotifications
             RootView()
                 .environment(settings)
                 .environment(lock)
+                .environment(weather)
         }
         .modelContainer(modelContainer)
     }

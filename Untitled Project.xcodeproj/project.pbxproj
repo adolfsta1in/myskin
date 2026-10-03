@@ -11,9 +11,22 @@
 		FAA81C5E306E458500890859 /* MySkinTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MySkinTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		FA13E425307175020097C226 /* Exceptions for "MyApp" folder in "MyApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 000000000000000100000000 /* MyApp */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		000000000000000000000010 /* MyApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				FA13E425307175020097C226 /* Exceptions for "MyApp" folder in "MyApp" target */,
+			);
 			path = MyApp;
 			sourceTree = "<group>";
 		};
@@ -309,9 +322,11 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MyApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MySkin;
 				INFOPLIST_KEY_NSCameraUsageDescription = "MySkin uses the camera to take photos of your skin for your diary.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "MySkin uses Face ID to unlock your diary.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "MySkin uses your approximate location to show humidity and UV where you are. Your location isn't stored.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -354,9 +369,11 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MyApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MySkin;
 				INFOPLIST_KEY_NSCameraUsageDescription = "MySkin uses the camera to take photos of your skin for your diary.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "MySkin uses Face ID to unlock your diary.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "MySkin uses your approximate location to show humidity and UV where you are. Your location isn't stored.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;

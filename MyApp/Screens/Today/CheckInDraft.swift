@@ -14,6 +14,8 @@ struct CheckInDraft: Equatable {
     var note = ""
     /// Flare-mode safety questions. Not stored: they are only used to check red flags on save.
     var symptoms = RedFlagSymptoms()
+    /// Weather at save time; nil keeps what the check-in already has.
+    var weather: WeatherReading?
 
     init() {}
 
@@ -32,11 +34,20 @@ struct CheckInDraft: Equatable {
     var orderedTriggers: [Trigger] { Trigger.allCases.filter(triggers.contains) }
 
     func makeCheckIn(day: Date, calendar: Calendar = .current) -> DailyCheckIn {
-        DailyCheckIn(
+        let checkIn = DailyCheckIn(
             day: day, itch: itch, pain: pain, sleep: sleep, mood: mood,
             triggers: orderedTriggers, customTags: customTags, newSpots: newSpots,
             note: trimmedNote, calendar: calendar
         )
+        applyWeather(to: checkIn)
+        return checkIn
+    }
+
+    private func applyWeather(to checkIn: DailyCheckIn) {
+        guard let weather else { return }
+        checkIn.humidity = weather.humidity
+        checkIn.uvIndex = weather.uvIndexMax
+        checkIn.temperature = weather.temperature
     }
 
     /// The fields `FlareDetector` reads, for the live mode while editing.
@@ -53,6 +64,7 @@ struct CheckInDraft: Equatable {
         checkIn.customTags = customTags
         checkIn.newSpots = newSpots
         checkIn.note = trimmedNote
+        applyWeather(to: checkIn)
         checkIn.updatedAt = .now
     }
 

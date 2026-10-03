@@ -338,7 +338,7 @@ struct PrivacyStep: View {
                     privacyRow("photo.badge.checkmark", "Photos never go to your shared photo library")
                     privacyRow("iphone", "Your diary is stored in the app on this iPhone")
                     privacyRow("person.crop.circle.badge.xmark", "No account needed")
-                    privacyRow("square.and.arrow.up", "MySkin never sends your data anywhere — you choose what to share")
+                    privacyRow("square.and.arrow.up", "Your diary isn't sent anywhere — you choose what to share. Weather, if you turn it on, uses your approximate location")
                 }
                 .glassCard()
             }

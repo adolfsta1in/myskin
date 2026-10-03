@@ -46,6 +46,7 @@ struct TodayView: View {
                         CalmDaysCard()
                             .transition(.opacity)
                     }
+                    WeatherCard()
                     RemindersCard()
                     QuestionnaireDueCards { takingQuestionnaire = $0 }
                     ItchChartCard()
@@ -223,6 +224,7 @@ private struct TodayHeader: View {
 /// Loads today's `DailyCheckIn` if there is one; saving updates it in place.
 private struct CheckInCard: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(WeatherModel.self) private var weather: WeatherModel?
     @Query private var todayCheckIns: [DailyCheckIn]
     @Query(sort: \DailyCheckIn.day, order: .reverse) private var allCheckIns: [DailyCheckIn]
     let mode: AppMode
@@ -451,6 +453,7 @@ private struct CheckInCard: View {
     }
 
     private func save() {
+        draft.weather = weather?.reading
         if let existing {
             draft.apply(to: existing)
         } else {
@@ -544,6 +547,112 @@ private struct CalmDaysCard: View {
             }
         }
         .glassCard(tint: Theme.sageSoft)
+    }
+}
+
+/// Humidity and UV where the user is (Open-Meteo). Asks for location only when tapped.
+private struct WeatherCard: View {
+    @Environment(WeatherModel.self) private var weather: WeatherModel?
+    @Environment(\.openURL) private var openURL
+    @Environment(\.scenePhase) private var scenePhase
+
+    var body: some View {
+        if let weather {
+            VStack(alignment: .leading, spacing: 12) {
+                SectionHeader(title: "Weather", systemImage: "cloud.sun")
+                content(weather)
+            }
+            .glassCard()
+            .task(id: scenePhase) {
+                if scenePhase == .active { await weather.refresh() }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func content(_ weather: WeatherModel) -> some View {
+        switch weather.state {
+        case .needsPermission:
+            Text("See humidity and UV where you are. Dry air and strong sun can affect psoriasis.")
+                .font(.rounded(.subheadline))
+                .foregroundStyle(Theme.inkSoft)
+            Button("Show weather", systemImage: "location") {
+                Task { await weather.refresh(askPermission: true) }
+            }
+            .font(.rounded(.subheadline, weight: .semibold))
+            .buttonStyle(.glass)
+            Text("Uses your approximate location, sent to Open-Meteo to get the weather. It isn't stored.")
+                .font(.rounded(.caption))
+                .foregroundStyle(Theme.inkSoft)
+        case .denied:
+            Text("Location is off for MySkin, so weather can't be shown.")
+                .font(.rounded(.subheadline))
+                .foregroundStyle(Theme.inkSoft)
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+            }
+            .font(.rounded(.subheadline, weight: .semibold))
+            .tint(Theme.accent)
+        case .loading:
+            ProgressView()
+                .frame(maxWidth: .infinity, minHeight: 60)
+        case .failed:
+            HStack {
+                Text("Couldn't load the weather.")
+                    .font(.rounded(.subheadline))
+                    .foregroundStyle(Theme.inkSoft)
+                Spacer()
+                Button("Try again") { Task { await weather.refresh() } }
+                    .font(.rounded(.subheadline, weight: .semibold))
+                    .tint(Theme.accent)
+            }
+        case .loaded(let reading):
+            HStack(spacing: 10) {
+                metric(
+                    title: "Humidity",
+                    value: "\(Int(reading.humidity.rounded())) %",
+                    detail: WeatherInfo.humidityTitle(reading.humidity),
+                    systemImage: "humidity"
+                )
+                metric(
+                    title: "UV today",
+                    value: reading.uvIndexMax.formatted(.number.precision(.fractionLength(0))),
+                    detail: UVLevel(index: reading.uvIndexMax).title,
+                    systemImage: "sun.max"
+                )
+                metric(
+                    title: "Now",
+                    value: Measurement(value: reading.temperature, unit: UnitTemperature.celsius)
+                        .formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(0)))),
+                    detail: "Air",
+                    systemImage: "thermometer.medium"
+                )
+            }
+            ForEach(WeatherInfo.notes(for: reading), id: \.self) { note in
+                Text(note)
+                    .font(.rounded(.footnote))
+                    .foregroundStyle(Theme.inkSoft)
+            }
+            Text("Saved with today's check-in. Weather data by Open-Meteo.com")
+                .font(.rounded(.caption2))
+                .foregroundStyle(Theme.inkSoft)
+        }
+    }
+
+    private func metric(title: String, value: String, detail: String, systemImage: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Label(title, systemImage: systemImage)
+                .font(.rounded(.caption, weight: .medium))
+                .foregroundStyle(Theme.inkSoft)
+            Text(value)
+                .font(.rounded(.title3, weight: .bold))
+                .foregroundStyle(Theme.ink)
+            Text(detail)
+                .font(.rounded(.caption))
+                .foregroundStyle(Theme.inkSoft)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .combine)
     }
 }
 
