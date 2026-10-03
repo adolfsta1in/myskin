@@ -68,6 +68,18 @@ struct OnboardingDraftTests {
         #expect(treatments.filter(\.isActive).count == 2)
     }
 
+    @Test func tappingAListItemTogglesIt() throws {
+        let draft = OnboardingDraft()
+        let calcipotriol = try #require(MedicationCatalog.all.first { $0.category == .vitaminD })
+        draft.hasNoTreatment = true
+        draft.toggle(calcipotriol)
+        #expect(draft.isChosen(calcipotriol))
+        #expect(!draft.hasNoTreatment)
+        draft.toggle(calcipotriol)
+        #expect(!draft.isChosen(calcipotriol))
+        #expect(draft.treatments.isEmpty)
+    }
+
     @Test func cyclingReturnsToClear() {
         let draft = OnboardingDraft()
         for _ in 0..<4 { draft.cycleLevel(for: "quick.nails") }

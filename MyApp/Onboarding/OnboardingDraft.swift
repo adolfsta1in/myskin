@@ -59,6 +59,19 @@ final class OnboardingDraft {
         hasNoTreatment = false
     }
 
+    func isChosen(_ medication: Medication) -> Bool {
+        treatments.contains { $0.catalogID == medication.id }
+    }
+
+    /// Tapping a catalog item in the list adds it, tapping again removes it.
+    func toggle(_ medication: Medication) {
+        if isChosen(medication) {
+            treatments.removeAll { $0.catalogID == medication.id }
+        } else {
+            add(medication)
+        }
+    }
+
     func addCustom(_ name: String) {
         let draft = TreatmentDraft(customName: name)
         guard draft.isValid, !treatments.contains(where: { $0.trimmedName.caseInsensitiveCompare(draft.trimmedName) == .orderedSame }) else { return }

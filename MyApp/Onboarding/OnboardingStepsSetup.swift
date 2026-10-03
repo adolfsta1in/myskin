@@ -69,6 +69,8 @@ struct FirstBodyMapStep: View {
 struct TreatmentsStep: View {
     @Environment(OnboardingDraft.self) private var draft
     @State private var query = ""
+    /// Catalog groups opened in the list.
+    @State private var openCategories: Set<MedicationCategory> = []
     @FocusState private var isSearching: Bool
     let next: () -> Void
 
@@ -84,7 +86,7 @@ struct TreatmentsStep: View {
         @Bindable var draft = draft
         OnboardingPage(
             title: "What are you using right now?",
-            subtitle: "Search the list or type your own. Schedules can be adjusted later in Treatment.",
+            subtitle: "Pick from the list, search, or type your own. Schedules can be adjusted later in Treatment.",
             why: "Knowing when a treatment started lets you see whether it's making a difference."
         ) {
             VStack(alignment: .leading, spacing: 18) {
@@ -125,6 +127,10 @@ struct TreatmentsStep: View {
                     }
                 }
 
+                if trimmedQuery.isEmpty {
+                    catalogList
+                }
+
                 TagChip(title: "Nothing right now", systemImage: "minus.circle", isSelected: draft.hasNoTreatment) {
                     withAnimation(.snappy) {
                         draft.hasNoTreatment.toggle()
@@ -138,6 +144,62 @@ struct TreatmentsStep: View {
                 PrimaryButton(title: "Continue", action: next)
             }
         }
+    }
+
+    /// The whole catalog by group, so nothing has to be typed.
+    private var catalogList: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(MedicationCategory.allCases) { category in
+                let items = MedicationCatalog.items(in: category)
+                let chosen = items.filter(draft.isChosen).count
+                let isOpen = openCategories.contains(category)
+                Button {
+                    withAnimation(.snappy) {
+                        if isOpen { openCategories.remove(category) } else { openCategories.insert(category) }
+                    }
+                } label: {
+                    HStack {
+                        Text(category.title)
+                            .font(.rounded(.body, weight: .medium))
+                            .foregroundStyle(Theme.ink)
+                        if chosen > 0 {
+                            Text("\(chosen)")
+                                .font(.rounded(.caption, weight: .bold))
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 7)
+                                .padding(.vertical, 2)
+                                .background(Theme.accent, in: .capsule)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.down")
+                            .rotationEffect(.degrees(isOpen ? 180 : 0))
+                            .foregroundStyle(Theme.inkSoft)
+                    }
+                    .padding(.vertical, 10)
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                .accessibilityHint(isOpen ? "Hides the medications" : "Shows the medications")
+
+                if isOpen {
+                    GlassEffectContainer(spacing: 8) {
+                        FlowLayout(spacing: 8) {
+                            ForEach(items) { medication in
+                                TagChip(title: medication.name, isSelected: draft.isChosen(medication)) {
+                                    withAnimation(.snappy) { draft.toggle(medication) }
+                                }
+                            }
+                        }
+                    }
+                    .padding(.bottom, 10)
+                    .transition(.opacity)
+                }
+                if category != MedicationCategory.allCases.last {
+                    Divider()
+                }
+            }
+        }
+        .glassCard(padding: 14)
     }
 
     private func addCustom() {
