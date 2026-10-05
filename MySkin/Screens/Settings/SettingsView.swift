@@ -28,6 +28,9 @@ struct SettingsView: View {
                     Text("When on, MySkin locks each time you leave the app and hides its content in the app switcher.")
                 }
                 DataSection(isDeleting: $isDeleting)
+                #if DEBUG
+                DeveloperSection()
+                #endif
                 aboutSection
             }
             .font(.rounded(.body))
@@ -264,6 +267,29 @@ private struct DataSection: View {
         }
     }
 }
+
+#if DEBUG
+/// Development only: walk through the onboarding again. Diary data is kept.
+private struct DeveloperSection: View {
+    @Environment(AppSettings.self) private var settings
+    @Environment(AppLock.self) private var lock
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        Section {
+            Button("Show onboarding", systemImage: "arrow.counterclockwise") {
+                dismiss()
+                lock.isLocked = false
+                settings.hasCompletedOnboarding = false
+            }
+        } header: {
+            Text("Developer")
+        } footer: {
+            Text("Debug builds only. Your diary is kept; treatments added in onboarding are added again.")
+        }
+    }
+}
+#endif
 
 /// Multi-select list of psoriasis forms.
 private struct PsoriasisTypesPicker: View {
