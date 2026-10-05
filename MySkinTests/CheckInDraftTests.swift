@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 import Testing
-@testable import MyApp
+@testable import MySkin
 
 struct CheckInDraftTests {
     private func makeContext() throws -> ModelContext {
@@ -76,37 +76,51 @@ struct CheckInDraftTests {
         #expect(draft.customTags.isEmpty)
     }
 
-    @Test func untouchedFoodIsSavedAsUnknown() {
+    @Test func checkInSaveLeavesFoodUnknown() {
         var draft = CheckInDraft()
         draft.itch = 3
         let checkIn = draft.makeCheckIn(day: .now)
         #expect(checkIn.foodIDs == nil)
         #expect(checkIn.customFoods.isEmpty)
-        #expect(!CheckInDraft(checkIn).foodLogged)
+        #expect(!FoodDraft(checkIn).isLogged)
+    }
+
+    @Test func updatingCheckInKeepsLoggedFood() {
+        let checkIn = CheckInDraft().makeCheckIn(day: .now)
+        var food = FoodDraft()
+        food.toggle(.dairy)
+        food.apply(to: checkIn)
+        var draft = CheckInDraft(checkIn)
+        draft.itch = 6
+        draft.apply(to: checkIn)
+        #expect(checkIn.foods == [.dairy])
     }
 
     @Test func noneOfTheseIsSavedAsEmpty() {
-        var draft = CheckInDraft()
+        let checkIn = CheckInDraft().makeCheckIn(day: .now)
+        var draft = FoodDraft()
         draft.toggle(.dairy)
         draft.addCustomFood("Eggs")
-        draft.markNoFood()
-        #expect(draft.isNoFood)
-        let checkIn = draft.makeCheckIn(day: .now)
+        draft.markNone()
+        #expect(draft.isNone)
+        draft.apply(to: checkIn)
         #expect(checkIn.foodIDs == [])
         #expect(checkIn.customFoods.isEmpty)
-        #expect(CheckInDraft(checkIn).isNoFood)
+        #expect(FoodDraft(checkIn).isNone)
     }
 
     @Test func foodsSaveAndReload() throws {
         let context = try makeContext()
-        var draft = CheckInDraft()
+        let checkIn = CheckInDraft().makeCheckIn(day: .now)
+        context.insert(checkIn)
+        var draft = FoodDraft()
         draft.toggle(.coffee)
         draft.toggle(.dairy)
         draft.toggle(.spicy)
         draft.toggle(.spicy)
         draft.addCustomFood(" Eggs ")
-        #expect(!draft.isNoFood)
-        context.insert(draft.makeCheckIn(day: .now))
+        #expect(!draft.isNone)
+        draft.apply(to: checkIn)
         try context.save()
 
         let stored = try #require(try context.fetch(FetchDescriptor<DailyCheckIn>()).first)
@@ -115,8 +129,8 @@ struct CheckInDraftTests {
         #expect(stored.foods == [.dairy, .coffee])
         #expect(stored.customFoods == ["Eggs"])
 
-        var reloaded = CheckInDraft(stored)
-        #expect(reloaded.foodLogged)
+        var reloaded = FoodDraft(stored)
+        #expect(reloaded.isLogged)
         #expect(reloaded.foods == [.dairy, .coffee])
         #expect(reloaded.customFoods == ["Eggs"])
 
@@ -129,13 +143,13 @@ struct CheckInDraftTests {
     }
 
     @Test func customFoodsIgnoreEmptyAndDuplicates() {
-        var draft = CheckInDraft()
+        var draft = FoodDraft()
         draft.addCustomFood("  ")
-        #expect(!draft.foodLogged)
+        #expect(!draft.isLogged)
         draft.addCustomFood("Eggs", known: ["eggs"])
         draft.addCustomFood("EGGS")
         #expect(draft.customFoods == ["eggs"])
-        #expect(draft.foodLogged)
+        #expect(draft.isLogged)
     }
 
     @Test func knownFoodsAreNewestFirstWithoutDuplicates() {
@@ -144,7 +158,42 @@ struct CheckInDraftTests {
         old.customFoods = ["Eggs", "Pizza"]
         let recent = DailyCheckIn(day: .now, itch: 2)
         recent.customFoods = ["Nuts", "eggs"]
-        #expect(CheckInDraft.knownFoods(from: [old, recent]) == ["Nuts", "eggs", "Pizza"])
+        #expect(FoodDraft.knownFoods(from: [old, recent]) == ["Nuts", "eggs", "Pizza"])
+    }
+
+    @Test func foodHistorySkipsDaysWithoutFoodLog() {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: .now)
+        func day(_ offset: Int) -> Date { calendar.date(byAdding: .day, value: offset, to: today) ?? today }
+        let logged = DailyCheckIn(day: day(-3), itch: 1)
+        logged.foodIDs = ["coffee"]
+        let none = DailyCheckIn(day: day(-2), itch: 1)
+        none.foodIDs = []
+        let unlogged = DailyCheckIn(day: day(-1), itch: 1)
+        let todays = DailyCheckIn(day: today, itch: 1)
+        todays.foodIDs = ["dairy"]
+        let history = FoodDraft.pickHistory(from: [logged, none, unlogged, todays], before: today)
+        #expect(history == [[], [.food(.coffee)]])
+    }
+
+    @Test func pickHistoryIsNewestFirstAndExcludesToday() {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: .now)
+        let older = DailyCheckIn(day: calendar.date(byAdding: .day, value: -2, to: today) ?? today, itch: 1, triggers: [.stress])
+        let yesterday = DailyCheckIn(day: calendar.date(byAdding: .day, value: -1, to: today) ?? today, itch: 1, triggers: [.coldDry], customTags: ["Gym"])
+        let todays = DailyCheckIn(day: today, itch: 1, triggers: [.alcohol])
+        let history = CheckInDraft.pickHistory(from: [older, todays, yesterday], before: today)
+        #expect(history == [[.trigger(.coldDry), .custom("Gym")], [.trigger(.stress)]])
+    }
+
+    @Test func draftDiffersOnlyWhenEntriesChange() {
+        let checkIn = DailyCheckIn(day: .now, itch: 4, triggers: [.stress], note: "Itchy")
+        var draft = CheckInDraft(checkIn)
+        draft.symptoms.fever = true
+        draft.note = "Itchy "
+        #expect(!draft.differs(from: checkIn))
+        draft.itch = 5
+        #expect(draft.differs(from: checkIn))
     }
 
     @Test func knownTagsAreNewestFirstWithoutDuplicates() {

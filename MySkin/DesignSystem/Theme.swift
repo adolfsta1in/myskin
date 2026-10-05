@@ -21,6 +21,10 @@ enum Theme {
     static let accent = Color(hex: 0x5B8A9A)
     static let accentSoft = Color(hex: 0xD4E4E7)
 
+    // MARK: Flare
+    /// Dusty rose-red for the Flare check-in, so the mode is obvious at a glance.
+    static let flare = Color(hex: 0xD0607A)
+
     // MARK: Intensity ramp — charts and body map only
     static let intensityCalm = Color(hex: 0xB9CDB2)
     static let intensityMild = Color(hex: 0xE6CB93)

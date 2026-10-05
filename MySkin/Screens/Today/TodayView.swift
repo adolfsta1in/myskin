@@ -42,6 +42,7 @@ struct TodayView: View {
                         let flags = RedFlagRules.flags(zones: currentZones, symptoms: symptoms, isFlare: status.mode == .flare)
                         if !flags.isEmpty { shownFlags = flags }
                     }
+                    FoodLogCard()
                     if status.mode == .calm {
                         CalmDaysCard()
                             .transition(.opacity)
@@ -242,11 +243,9 @@ private struct CheckInCard: View {
 
     @State private var draft = CheckInDraft()
     @State private var showsDetails = false
-    @State private var isAddingTag = false
-    @State private var newTag = ""
-    @State private var isAddingFood = false
-    @State private var newFood = ""
-    @State private var isSaved = false
+    /// A saved check-in folds down to the itch row; the chevron opens it again.
+    @State private var isExpanded = true
+    @State private var isPickingTriggers = false
     @State private var saveCount = 0
     @State private var saveError: String?
 
@@ -266,16 +265,28 @@ private struct CheckInCard: View {
 
     private var existing: DailyCheckIn? { todayCheckIns.first }
 
+    /// Saved and not edited since.
+    private var isSaved: Bool {
+        guard let existing else { return false }
+        return !draft.differs(from: existing)
+    }
+
+    /// Flare tints the card rose-red so the mode is obvious at a glance.
+    private var tint: Color { mode == .flare ? Theme.flare : Theme.accent }
+
     /// Earlier custom tags plus the ones picked today.
     private var customTags: [String] {
         let known = CheckInDraft.knownTags(from: allCheckIns)
         return known + draft.customTags.filter { !known.contains($0) }
     }
 
-    /// Earlier custom foods plus the ones picked today.
-    private var customFoods: [String] {
-        let known = CheckInDraft.knownFoods(from: allCheckIns)
-        return known + draft.customFoods.filter { !known.contains($0) }
+    /// Chips on the card: last time's and frequent ones; the rest is behind "More".
+    private var quickPicks: [LogPick] {
+        QuickPicks.suggest(
+            history: CheckInDraft.pickHistory(from: allCheckIns, before: day),
+            defaults: Trigger.allCases.map(LogPick.trigger),
+            selected: draft.picks
+        )
     }
 
     private var itchDescription: String {
@@ -287,20 +298,18 @@ private struct CheckInCard: View {
         }
     }
 
+    /// One line under the itch row while the card is folded.
+    private var foldedSummary: String {
+        var parts = [draft.picks.isEmpty ? "No triggers" : draft.picks.map(\.title).formatted(.list(type: .and))]
+        if draft.newSpots { parts.insert("New spots", at: 0) }
+        if let sleep = draft.sleep { parts.append("Sleep \(sleep)") }
+        if let pain = draft.pain { parts.append("Pain \(pain)") }
+        return parts.joined(separator: " · ")
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                SectionHeader(
-                    title: mode == .calm ? "Quick check-in" : "Flare check-in",
-                    subtitle: mode == .calm ? "About 10 seconds" : "A little more detail helps spot patterns"
-                )
-                if isSaved {
-                    Label("Saved", systemImage: "checkmark.circle.fill")
-                        .font(.rounded(.subheadline, weight: .semibold))
-                        .foregroundStyle(Theme.sageDeep)
-                        .transition(.scale.combined(with: .opacity))
-                }
-            }
+            header
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack(alignment: .firstTextBaseline) {
@@ -323,10 +332,106 @@ private struct CheckInCard: View {
                 } maximumValueLabel: {
                     Text("10").font(.rounded(.caption)).foregroundStyle(Theme.inkSoft)
                 }
-                .tint(Theme.accent)
+                .tint(tint)
                 .sensoryFeedback(.selection, trigger: draft.itch)
             }
 
+            if isExpanded {
+                expandedContent
+                    .transition(.opacity)
+            } else {
+                Text(foldedSummary)
+                    .font(.rounded(.footnote))
+                    .foregroundStyle(Theme.inkSoft)
+                    .lineLimit(2)
+                    .transition(.opacity)
+            }
+
+            if isExpanded || !isSaved {
+                Button(action: save) {
+                    Text(existing == nil ? "Save check-in" : "Update check-in")
+                        .font(.rounded(.headline, weight: .semibold))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 4)
+                }
+                .buttonStyle(.glassProminent)
+                .tint(tint)
+                .sensoryFeedback(.success, trigger: saveCount)
+                .transition(.opacity)
+            }
+        }
+        .glassCard(tint: mode == .flare ? Theme.flare : nil)
+        .animation(.smooth, value: isExpanded)
+        .animation(.smooth, value: isSaved)
+        // Reload when today's record appears (first save, or data changed elsewhere).
+        .task(id: existing?.persistentModelID) {
+            if let existing {
+                // Safety answers aren't stored; keep what was ticked in this session.
+                let symptoms = draft.symptoms
+                draft = CheckInDraft(existing)
+                draft.symptoms = symptoms
+                showsDetails = existing.pain != nil || existing.sleep != nil || existing.mood != nil || !existing.note.isEmpty
+                isExpanded = false
+            }
+        }
+        // Not reported until the draft changes, so a stored check-in isn't hidden by the empty draft at launch.
+        .onChange(of: draft.sample(day: day)) { _, sample in
+            onDraftChange(sample)
+        }
+        .sheet(isPresented: $isPickingTriggers) {
+            LogPickerSheet(
+                title: "Triggers",
+                sections: [
+                    .init(title: "Common triggers", picks: Trigger.allCases.map(LogPick.trigger)),
+                    .init(title: "Your tags", picks: customTags.map(LogPick.custom)),
+                ],
+                addTitle: "Add your own",
+                addPlaceholder: "e.g. Hot shower",
+                known: customTags,
+                draft: $draft,
+                systemImage: Self.systemImage
+            )
+        }
+        .alert("Couldn't save", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(saveError ?? "")
+        }
+    }
+
+    private var header: some View {
+        HStack {
+            SectionHeader(
+                title: mode == .calm ? "Quick check-in" : "Flare check-in",
+                // Folded and saved: the "Saved" label says enough.
+                subtitle: isSaved && !isExpanded ? nil : (mode == .calm ? "About 10 seconds" : "A little more detail helps spot patterns")
+            )
+            Spacer()
+            if isSaved {
+                Label("Saved", systemImage: "checkmark.circle.fill")
+                    .font(.rounded(.subheadline, weight: .semibold))
+                    .foregroundStyle(Theme.sageDeep)
+                    .transition(.scale.combined(with: .opacity))
+            }
+            if existing != nil {
+                Button {
+                    isExpanded.toggle()
+                } label: {
+                    Image(systemName: "chevron.down")
+                        .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                        .font(.rounded(.subheadline, weight: .semibold))
+                        .foregroundStyle(Theme.inkSoft)
+                        .frame(width: 32, height: 32)
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(isExpanded ? "Fold check-in" : "Show check-in details")
+            }
+        }
+    }
+
+    private var expandedContent: some View {
+        VStack(alignment: .leading, spacing: 16) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Anything that might matter?")
                     .font(.rounded(.subheadline, weight: .medium))
@@ -336,41 +441,12 @@ private struct CheckInCard: View {
                         TagChip(title: "New or spreading spots", systemImage: "circle.dotted.circle", isSelected: draft.newSpots) {
                             draft.newSpots.toggle()
                         }
-                        ForEach(Trigger.allCases) { trigger in
-                            TagChip(title: trigger.title, systemImage: trigger.systemImage, isSelected: draft.triggers.contains(trigger)) {
-                                draft.toggle(trigger)
+                        ForEach(quickPicks, id: \.self) { pick in
+                            TagChip(title: pick.title, systemImage: Self.systemImage(pick), isSelected: draft.isSelected(pick)) {
+                                draft.toggle(pick)
                             }
                         }
-                        ForEach(customTags, id: \.self) { tag in
-                            TagChip(title: tag, systemImage: "tag", isSelected: draft.customTags.contains(tag)) {
-                                draft.toggleCustomTag(tag)
-                            }
-                        }
-                        TagChip(title: "Add", systemImage: "plus") { isAddingTag = true }
-                    }
-                }
-            }
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Food today")
-                    .font(.rounded(.subheadline, weight: .medium))
-                    .foregroundStyle(Theme.ink)
-                GlassEffectContainer(spacing: 8) {
-                    FlowLayout(spacing: 8) {
-                        ForEach(Food.allCases) { food in
-                            TagChip(title: food.title, systemImage: food.systemImage, isSelected: draft.foods.contains(food)) {
-                                draft.toggle(food)
-                            }
-                        }
-                        ForEach(customFoods, id: \.self) { food in
-                            TagChip(title: food, systemImage: "fork.knife.circle", isSelected: draft.customFoods.contains(food)) {
-                                draft.toggleCustomFood(food)
-                            }
-                        }
-                        TagChip(title: "None of these", systemImage: "xmark.circle", isSelected: draft.isNoFood) {
-                            draft.markNoFood()
-                        }
-                        TagChip(title: "Add food", systemImage: "plus") { isAddingFood = true }
+                        TagChip(title: "More", systemImage: "plus") { isPickingTriggers = true }
                     }
                 }
             }
@@ -385,54 +461,14 @@ private struct CheckInCard: View {
                 .font(.rounded(.subheadline, weight: .medium))
                 .foregroundStyle(Theme.accent)
             }
+        }
+    }
 
-            Button(action: save) {
-                Text(existing == nil ? "Save check-in" : "Update check-in")
-                    .font(.rounded(.headline, weight: .semibold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 4)
-            }
-            .buttonStyle(.glassProminent)
-            .tint(Theme.accent)
-            .sensoryFeedback(.success, trigger: saveCount)
-        }
-        .glassCard()
-        // Reload when today's record appears (first save, or data changed elsewhere).
-        .task(id: existing?.persistentModelID) {
-            if let existing {
-                // Safety answers aren't stored; keep what was ticked in this session.
-                let symptoms = draft.symptoms
-                draft = CheckInDraft(existing)
-                draft.symptoms = symptoms
-                showsDetails = existing.pain != nil || existing.sleep != nil || existing.mood != nil || !existing.note.isEmpty
-            }
-        }
-        // Not reported until the draft changes, so a stored check-in isn't hidden by the empty draft at launch.
-        .onChange(of: draft.sample(day: day)) { _, sample in
-            onDraftChange(sample)
-        }
-        .alert("Add a tag", isPresented: $isAddingTag) {
-            TextField("e.g. Hot shower", text: $newTag)
-                .submitLabel(.done)
-            Button("Add") {
-                draft.addCustomTag(newTag, known: customTags)
-                newTag = ""
-            }
-            Button("Cancel", role: .cancel) { newTag = "" }
-        }
-        .alert("Add a food", isPresented: $isAddingFood) {
-            TextField("e.g. Eggs", text: $newFood)
-                .submitLabel(.done)
-            Button("Add") {
-                draft.addCustomFood(newFood, known: customFoods)
-                newFood = ""
-            }
-            Button("Cancel", role: .cancel) { newFood = "" }
-        }
-        .alert("Couldn't save", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(saveError ?? "")
+    private static func systemImage(_ pick: LogPick) -> String {
+        switch pick {
+        case .trigger(let trigger): trigger.systemImage
+        case .food(let food): food.systemImage
+        case .custom: "tag"
         }
     }
 
@@ -509,7 +545,7 @@ private struct CheckInCard: View {
         do {
             try modelContext.save()
             saveCount += 1
-            withAnimation(.bouncy) { isSaved = true }
+            isExpanded = false
             onSaved(mode == .flare ? draft.symptoms : RedFlagSymptoms())
         } catch {
             modelContext.rollback()
@@ -524,6 +560,109 @@ private struct CheckInCard: View {
         case 3: "Okay"
         case 4: "Good"
         default: "Great"
+        }
+    }
+}
+
+// MARK: - Food
+
+/// Separate food log for today. It is stored on today's check-in and saved on every tap,
+/// so it needs a saved check-in first (itch is required for a check-in).
+private struct FoodLogCard: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query private var todayCheckIns: [DailyCheckIn]
+    @Query(sort: \DailyCheckIn.day, order: .reverse) private var allCheckIns: [DailyCheckIn]
+    private let day: Date
+
+    @State private var draft = FoodDraft()
+    @State private var isPickingFoods = false
+    @State private var saveError: String?
+
+    init(day: Date = .now) {
+        let start = Calendar.current.startOfDay(for: day)
+        self.day = start
+        _todayCheckIns = Query(filter: #Predicate<DailyCheckIn> { $0.day == start })
+    }
+
+    private var existing: DailyCheckIn? { todayCheckIns.first }
+
+    /// Earlier custom foods plus the ones picked today.
+    private var customFoods: [String] {
+        let known = FoodDraft.knownFoods(from: allCheckIns)
+        return known + draft.customFoods.filter { !known.contains($0) }
+    }
+
+    private var quickPicks: [LogPick] {
+        QuickPicks.suggest(
+            history: FoodDraft.pickHistory(from: allCheckIns, before: day),
+            defaults: Food.allCases.map(LogPick.food),
+            selected: draft.picks
+        )
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionHeader(
+                title: "Food today",
+                subtitle: existing == nil ? "Save today's check-in first, then log what you ate" : "Tap what you ate — saved right away"
+            )
+            if existing != nil {
+                GlassEffectContainer(spacing: 8) {
+                    FlowLayout(spacing: 8) {
+                        ForEach(quickPicks, id: \.self) { pick in
+                            TagChip(title: pick.title, systemImage: Self.systemImage(pick), isSelected: draft.isSelected(pick)) {
+                                draft.toggle(pick)
+                            }
+                        }
+                        TagChip(title: "None of these", systemImage: "xmark.circle", isSelected: draft.isNone) {
+                            draft.markNone()
+                        }
+                        TagChip(title: "More", systemImage: "plus") { isPickingFoods = true }
+                    }
+                }
+            }
+        }
+        .glassCard()
+        .task(id: existing?.persistentModelID) {
+            if let existing { draft = FoodDraft(existing) }
+        }
+        // Every change (here or in the full list) is saved at once.
+        .onChange(of: draft) { _, draft in
+            guard let existing, FoodDraft(existing) != draft else { return }
+            draft.apply(to: existing)
+            do {
+                try modelContext.save()
+            } catch {
+                modelContext.rollback()
+                saveError = error.localizedDescription
+            }
+        }
+        .sheet(isPresented: $isPickingFoods) {
+            LogPickerSheet(
+                title: "Food today",
+                sections: [
+                    .init(title: "Common foods", picks: Food.allCases.map(LogPick.food)),
+                    .init(title: "Your foods", picks: customFoods.map(LogPick.custom)),
+                ],
+                addTitle: "Add a food",
+                addPlaceholder: "e.g. Eggs",
+                known: customFoods,
+                draft: $draft,
+                systemImage: Self.systemImage
+            )
+        }
+        .alert("Couldn't save", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(saveError ?? "")
+        }
+    }
+
+    private static func systemImage(_ pick: LogPick) -> String {
+        switch pick {
+        case .food(let food): food.systemImage
+        case .trigger(let trigger): trigger.systemImage
+        case .custom: "fork.knife.circle"
         }
     }
 }

@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import MyApp
+@testable import MySkin
 
 struct AppSettingsTests {
     /// Isolated defaults domain, wiped before use.

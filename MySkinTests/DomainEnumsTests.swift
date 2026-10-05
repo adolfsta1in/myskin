@@ -1,5 +1,5 @@
 import Testing
-@testable import MyApp
+@testable import MySkin
 
 /// Raw values are stored on disk. These tests fail if a case is renamed or removed by accident.
 struct DomainEnumsTests {

@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import MyApp
+@testable import MySkin
 
 struct DiaryCalendarTests {
     private let calendar: Calendar = {

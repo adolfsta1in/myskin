@@ -1,5 +1,5 @@
 import Testing
-@testable import MyApp
+@testable import MySkin
 
 /// Checks that the test target is wired to the app module.
 struct SmokeTests {

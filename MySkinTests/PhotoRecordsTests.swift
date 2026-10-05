@@ -4,7 +4,7 @@ import ImageIO
 import SwiftData
 import Testing
 import UniformTypeIdentifiers
-@testable import MyApp
+@testable import MySkin
 
 struct PhotoRecordsTests {
     private func makeStore() throws -> PhotoStore {

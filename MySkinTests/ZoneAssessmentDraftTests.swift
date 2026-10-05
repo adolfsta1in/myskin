@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 import Testing
-@testable import MyApp
+@testable import MySkin
 
 struct ZoneAssessmentDraftTests {
     private func makeContext() throws -> ModelContext {

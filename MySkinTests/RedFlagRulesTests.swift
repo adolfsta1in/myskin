@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import MyApp
+@testable import MySkin
 
 struct RedFlagRulesTests {
     /// Both thighs and the chest: 18 % of the body.

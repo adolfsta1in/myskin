@@ -6,28 +6,38 @@
 	objectVersion = 90;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		FAA81C70306E458600890859 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 000000000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 000000000000000100000000;
+			remoteInfo = MySkin;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
-		000000000000000000000120 /* MyApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000120 /* MySkin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MySkin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FAA81C5E306E458500890859 /* MySkinTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MySkinTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		FA13E425307175020097C226 /* Exceptions for "MyApp" folder in "MyApp" target */ = {
+		FA13E425307175020097C226 /* Exceptions for "MySkin" folder in "MySkin" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 000000000000000100000000 /* MyApp */;
+			target = 000000000000000100000000 /* MySkin */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		000000000000000000000010 /* MyApp */ = {
+		000000000000000000000010 /* MySkin */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				FA13E425307175020097C226 /* Exceptions for "MyApp" folder in "MyApp" target */,
+				FA13E425307175020097C226 /* Exceptions for "MySkin" folder in "MySkin" target */,
 			);
-			path = MyApp;
+			path = MySkin;
 			sourceTree = "<group>";
 		};
 		FAA81BE4306E355300890859 /* docs */ = {
@@ -60,7 +70,7 @@
 			isa = PBXGroup;
 			children = (
 				FAA81BE4306E355300890859 /* docs */,
-				000000000000000000000010 /* MyApp */,
+				000000000000000000000010 /* MySkin */,
 				FAA81C5F306E458500890859 /* MySkinTests */,
 				000000000000000000000020 /* Products */,
 			);
@@ -69,7 +79,7 @@
 		000000000000000000000020 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				000000000000000000000120 /* MyApp.app */,
+				000000000000000000000120 /* MySkin.app */,
 				FAA81C5E306E458500890859 /* MySkinTests.xctest */,
 			);
 			name = Products;
@@ -78,9 +88,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		000000000000000100000000 /* MyApp */ = {
+		000000000000000100000000 /* MySkin */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "MyApp" */;
+			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "MySkin" */;
 			buildPhases = (
 				000000000000000120000000 /* Sources */,
 				000000000000000130000000 /* Frameworks */,
@@ -89,12 +99,12 @@
 			buildRules = (
 			);
 			fileSystemSynchronizedGroups = (
-				000000000000000000000010 /* MyApp */,
+				000000000000000000000010 /* MySkin */,
 				FAA81BE4306E355300890859 /* docs */,
 			);
-			name = MyApp;
+			name = MySkin;
 			productName = MyApp;
-			productReference = 000000000000000000000120 /* MyApp.app */;
+			productReference = 000000000000000000000120 /* MySkin.app */;
 			productType = "com.apple.product-type.application";
 		};
 		FAA81C5D306E458400890859 /* MySkinTests */ = {
@@ -106,6 +116,9 @@
 				FAA81C5C306E458400890859 /* Resources */,
 			);
 			buildRules = (
+			);
+			dependencies = (
+				FAA81C71306E458600890859 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				FAA81C5F306E458500890859 /* MySkinTests */,
@@ -133,7 +146,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 000000000000000010000000 /* Build configuration list for PBXProject "Untitled Project" */;
+			buildConfigurationList = 000000000000000010000000 /* Build configuration list for PBXProject "MySkin" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -147,7 +160,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				000000000000000100000000 /* MyApp */,
+				000000000000000100000000 /* MySkin */,
 				FAA81C5D306E458400890859 /* MySkinTests */,
 			);
 		};
@@ -179,8 +192,16 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		FAA81C71306E458600890859 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 000000000000000100000000 /* MySkin */;
+			targetProxy = FAA81C70306E458600890859 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
-		000000000000000011000000 /* Debug configuration for PBXProject "Untitled Project" */ = {
+		000000000000000011000000 /* Debug configuration for PBXProject "MySkin" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -250,7 +271,7 @@
 			};
 			name = Debug;
 		};
-		000000000000000012000000 /* Release configuration for PBXProject "Untitled Project" */ = {
+		000000000000000012000000 /* Release configuration for PBXProject "MySkin" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -312,7 +333,7 @@
 			};
 			name = Release;
 		};
-		000000000000000111000000 /* Debug configuration for PBXNativeTarget "MyApp" */ = {
+		000000000000000111000000 /* Debug configuration for PBXNativeTarget "MySkin" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -322,7 +343,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = MyApp/Info.plist;
+				INFOPLIST_FILE = MySkin/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MySkin;
 				INFOPLIST_KEY_NSCameraUsageDescription = "MySkin uses the camera to take photos of your skin for your diary.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "MySkin uses Face ID to unlock your diary.";
@@ -359,7 +380,7 @@
 			};
 			name = Debug;
 		};
-		000000000000000112000000 /* Release configuration for PBXNativeTarget "MyApp" */ = {
+		000000000000000112000000 /* Release configuration for PBXNativeTarget "MySkin" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -369,7 +390,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = MyApp/Info.plist;
+				INFOPLIST_FILE = MySkin/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MySkin;
 				INFOPLIST_KEY_NSCameraUsageDescription = "MySkin uses the camera to take photos of your skin for your diary.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "MySkin uses Face ID to unlock your diary.";
@@ -427,7 +448,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MyApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MyApp";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MySkin.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MySkin";
 			};
 			name = Debug;
 		};
@@ -452,26 +473,26 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MyApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MyApp";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MySkin.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MySkin";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		000000000000000010000000 /* Build configuration list for PBXProject "Untitled Project" */ = {
+		000000000000000010000000 /* Build configuration list for PBXProject "MySkin" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000011000000 /* Debug configuration for PBXProject "Untitled Project" */,
-				000000000000000012000000 /* Release configuration for PBXProject "Untitled Project" */,
+				000000000000000011000000 /* Debug configuration for PBXProject "MySkin" */,
+				000000000000000012000000 /* Release configuration for PBXProject "MySkin" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		000000000000000110000000 /* Build configuration list for PBXNativeTarget "MyApp" */ = {
+		000000000000000110000000 /* Build configuration list for PBXNativeTarget "MySkin" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000111000000 /* Debug configuration for PBXNativeTarget "MyApp" */,
-				000000000000000112000000 /* Release configuration for PBXNativeTarget "MyApp" */,
+				000000000000000111000000 /* Debug configuration for PBXNativeTarget "MySkin" */,
+				000000000000000112000000 /* Release configuration for PBXNativeTarget "MySkin" */,
 			);
 			defaultConfigurationName = Release;
 		};

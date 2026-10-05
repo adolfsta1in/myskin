@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import MyApp
+@testable import MySkin
 
 struct FlareDetectorTests {
     /// Fixed calendar and date so the tests do not depend on the machine's time zone.

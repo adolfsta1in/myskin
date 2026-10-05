@@ -1,8 +1,16 @@
 import Foundation
 
+/// A draft whose chips can be picked in `LogPickerSheet`.
+protocol PickDraft {
+    func isSelected(_ pick: LogPick) -> Bool
+    mutating func toggle(_ pick: LogPick)
+    /// Adds and selects a typed entry; `known` reuses an existing spelling.
+    mutating func addCustom(_ raw: String, known: [String])
+}
+
 /// Editable copy of a day's check-in. Optional scales stay nil until the user sets them,
-/// so an untouched slider is not saved as 0.
-struct CheckInDraft: Equatable {
+/// so an untouched slider is not saved as 0. Food is logged separately (`FoodDraft`).
+struct CheckInDraft: Equatable, PickDraft {
     var itch = 0
     var pain: Int?
     var sleep: Int?
@@ -10,11 +18,6 @@ struct CheckInDraft: Equatable {
     var triggers: Set<Trigger> = []
     /// User-defined tags, in the order they were added.
     var customTags: [String] = []
-    var foods: Set<Food> = []
-    /// User-defined foods, in the order they were added.
-    var customFoods: [String] = []
-    /// Whether food was logged at all. Untouched food is saved as nil (unknown), not as "nothing eaten".
-    var foodLogged = false
     var newSpots = false
     var note = ""
     /// Flare-mode safety questions. Not stored: they are only used to check red flags on save.
@@ -31,9 +34,6 @@ struct CheckInDraft: Equatable {
         mood = checkIn.mood
         triggers = Set(checkIn.triggers)
         customTags = checkIn.customTags
-        foods = Set(checkIn.foods)
-        customFoods = checkIn.customFoods
-        foodLogged = checkIn.foodIDs != nil
         newSpots = checkIn.newSpots
         note = checkIn.note
     }
@@ -41,14 +41,18 @@ struct CheckInDraft: Equatable {
     /// Triggers in a stable order for storage.
     var orderedTriggers: [Trigger] { Trigger.allCases.filter(triggers.contains) }
 
-    /// Foods in a stable order for storage.
-    var orderedFoods: [Food] { Food.allCases.filter(foods.contains) }
+    /// Today's picked triggers and tags as chips.
+    var picks: [LogPick] { orderedTriggers.map(LogPick.trigger) + customTags.map(LogPick.custom) }
 
-    /// Stored `foodIDs`: nil while food wasn't logged.
-    var foodIDs: [String]? { foodLogged ? orderedFoods.map(\.rawValue) : nil }
-
-    /// "None of these" is shown selected when food was logged but nothing was picked.
-    var isNoFood: Bool { foodLogged && foods.isEmpty && customFoods.isEmpty }
+    /// Whether the entries differ from the stored check-in (safety answers and weather aren't stored).
+    func differs(from checkIn: DailyCheckIn) -> Bool {
+        var stored = CheckInDraft(checkIn)
+        stored.symptoms = symptoms
+        stored.weather = weather
+        var current = self
+        current.note = trimmedNote
+        return current != stored
+    }
 
     func makeCheckIn(day: Date, calendar: Calendar = .current) -> DailyCheckIn {
         let checkIn = DailyCheckIn(
@@ -56,14 +60,8 @@ struct CheckInDraft: Equatable {
             triggers: orderedTriggers, customTags: customTags, newSpots: newSpots,
             note: trimmedNote, calendar: calendar
         )
-        applyFood(to: checkIn)
         applyWeather(to: checkIn)
         return checkIn
-    }
-
-    private func applyFood(to checkIn: DailyCheckIn) {
-        checkIn.foodIDs = foodIDs
-        checkIn.customFoods = foodLogged ? customFoods : []
     }
 
     private func applyWeather(to checkIn: DailyCheckIn) {
@@ -87,7 +85,6 @@ struct CheckInDraft: Equatable {
         checkIn.customTags = customTags
         checkIn.newSpots = newSpots
         checkIn.note = trimmedNote
-        applyFood(to: checkIn)
         applyWeather(to: checkIn)
         checkIn.updatedAt = .now
     }
@@ -106,33 +103,30 @@ struct CheckInDraft: Equatable {
         Self.add(raw, to: &customTags, known: known)
     }
 
-    mutating func toggle(_ food: Food) {
-        if foods.contains(food) { foods.remove(food) } else { foods.insert(food) }
-        foodLogged = true
+    func isSelected(_ pick: LogPick) -> Bool {
+        switch pick {
+        case .trigger(let trigger): triggers.contains(trigger)
+        case .custom(let tag): customTags.contains(tag)
+        case .food: false
+        }
     }
 
-    mutating func toggleCustomFood(_ food: String) {
-        if let index = customFoods.firstIndex(of: food) { customFoods.remove(at: index) } else { customFoods.append(food) }
-        foodLogged = true
+    mutating func toggle(_ pick: LogPick) {
+        switch pick {
+        case .trigger(let trigger): toggle(trigger)
+        case .custom(let tag): toggleCustomTag(tag)
+        case .food: break
+        }
     }
 
-    /// Adds and selects a typed food, with the same rules as `addCustomTag`.
-    mutating func addCustomFood(_ raw: String, known: [String] = []) {
-        guard Self.add(raw, to: &customFoods, known: known) else { return }
-        foodLogged = true
-    }
-
-    /// "None of these": food is logged, nothing picked.
-    mutating func markNoFood() {
-        foods = []
-        customFoods = []
-        foodLogged = true
+    mutating func addCustom(_ raw: String, known: [String]) {
+        addCustomTag(raw, known: known)
     }
 
     /// Trims `raw` and appends it unless it is empty or already in `list` (case-insensitive).
     /// An entry from `list` or `known` with other casing is reused. Returns false for empty input.
     @discardableResult
-    private static func add(_ raw: String, to list: inout [String], known: [String]) -> Bool {
+    static func add(_ raw: String, to list: inout [String], known: [String]) -> Bool {
         let value = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !value.isEmpty else { return false }
         let existing = (list + known).first { $0.caseInsensitiveCompare(value) == .orderedSame } ?? value
@@ -147,12 +141,15 @@ struct CheckInDraft: Equatable {
         known(checkIns, \.customTags)
     }
 
-    /// Custom foods used before, newest first, without duplicates.
-    static func knownFoods(from checkIns: [DailyCheckIn]) -> [String] {
-        known(checkIns, \.customFoods)
+    /// Triggers and tags of check-ins before `day`, newest first — the input of `QuickPicks`.
+    static func pickHistory(from checkIns: [DailyCheckIn], before day: Date) -> [[LogPick]] {
+        checkIns
+            .filter { $0.day < day }
+            .sorted { $0.day > $1.day }
+            .map { CheckInDraft($0).picks }
     }
 
-    private static func known(_ checkIns: [DailyCheckIn], _ values: KeyPath<DailyCheckIn, [String]>) -> [String] {
+    static func known(_ checkIns: [DailyCheckIn], _ values: KeyPath<DailyCheckIn, [String]>) -> [String] {
         var seen: Set<String> = []
         return checkIns
             .sorted { $0.day > $1.day }

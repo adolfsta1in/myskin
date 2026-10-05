@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 import Testing
-@testable import MyApp
+@testable import MySkin
 
 /// Stores written by earlier app versions must open with the current schema without losing data.
 struct MigrationTests {

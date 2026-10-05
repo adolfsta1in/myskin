@@ -1,5 +1,5 @@
 import Testing
-@testable import MyApp
+@testable import MySkin
 
 struct SeverityCalculatorTests {
     private func isClose(_ lhs: Double, _ rhs: Double) -> Bool { abs(lhs - rhs) < 0.000_1 }

@@ -1,7 +1,7 @@
 import Foundation
 import PDFKit
 import Testing
-@testable import MyApp
+@testable import MySkin
 
 struct ReportRendererTests {
     @Test func writesAOnePagePDF() throws {

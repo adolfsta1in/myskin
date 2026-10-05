@@ -1,5 +1,5 @@
 import Testing
-@testable import MyApp
+@testable import MySkin
 
 struct QuestionnairesTests {
     /// Index of the option with the given score in every question.

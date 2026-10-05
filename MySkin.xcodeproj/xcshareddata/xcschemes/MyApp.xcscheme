@@ -16,8 +16,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "000000000000000100000000"
-               BuildableName = "MyApp.app"
-               ReferencedContainer = "container:Untitled Project.xcodeproj">
+               BuildableName = "MySkin.app"
+               ReferencedContainer = "container:MySkin.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -37,7 +37,7 @@
                BlueprintIdentifier = "FAA81C5D306E458400890859"
                BuildableName = "MySkinTests.xctest"
                BlueprintName = "MySkinTests"
-               ReferencedContainer = "container:Untitled Project.xcodeproj">
+               ReferencedContainer = "container:MySkin.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -58,8 +58,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "000000000000000100000000"
-            BuildableName = "MyApp.app"
-            ReferencedContainer = "container:Untitled Project.xcodeproj">
+            BuildableName = "MySkin.app"
+            ReferencedContainer = "container:MySkin.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -74,8 +74,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "000000000000000100000000"
-            BuildableName = "MyApp.app"
-            ReferencedContainer = "container:Untitled Project.xcodeproj">
+            BuildableName = "MySkin.app"
+            ReferencedContainer = "container:MySkin.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

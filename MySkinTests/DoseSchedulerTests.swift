@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import MyApp
+@testable import MySkin
 
 struct DoseSchedulerTests {
     /// Fixed calendar so the tests do not depend on the machine's time zone.

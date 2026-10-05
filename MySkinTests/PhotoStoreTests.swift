@@ -3,7 +3,7 @@ import Foundation
 import ImageIO
 import Testing
 import UniformTypeIdentifiers
-@testable import MyApp
+@testable import MySkin
 
 struct PhotoStoreTests {
     /// Fresh store in a temporary folder.
