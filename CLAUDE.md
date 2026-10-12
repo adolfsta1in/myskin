@@ -74,7 +74,7 @@ docs/                  spec, research, current-state, migration-plan
 - **Текущий шаг:** этап E (v1.1). Готовы 45–53.1, 52.1, 58 (питание) и 58.1 (компактный чек-ин). Дальше — шаг 59 (движок закономерностей, по `docs/patterns-prompt.md`) или 54 (Supabase), по выбору пользователя.
 - Готово: фазы анализа (spec, current-state, migration-plan), этап 0 целиком:
   - Шаг 1 — git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`;
-  - Шаг 2 — bundle id `com.adolfsta1in.myskin`, usage descriptions для Face ID и камеры;
+  - Шаг 2 — bundle id `com.adolfsta1in.myskin` (позже заменён на `app.myskin.ios`), usage descriptions для Face ID и камеры;
   - Шаг 3 — Swift 6; `Shape`-типы помечены `nonisolated`, т. к. по умолчанию всё на MainActor;
   - Шаг 4 — таргет `MySkinTests` (Swift Testing, Swift 6, MainActor по умолчанию, хост — `MyApp`, доступен `@testable import MyApp`), подключён к схеме `MyApp`; тесты запускаются через `RunAllTests` / ⌘U.
   - Этап A:
