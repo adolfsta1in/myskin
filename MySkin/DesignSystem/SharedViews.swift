@@ -3,22 +3,85 @@ import Charts
 
 // MARK: - Body silhouette
 
-/// Tappable body silhouette built from simple shapes. Zones fill with intensity color.
+/// Tappable body illustration. Affected zones are tinted with their intensity color, clipped to the body outline.
 struct BodySilhouette: View {
     let side: BodySide
     let intensities: [String: Int]
     var onTap: (BodyZone) -> Void = { _ in }
 
+    private var artwork: Image {
+        Image(side == .front ? "BodyFront" : "BodyBack")
+    }
+
+    /// Lines between neighbouring zones in `BodyZone.designSize` space; they follow the zone rects
+    /// and are clipped to the body outline, so they can run past it.
+    private static let borders: [(CGPoint, CGPoint)] = {
+        var lines: [(CGPoint, CGPoint)] = [
+            (CGPoint(x: 70, y: 50), CGPoint(x: 130, y: 50)),    // head | neck
+            (CGPoint(x: 60, y: 76), CGPoint(x: 140, y: 76)),    // neck | chest
+            (CGPoint(x: 61, y: 150), CGPoint(x: 139, y: 150)),  // chest | abdomen
+            (CGPoint(x: 50, y: 212), CGPoint(x: 150, y: 212)),  // abdomen | hips
+            (CGPoint(x: 48, y: 250), CGPoint(x: 152, y: 250)),  // hips | thighs
+            (CGPoint(x: 48, y: 320), CGPoint(x: 152, y: 320)),  // thighs | knees
+            (CGPoint(x: 48, y: 348), CGPoint(x: 152, y: 348)),  // knees | shins
+            (CGPoint(x: 48, y: 428), CGPoint(x: 152, y: 428)),  // shins | feet
+        ]
+        let arm: [(CGPoint, CGPoint)] = [
+            (CGPoint(x: 61, y: 74), CGPoint(x: 61, y: 146)),    // upper arm | chest
+            (CGPoint(x: 15, y: 154), CGPoint(x: 60, y: 154)),   // upper arm | elbow
+            (CGPoint(x: 12, y: 180), CGPoint(x: 61, y: 180)),   // elbow | forearm
+            (CGPoint(x: 0, y: 228), CGPoint(x: 46, y: 228)),    // forearm | hand
+        ]
+        let width = BodyZone.designSize.width
+        for (start, end) in arm {
+            lines.append((start, end))
+            lines.append((CGPoint(x: width - start.x, y: start.y), CGPoint(x: width - end.x, y: end.y)))
+        }
+        return lines
+    }()
+
     var body: some View {
         GeometryReader { geo in
             let sx = geo.size.width / BodyZone.designSize.width
             let sy = geo.size.height / BodyZone.designSize.height
+            let zones = BodyZone.cached(for: side)
             ZStack(alignment: .topLeading) {
-                ForEach(BodyZone.cached(for: side)) { zone in
+                artwork
+                    .resizable()
+                    .accessibilityHidden(true)
+
+                // Tints: soft-edged zone shapes, masked by the illustration so they follow the body.
+                ZStack(alignment: .topLeading) {
+                    ForEach(zones) { zone in
+                        let level = intensities[zone.id] ?? 0
+                        zone.kind.shape
+                            .fill(Theme.intensity(level: level))
+                            .opacity(level == 0 ? 0 : 0.8)
+                            .frame(width: zone.rect.width * sx, height: zone.rect.height * sy)
+                            .position(x: zone.rect.midX * sx, y: zone.rect.midY * sy)
+                    }
+                }
+                .frame(width: geo.size.width, height: geo.size.height)
+                .blur(radius: 2.5)
+                .mask { artwork.resizable() }
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+
+                // Zone borders: dashed cuts across the body show where each tappable area ends.
+                Path { path in
+                    for (start, end) in Self.borders {
+                        path.move(to: CGPoint(x: start.x * sx, y: start.y * sy))
+                        path.addLine(to: CGPoint(x: end.x * sx, y: end.y * sy))
+                    }
+                }
+                .stroke(.white.opacity(0.9), style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
+                .mask { artwork.resizable() }
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+
+                ForEach(zones) { zone in
                     let level = intensities[zone.id] ?? 0
-                    zone.kind.shape
-                        .fill(level == 0 ? Theme.sand : Theme.intensity(level: level))
-                        .overlay(zone.kind.shape.stroke(.white.opacity(0.7), lineWidth: 1.5))
+                    Color.clear
                         .frame(width: zone.rect.width * sx, height: zone.rect.height * sy)
                         .contentShape(zone.kind.shape)
                         .position(x: zone.rect.midX * sx, y: zone.rect.midY * sy)
@@ -202,28 +265,13 @@ struct ScoreTrendChart: View {
 
 // MARK: - Fingertip unit illustration
 
-/// Simple finger drawing with the fingertip-unit segment highlighted.
+/// Index finger with a line of cream from the tip to the first crease (one fingertip unit).
 struct FingerIllustration: View {
     var body: some View {
-        ZStack(alignment: .top) {
-            // Finger
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(Theme.sand)
-                .frame(width: 44, height: 120)
-            // Cream line from tip to first crease
-            Capsule()
-                .fill(.white)
-                .overlay(Capsule().stroke(Theme.sandDeep, lineWidth: 1))
-                .frame(width: 18, height: 42)
-                .padding(.top, 8)
-            // Creases
-            VStack(spacing: 34) {
-                Capsule().fill(Theme.sandDeep).frame(width: 26, height: 2)
-                Capsule().fill(Theme.sandDeep).frame(width: 26, height: 2)
-            }
-            .padding(.top, 54)
-        }
-        .frame(width: 60, height: 124)
-        .accessibilityLabel("A line of cream from the fingertip to the first crease")
+        Image("FingertipUnit")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 72, height: 124)
+            .accessibilityLabel("A line of cream from the fingertip to the first crease")
     }
 }

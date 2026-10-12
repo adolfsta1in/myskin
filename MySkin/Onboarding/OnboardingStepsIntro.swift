@@ -14,21 +14,12 @@ struct WelcomeStep: View {
     var body: some View {
         OnboardingPage(title: "Understand your skin") {
             VStack(alignment: .leading, spacing: 24) {
-                HStack {
-                    Spacer()
-                    ZStack {
-                        SoftIllustration(systemImage: "leaf", size: 200)
-                        Image(systemName: "sparkle")
-                            .font(.title)
-                            .foregroundStyle(Theme.accent)
-                            .offset(x: 70, y: -70)
-                        Circle()
-                            .fill(Theme.accentSoft)
-                            .frame(width: 36, height: 36)
-                            .offset(x: -80, y: 60)
-                    }
-                    Spacer()
-                }
+                Image("WelcomeHero")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 210)
+                    .frame(maxWidth: .infinity)
+                    .accessibilityHidden(true)
                 GlassEffectContainer(spacing: 14) {
                 VStack(alignment: .leading, spacing: 14) {
                     ForEach(promises.indices, id: \.self) { index in
@@ -274,7 +265,7 @@ struct SkinNowStep: View {
         ) {
             VStack(spacing: 24) {
                 SkinMoodIllustration(level: draft.skinNow)
-                    .frame(height: 220)
+                    .frame(height: 230)
                     .frame(maxWidth: .infinity)
                 Text(label)
                     .font(.rounded(.title2, weight: .bold))
@@ -300,31 +291,29 @@ struct SkinNowStep: View {
     }
 }
 
-/// Soft abstract illustration that becomes busier as the level grows.
+/// Illustrated elbow whose plaques grow with the level: neighbouring stages cross-fade as the slider moves.
 struct SkinMoodIllustration: View {
     let level: Double
 
+    private static let stages = 5
+
     var body: some View {
+        let position = min(max(level, 0), 1) * Double(Self.stages - 1)
+        let lower = min(Int(position), Self.stages - 2)
+        let fraction = position - Double(lower)
         ZStack {
-            Circle()
-                .fill(Theme.sageSoft.opacity(1 - level * 0.6))
-                .frame(width: 200, height: 200)
-            Circle()
-                .fill(Theme.sand)
-                .frame(width: 150, height: 150)
-            ForEach(0..<6, id: \.self) { index in
-                let angle = Double(index) / 6 * 2 * .pi
-                Circle()
-                    .fill(Theme.intensity(value: level * 10).opacity(0.75))
-                    .frame(width: 18 + level * 26, height: 18 + level * 26)
-                    .offset(x: cos(angle) * 44, y: sin(angle) * 44)
-                    .opacity(Double(index) < level * 7 ? 1 : 0)
-            }
-            Image(systemName: level < 0.3 ? "leaf" : "circle.hexagongrid")
-                .font(.system(size: 34, weight: .light))
-                .foregroundStyle(Theme.sageDeep)
+            Image("SkinLevel\(lower)")
+                .resizable()
+                .scaledToFill()
+            Image("SkinLevel\(lower + 1)")
+                .resizable()
+                .scaledToFill()
+                .opacity(fraction)
         }
-        .animation(.smooth, value: level)
+        .frame(width: 210, height: 210)
+        .clipShape(.circle)
+        .overlay(Circle().stroke(Theme.sandDeep.opacity(0.6), lineWidth: 1))
+        .background(Circle().fill(Theme.sageSoft).padding(-8))
         .accessibilityHidden(true)
     }
 }

@@ -40,7 +40,7 @@ struct BodyZone: Identifiable, Hashable {
     /// Stable id stored in the database, e.g. `front.elbow.left`. Never rename.
     let id: String
     let name: String
-    /// Frame in a 200 × 440 design space.
+    /// Frame in a 200 × 460 design space, matched to the `BodyFront`/`BodyBack` illustrations.
     let rect: CGRect
     let kind: ZoneShapeKind
     /// Approximate share of total body surface, in percent.
@@ -53,7 +53,7 @@ struct BodyZone: Identifiable, Hashable {
     static func == (lhs: BodyZone, rhs: BodyZone) -> Bool { lhs.id == rhs.id }
     func hash(into hasher: inout Hasher) { hasher.combine(id) }
 
-    static let designSize = CGSize(width: 200, height: 440)
+    static let designSize = CGSize(width: 200, height: 460)
 
     /// Zones for one side of the silhouette. Left/right are from the person's perspective.
     static func zones(for side: BodySide) -> [BodyZone] {
@@ -72,21 +72,21 @@ struct BodyZone: Identifiable, Hashable {
 
         var zones: [BodyZone] = [
             // The face is a special site; the back of the head is covered by `quick.scalp`.
-            BodyZone(id: "\(prefix).head", name: side == .front ? "Face" : "Back of head", rect: CGRect(x: 78, y: 6, width: 44, height: 54), kind: .ellipse, area: 4.5, region: .head, isSpecialSite: side == .front),
-            BodyZone(id: "\(prefix).neck", name: "Neck", rect: CGRect(x: 90, y: 56, width: 20, height: 20), kind: .rounded, area: 1, region: .head),
-            BodyZone(id: "\(prefix).torso.upper", name: side == .front ? "Chest" : "Upper back", rect: CGRect(x: 62, y: 74, width: 76, height: 68), kind: .rounded, area: 9, region: .trunk),
-            BodyZone(id: "\(prefix).torso.lower", name: side == .front ? "Abdomen" : "Lower back", rect: CGRect(x: 65, y: 144, width: 70, height: 56), kind: .rounded, area: 9, region: .trunk),
+            BodyZone(id: "\(prefix).head", name: side == .front ? "Face" : "Back of head", rect: CGRect(x: 73, y: 0, width: 54, height: 50), kind: .ellipse, area: 4.5, region: .head, isSpecialSite: side == .front),
+            BodyZone(id: "\(prefix).neck", name: "Neck", rect: CGRect(x: 83, y: 50, width: 34, height: 26), kind: .rounded, area: 1, region: .head),
+            BodyZone(id: "\(prefix).torso.upper", name: side == .front ? "Chest" : "Upper back", rect: CGRect(x: 61, y: 76, width: 78, height: 74), kind: .rounded, area: 9, region: .trunk),
+            BodyZone(id: "\(prefix).torso.lower", name: side == .front ? "Abdomen" : "Lower back", rect: CGRect(x: 61, y: 150, width: 78, height: 62), kind: .rounded, area: 9, region: .trunk),
             // PASI counts the buttocks with the lower limbs.
-            BodyZone(id: "\(prefix).pelvis", name: side == .front ? "Hips" : "Buttocks", rect: CGRect(x: 63, y: 202, width: 74, height: 34), kind: .rounded, area: side == .front ? 1 : 2.5, region: .legs),
+            BodyZone(id: "\(prefix).pelvis", name: side == .front ? "Hips" : "Buttocks", rect: CGRect(x: 54, y: 212, width: 92, height: 38), kind: .rounded, area: side == .front ? 1 : 2.5, region: .legs),
         ]
-        zones += pair("upperarm", "upper arm", CGRect(x: 38, y: 78, width: 22, height: 70), .capsule, 1.8, .arms)
-        zones += pair("elbow", "elbow", CGRect(x: 32, y: 146, width: 24, height: 26), .ellipse, 0.4, .arms)
-        zones += pair("forearm", "forearm", CGRect(x: 26, y: 170, width: 24, height: 56), .capsule, 1.3, .arms)
-        zones += pair("hand", "hand", CGRect(x: 20, y: 226, width: 26, height: 34), .ellipse, 1.0, .arms)
-        zones += pair("thigh", "thigh", CGRect(x: 66, y: 238, width: 32, height: 80), .capsule, 4.5, .legs)
-        zones += pair("knee", "knee", CGRect(x: 69, y: 318, width: 26, height: 26), .ellipse, 0.8, .legs)
-        zones += pair("shin", "shin", CGRect(x: 71, y: 344, width: 22, height: 62), .capsule, 3, .legs)
-        zones += pair("foot", "foot", CGRect(x: 66, y: 406, width: 30, height: 22), .capsule, 0.7, .legs)
+        zones += pair("upperarm", "upper arm", CGRect(x: 36, y: 84, width: 25, height: 70), .capsule, 1.8, .arms)
+        zones += pair("elbow", "elbow", CGRect(x: 30, y: 154, width: 27, height: 26), .ellipse, 0.4, .arms)
+        zones += pair("forearm", "forearm", CGRect(x: 20, y: 180, width: 32, height: 48), .capsule, 1.3, .arms)
+        zones += pair("hand", "hand", CGRect(x: 2, y: 228, width: 36, height: 42), .ellipse, 1.0, .arms)
+        zones += pair("thigh", "thigh", CGRect(x: 54, y: 250, width: 45, height: 70), .capsule, 4.5, .legs)
+        zones += pair("knee", "knee", CGRect(x: 63, y: 320, width: 30, height: 28), .ellipse, 0.8, .legs)
+        zones += pair("shin", "shin", CGRect(x: 63, y: 348, width: 29, height: 80), .capsule, 3, .legs)
+        zones += pair("foot", "foot", CGRect(x: 59, y: 428, width: 33, height: 32), .capsule, 0.7, .legs)
         return zones
     }
 

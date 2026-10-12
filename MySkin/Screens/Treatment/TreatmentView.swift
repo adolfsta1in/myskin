@@ -86,7 +86,11 @@ struct TreatmentView: View {
 
     private var emptyState: some View {
         VStack(spacing: 16) {
-            SoftIllustration(systemImage: "cross.vial", size: 120)
+            Image("EmptyTreatments")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 140)
+                .accessibilityHidden(true)
             Text("No treatments yet")
                 .font(.rounded(.title3, weight: .semibold))
                 .foregroundStyle(Theme.ink)

@@ -82,7 +82,11 @@ struct PhotosView: View {
 
     private var emptyState: some View {
         VStack(spacing: 16) {
-            SoftIllustration(systemImage: "camera", size: 120)
+            Image("EmptyPhotos")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 150)
+                .accessibilityHidden(true)
             Text("No photos yet")
                 .font(.rounded(.title3, weight: .semibold))
                 .foregroundStyle(Theme.ink)
