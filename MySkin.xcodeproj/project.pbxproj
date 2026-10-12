@@ -345,6 +345,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MySkin/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MySkin;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSCameraUsageDescription = "MySkin uses the camera to take photos of your skin for your diary.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "MySkin uses Face ID to unlock your diary.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "MySkin uses your approximate location to show humidity and UV where you are. Your location isn't stored.";
@@ -392,6 +393,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MySkin/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MySkin;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSCameraUsageDescription = "MySkin uses the camera to take photos of your skin for your diary.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "MySkin uses Face ID to unlock your diary.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "MySkin uses your approximate location to show humidity and UV where you are. Your location isn't stored.";
