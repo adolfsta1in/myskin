@@ -6,6 +6,7 @@ import UserNotifications
     @State private var settings: AppSettings
     @State private var lock: AppLock
     @State private var weather = WeatherModel()
+    @State private var remoteConfig = RemoteConfigStore()
     /// nil if the store couldn't be opened. Never fall back to an empty store: the user would
     /// think their diary is gone. `StoreRecoveryView` offers retry, a copy, or a new diary.
     @State private var modelContainer: ModelContainer?
@@ -27,6 +28,7 @@ import UserNotifications
                     .environment(settings)
                     .environment(lock)
                     .environment(weather)
+                    .environment(remoteConfig)
                     .modelContainer(modelContainer)
             } else {
                 StoreRecoveryView {

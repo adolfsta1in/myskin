@@ -2,6 +2,7 @@ import SwiftData
 import SwiftUI
 
 struct TodayView: View {
+    @Environment(RemoteConfigStore.self) private var remoteConfig: RemoteConfigStore?
     @Query private var checkIns: [DailyCheckIn]
     @Query private var assessments: [ZoneAssessment]
     @State private var isShowingCanvas = false
@@ -34,6 +35,9 @@ struct TodayView: View {
                 VStack(alignment: .leading, spacing: 18) {
                     TodayHeader(onLongPress: { isShowingCanvas = true }, onSettings: { isShowingSettings = true })
                     ModeBanner(status: status)
+                    if let remoteConfig, let announcement = remoteConfig.announcement() {
+                        AnnouncementCard(announcement: announcement) { remoteConfig.dismiss(announcement) }
+                    }
                     if !mapFlags.isEmpty {
                         RedFlagCard { shownFlags = mapFlags }
                     }
@@ -47,7 +51,10 @@ struct TodayView: View {
                         CalmDaysCard()
                             .transition(.opacity)
                     }
-                    WeatherCard()
+                    // The remote config can switch the weather off (e.g. if the service breaks).
+                    if remoteConfig?.isEnabled(.weather) ?? true {
+                        WeatherCard()
+                    }
                     RemindersCard()
                     QuestionnaireDueCards { takingQuestionnaire = $0 }
                     NavigationLink {
@@ -187,6 +194,38 @@ private struct RedFlagCard: View {
             .glassCard(tint: Theme.intensityModerate)
         }
         .buttonStyle(.plain)
+    }
+}
+
+/// Optional notice from the remote config (never medical content). Dismissed for good by id.
+private struct AnnouncementCard: View {
+    let announcement: RemoteAnnouncement
+    let dismiss: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline) {
+                Label(announcement.title, systemImage: "megaphone.fill")
+                    .font(.rounded(.headline, weight: .semibold))
+                    .foregroundStyle(Theme.ink)
+                Spacer(minLength: 8)
+                Button("Dismiss", systemImage: "xmark", action: dismiss)
+                    .labelStyle(.iconOnly)
+                    .font(.rounded(.subheadline, weight: .semibold))
+                    .foregroundStyle(Theme.inkSoft)
+            }
+            if !announcement.message.isEmpty {
+                Text(announcement.message)
+                    .font(.rounded(.subheadline))
+                    .foregroundStyle(Theme.inkSoft)
+            }
+            if let link = announcement.link {
+                Link("Learn more", destination: link)
+                    .font(.rounded(.subheadline, weight: .semibold))
+                    .tint(Theme.accent)
+            }
+        }
+        .glassCard(tint: Theme.accentSoft)
     }
 }
 

@@ -74,11 +74,15 @@ private struct ReminderSync: ViewModifier {
 struct RootView: View {
     @Environment(AppLock.self) private var lock
     @Environment(AppSettings.self) private var settings
+    @Environment(RemoteConfigStore.self) private var remoteConfig: RemoteConfigStore?
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         Group {
-            if !settings.hasCompletedOnboarding {
+            if let remoteConfig, remoteConfig.requiresUpdate {
+                UpdateRequiredView(updateURL: remoteConfig.config.updateURL)
+                    .transition(.opacity)
+            } else if !settings.hasCompletedOnboarding {
                 OnboardingFlow()
                     .transition(.opacity)
             } else if lock.isLocked {
@@ -106,6 +110,10 @@ struct RootView: View {
         }
         .onChange(of: settings.faceIDEnabled) { _, enabled in
             if !enabled { lock.isLocked = false }
+        }
+        // Remote config: on launch and on returning to the app (`RemoteConfigPolicy` limits how often).
+        .task(id: scenePhase) {
+            if scenePhase == .active { await remoteConfig?.refresh() }
         }
     }
 }
