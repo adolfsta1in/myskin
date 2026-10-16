@@ -71,43 +71,17 @@ nonisolated enum WeatherInfo {
         (value * 100).rounded() / 100
     }
 
-    // MARK: Open-Meteo
+    // MARK: WeatherKit
 
-    static func openMeteoURL(latitude: Double, longitude: Double) -> URL? {
-        var components = URLComponents(string: "https://api.open-meteo.com/v1/forecast")
-        components?.queryItems = [
-            URLQueryItem(name: "latitude", value: String(rounded(latitude))),
-            URLQueryItem(name: "longitude", value: String(rounded(longitude))),
-            URLQueryItem(name: "current", value: "temperature_2m,relative_humidity_2m,uv_index"),
-            URLQueryItem(name: "daily", value: "uv_index_max"),
-            URLQueryItem(name: "timezone", value: "auto"),
-            URLQueryItem(name: "forecast_days", value: "1"),
-        ]
-        return components?.url
-    }
-
-    private struct OpenMeteoResponse: Decodable {
-        struct Current: Decodable {
-            let temperature_2m: Double
-            let relative_humidity_2m: Double
-            let uv_index: Double?
-        }
-        struct Daily: Decodable {
-            let uv_index_max: [Double?]
-        }
-        let current: Current
-        let daily: Daily?
-    }
-
-    static func parseOpenMeteo(_ data: Data) throws -> WeatherReading {
-        let response = try JSONDecoder().decode(OpenMeteoResponse.self, from: data)
-        let uvNow = response.current.uv_index ?? 0
-        let uvMax = response.daily?.uv_index_max.first.flatMap(\.self) ?? uvNow
+    /// WeatherKit gives humidity as 0…1 and UV as whole numbers; the card and the check-in use % and Double.
+    /// `uvMaxToday` is nil when the daily forecast is missing — then today's peak is at least the UV now.
+    static func reading(temperatureCelsius: Double, humidityFraction: Double, uvNow: Int, uvMaxToday: Int?) -> WeatherReading {
+        let uvNow = Double(max(uvNow, 0))
         return WeatherReading(
-            temperature: response.current.temperature_2m,
-            humidity: response.current.relative_humidity_2m,
+            temperature: temperatureCelsius,
+            humidity: min(max(humidityFraction, 0), 1) * 100,
             uvIndex: uvNow,
-            uvIndexMax: max(uvMax, uvNow)
+            uvIndexMax: max(Double(uvMaxToday ?? 0), uvNow)
         )
     }
 }

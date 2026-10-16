@@ -743,7 +743,7 @@ private struct CalmDaysCard: View {
     }
 }
 
-/// Humidity and UV where the user is (Open-Meteo). Asks for location only when tapped.
+/// Humidity and UV where the user is (Apple WeatherKit). Asks for location only when tapped.
 /// Sky-blue card: UV first (it matters most for psoriasis), then humidity and temperature.
 private struct WeatherCard: View {
     @Environment(WeatherModel.self) private var weather: WeatherModel?
@@ -781,7 +781,7 @@ private struct WeatherCard: View {
             }
             .buttonStyle(.glassProminent)
             .tint(Theme.accent)
-            Text("Uses your approximate location, sent to Open-Meteo for the weather and to Apple for the place name. It isn't stored.")
+            Text("Uses your approximate location, sent to Apple for the weather and the place name. It isn't stored.")
                 .font(.rounded(.caption))
                 .foregroundStyle(Theme.inkSoft)
         case .denied:
@@ -896,9 +896,10 @@ private struct WeatherCard: View {
                 .background(.white.opacity(0.45), in: .rect(cornerRadius: 16))
             }
 
-            Text("Saved with today's check-in · Weather data by Open-Meteo.com")
+            Text("Saved with today's check-in")
                 .font(.rounded(.caption2))
                 .foregroundStyle(Theme.inkSoft)
+            WeatherAttributionView(credit: weather?.credit)
         }
         .accessibilityElement(children: .contain)
     }
@@ -1239,3 +1240,35 @@ private struct TrendBadge: View {
         .previewSetup()
 }
 #endif
+
+/// Apple Weather mark and the legal link — WeatherKit requires both wherever its data is shown.
+private struct WeatherAttributionView: View {
+    let credit: WeatherCredit?
+
+    var body: some View {
+        HStack(spacing: 8) {
+            if let credit {
+                AsyncImage(url: credit.markURL) { image in
+                    image
+                        .resizable()
+                        .scaledToFit()
+                } placeholder: {
+                    Text(credit.serviceName)
+                        .font(.rounded(.caption2, weight: .semibold))
+                        .foregroundStyle(Theme.inkSoft)
+                }
+                .frame(height: 12)
+                .accessibilityLabel(credit.serviceName)
+            } else {
+                Text("Apple Weather")
+                    .font(.rounded(.caption2, weight: .semibold))
+                    .foregroundStyle(Theme.inkSoft)
+            }
+            if let legal = credit?.legalPageURL ?? WeatherCredit.appleWeatherLegalPage {
+                Link("Data sources", destination: legal)
+                    .font(.rounded(.caption2, weight: .medium))
+                    .tint(Theme.accent)
+            }
+        }
+    }
+}

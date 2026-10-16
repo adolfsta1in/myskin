@@ -3,19 +3,24 @@ import Testing
 @testable import MySkin
 
 struct WeatherInfoTests {
-    @Test func parsesOpenMeteo() throws {
-        let json = """
-        {"current":{"time":"2026-10-03T14:00","temperature_2m":18.4,"relative_humidity_2m":31,"uv_index":2.1},
-         "daily":{"time":["2026-10-03"],"uv_index_max":[5.6]}}
-        """
-        let reading = try WeatherInfo.parseOpenMeteo(Data(json.utf8))
-        #expect(reading == WeatherReading(temperature: 18.4, humidity: 31, uvIndex: 2.1, uvIndexMax: 5.6))
+    @Test func convertsWeatherKitValues() {
+        let reading = WeatherInfo.reading(temperatureCelsius: 18.4, humidityFraction: 0.31, uvNow: 2, uvMaxToday: 6)
+        #expect(reading.temperature == 18.4)
+        #expect(abs(reading.humidity - 31) < 0.0001)
+        #expect(reading.uvIndex == 2)
+        #expect(reading.uvIndexMax == 6)
     }
 
-    @Test func missingUVFallsBackToZero() throws {
-        let json = #"{"current":{"temperature_2m":5,"relative_humidity_2m":80,"uv_index":null}}"#
-        let reading = try WeatherInfo.parseOpenMeteo(Data(json.utf8))
-        #expect(reading.uvIndexMax == 0)
+    @Test func missingDailyUVFallsBackToUVNow() {
+        let reading = WeatherInfo.reading(temperatureCelsius: 5, humidityFraction: 0.8, uvNow: 3, uvMaxToday: nil)
+        #expect(reading.uvIndexMax == 3)
+        // Today's peak is never below the UV now.
+        #expect(WeatherInfo.reading(temperatureCelsius: 5, humidityFraction: 0.8, uvNow: 4, uvMaxToday: 2).uvIndexMax == 4)
+    }
+
+    @Test func humidityIsClampedToPercent() {
+        #expect(WeatherInfo.reading(temperatureCelsius: 0, humidityFraction: 1.2, uvNow: 0, uvMaxToday: 0).humidity == 100)
+        #expect(WeatherInfo.reading(temperatureCelsius: 0, humidityFraction: -0.1, uvNow: -1, uvMaxToday: nil).humidity == 0)
     }
 
     @Test func uvBands() {
@@ -35,11 +40,9 @@ struct WeatherInfoTests {
         #expect(WeatherInfo.humidityTitle(85) == "Humid")
     }
 
-    @Test func coordinatesAreRoundedInTheRequest() throws {
-        let url = try #require(WeatherInfo.openMeteoURL(latitude: 43.238949, longitude: 76.889709))
-        let query = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems)
-        #expect(query.first { $0.name == "latitude" }?.value == "43.24")
-        #expect(query.first { $0.name == "longitude" }?.value == "76.89")
+    @Test func coordinatesAreRoundedBeforeTheyLeaveTheDevice() {
+        #expect(WeatherInfo.rounded(43.238949) == 43.24)
+        #expect(WeatherInfo.rounded(76.889709) == 76.89)
     }
 
     @Test func weatherIsSavedWithTheCheckIn() {

@@ -120,7 +120,7 @@ enum SchemaV3: VersionedSchema {
         /// User-defined foods, stored as typed by the user.
         var customFoods: [String] = []
         var note: String
-        /// Weather where the user was, saved with the check-in (Open-Meteo). Nil if not available.
+        /// Weather where the user was, saved with the check-in (WeatherKit; Open-Meteo before C13). Nil if not available.
         /// Relative humidity, %.
         var humidity: Double?
         /// UV index (daily maximum).

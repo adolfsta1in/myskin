@@ -3,21 +3,47 @@ import Foundation
 import MapKit
 import Observation
 import UIKit
+import WeatherKit
 
-/// Source of weather data. Open-Meteo for now; WeatherKit can replace it without touching screens.
+/// Source of weather data, behind a protocol so screens don't depend on it.
 protocol WeatherProvider: Sendable {
     func reading(latitude: Double, longitude: Double) async throws -> WeatherReading
+    /// Credit the card has to show next to the data; nil if it couldn't be loaded.
+    func credit() async -> WeatherCredit?
 }
 
-/// Open-Meteo forecast API: no key, CC BY 4.0 (attribution is shown on the card).
-nonisolated struct OpenMeteoWeather: WeatherProvider {
+/// Required attribution of the weather source: its mark and the legal page.
+nonisolated struct WeatherCredit: Equatable, Sendable {
+    let serviceName: String
+    /// Mark for a light background — the app always uses the light appearance.
+    let markURL: URL
+    let legalPageURL: URL
+
+    /// Shown if WeatherKit's attribution couldn't be loaded.
+    static let appleWeatherLegalPage = URL(string: "https://weatherkit.apple.com/legal-attribution.html")
+}
+
+/// Apple WeatherKit (needs the WeatherKit capability and App Service on the App ID).
+/// Like the geocoder, it only gets coordinates rounded to about 1 km.
+nonisolated struct AppleWeather: WeatherProvider {
     func reading(latitude: Double, longitude: Double) async throws -> WeatherReading {
-        guard let url = WeatherInfo.openMeteoURL(latitude: latitude, longitude: longitude) else { throw URLError(.badURL) }
-        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 15)
-        request.httpMethod = "GET"
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw URLError(.badServerResponse) }
-        return try WeatherInfo.parseOpenMeteo(data)
+        let location = CLLocation(latitude: WeatherInfo.rounded(latitude), longitude: WeatherInfo.rounded(longitude))
+        let (current, daily) = try await WeatherService.shared.weather(for: location, including: .current, .daily)
+        return WeatherInfo.reading(
+            temperatureCelsius: current.temperature.converted(to: .celsius).value,
+            humidityFraction: current.humidity,
+            uvNow: current.uvIndex.value,
+            uvMaxToday: daily.first?.uvIndex.value
+        )
+    }
+
+    func credit() async -> WeatherCredit? {
+        guard let attribution = try? await WeatherService.shared.attribution else { return nil }
+        return WeatherCredit(
+            serviceName: attribution.serviceName,
+            markURL: attribution.combinedMarkLightURL,
+            legalPageURL: attribution.legalPageURL
+        )
     }
 }
 
@@ -66,6 +92,8 @@ final class WeatherModel {
     private(set) var updatedAt: Date?
     /// City (or area) name for the card, from Apple's reverse geocoder; nil if unknown.
     private(set) var placeName: String?
+    /// Attribution of the weather source, loaded once with the first reading.
+    private(set) var credit: WeatherCredit?
     private let provider: any WeatherProvider
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private var isFetching = false
@@ -77,7 +105,7 @@ final class WeatherModel {
         static let requestCount = "weatherRequestCount"
     }
 
-    init(provider: any WeatherProvider = OpenMeteoWeather(), defaults: UserDefaults = .standard) {
+    init(provider: any WeatherProvider = AppleWeather(), defaults: UserDefaults = .standard) {
         self.provider = provider
         self.defaults = defaults
         state = LocationProvider.status == .notDetermined ? .needsPermission
@@ -120,6 +148,7 @@ final class WeatherModel {
             updatedAt = .now
             failedAt = nil
             placeName = await Self.placeName(for: location)
+            if credit == nil { credit = await provider.credit() }
         } catch LocationProvider.LocationError.denied {
             state = LocationProvider.status == .notDetermined ? .needsPermission : .denied
         } catch {
