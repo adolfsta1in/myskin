@@ -90,6 +90,9 @@ struct BodySilhouette: View {
                         .accessibilityLabel(zone.name)
                         .accessibilityValue(IntensityLegend.label(for: level))
                         .accessibilityAddTraits(.isButton)
+                        .accessibilityHint("Opens the rating for this area")
+                        // VoiceOver activates the zone directly, not by a synthesized tap at its centre.
+                        .accessibilityAction { onTap(zone) }
                 }
             }
         }
@@ -110,18 +113,31 @@ struct IntensityLegend: View {
     }
 
     var body: some View {
-        HStack(spacing: 12) {
-            ForEach(0..<4, id: \.self) { level in
-                HStack(spacing: 4) {
-                    Circle()
-                        .fill(Theme.intensity(level: level))
-                        .frame(width: 10, height: 10)
-                    Text(Self.label(for: level))
-                }
+        // Four labels don't fit in a row at the largest text sizes: then two by two.
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 12) { items }
+            Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 6) {
+                GridRow { item(0); item(1) }
+                GridRow { item(2); item(3) }
             }
         }
         .font(.rounded(.caption))
         .foregroundStyle(Theme.inkSoft)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var items: some View {
+        ForEach(0..<4, id: \.self) { item($0) }
+    }
+
+    private func item(_ level: Int) -> some View {
+        HStack(spacing: 4) {
+            Circle()
+                .fill(Theme.intensity(level: level))
+                .frame(width: 10, height: 10)
+            Text(Self.label(for: level))
+                .fixedSize()
+        }
     }
 }
 

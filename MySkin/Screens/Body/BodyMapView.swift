@@ -9,6 +9,8 @@ struct BodyMapView: View {
     @State private var lastTapped: BodyZone?
     @State private var editingZone: BodyZone?
     @State private var tapCount = 0
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @ScaledMetric(relativeTo: .largeTitle) private var bsaFontSize = 40.0
 
     /// The latest joint check feeds the «elevated» mark.
     private var summary: BodyMapSummary {
@@ -87,7 +89,8 @@ struct BodyMapView: View {
         VStack(alignment: .leading, spacing: 12) {
             SectionHeader(title: "Quick zones", subtitle: "Hard-to-draw areas")
             GlassEffectContainer(spacing: 10) {
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+            // Two columns don't fit the longest names at the largest text sizes.
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: dynamicTypeSize.isAccessibilitySize ? 1 : 2), spacing: 10) {
                 ForEach(BodyZone.quickZones) { zone in
                     let level = levels[zone.id] ?? 0
                     Button {
@@ -97,10 +100,12 @@ struct BodyMapView: View {
                             Circle()
                                 .fill(Theme.intensity(level: level))
                                 .frame(width: 14, height: 14)
+                                .accessibilityHidden(true)
                             Text(zone.name)
                                 .font(.rounded(.subheadline, weight: .medium))
                                 .foregroundStyle(Theme.ink)
-                            Spacer()
+                                .multilineTextAlignment(.leading)
+                            Spacer(minLength: 4)
                             Text(IntensityLegend.label(for: level))
                                 .font(.rounded(.caption))
                                 .foregroundStyle(Theme.inkSoft)
@@ -110,6 +115,7 @@ struct BodyMapView: View {
                         .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 18))
                     }
                     .buttonStyle(.plain)
+                    .accessibilityHint("Opens the rating for this area")
                     .sensoryFeedback(.selection, trigger: level)
                 }
             }
@@ -122,21 +128,25 @@ struct BodyMapView: View {
     private func summaryCard(_ summary: BodyMapSummary) -> some View {
         let snapshot = summary.snapshot
         VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .center, spacing: 16) {
+            let layout = dynamicTypeSize.isAccessibilitySize
+                ? AnyLayout(VStackLayout(alignment: .leading, spacing: 12))
+                : AnyLayout(HStackLayout(alignment: .center, spacing: 16))
+            layout {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Your estimated area")
                         .font(.rounded(.subheadline, weight: .medium))
                         .foregroundStyle(Theme.inkSoft)
                     Text("≈ \(snapshot.bsa, format: .number.precision(.fractionLength(0...1)))%")
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .font(.system(size: bsaFontSize, weight: .bold, design: .rounded))
                         .foregroundStyle(Theme.ink)
                         .contentTransition(.numericText())
                     Text("of body surface")
                         .font(.rounded(.footnote))
                         .foregroundStyle(Theme.inkSoft)
                 }
-                Spacer()
-                VStack(alignment: .trailing, spacing: 6) {
+                .accessibilityElement(children: .combine)
+                if !dynamicTypeSize.isAccessibilitySize { Spacer() }
+                VStack(alignment: dynamicTypeSize.isAccessibilitySize ? .leading : .trailing, spacing: 6) {
                     Text(snapshot.category.title)
                         .font(.rounded(.subheadline, weight: .semibold))
                         .foregroundStyle(Theme.ink)
@@ -202,4 +212,10 @@ struct BodyMapView: View {
 #Preview {
     BodyMapView()
         .previewSetup()
+}
+
+#Preview("Largest text") {
+    BodyMapView()
+        .previewSetup()
+        .dynamicTypeSize(.accessibility5)
 }
