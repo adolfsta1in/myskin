@@ -5,9 +5,8 @@ import Observation
 /// The request carries nothing about the user — a plain GET without cookies, cache or query.
 @Observable
 final class RemoteConfigStore {
-    /// Our static JSON file. nil until the site exists (release plan A3 / phase C):
-    /// then the app makes no request at all and runs on `RemoteConfig.builtIn`.
-    static let endpoint: URL? = nil
+    /// Our static JSON file. With nil the app makes no request at all and runs on `RemoteConfig.builtIn`.
+    static let endpoint: URL? = AppLinks.remoteConfig
 
     private(set) var config: RemoteConfig
     private(set) var dismissedAnnouncementID: String?

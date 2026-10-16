@@ -202,9 +202,24 @@ struct SettingsView: View {
             Text("Safety information is based on the American Academy of Dermatology psoriasis guidelines and NICE guideline CG153 (Psoriasis: assessment and management). Medication schedules are typical examples — use what your doctor prescribed.")
                 .font(.rounded(.footnote))
                 .foregroundStyle(Theme.inkSoft)
+            aboutLink("Privacy Policy", systemImage: "hand.raised", AppLinks.privacy)
+            aboutLink("Terms & Medical Disclaimer", systemImage: "doc.text", AppLinks.terms)
+            aboutLink("Help & FAQ", systemImage: "questionmark.circle", AppLinks.support)
+            aboutLink("Contact support", systemImage: "envelope", AppLinks.contactSupport)
             if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String {
                 LabeledContent("Version", value: version)
             }
+        }
+    }
+
+    @ViewBuilder
+    private func aboutLink(_ title: String, systemImage: String, _ url: URL?) -> some View {
+        if let url {
+            Link(destination: url) {
+                Label(title, systemImage: systemImage)
+                    .font(.rounded(.body))
+            }
+            .tint(Theme.accent)
         }
     }
 }

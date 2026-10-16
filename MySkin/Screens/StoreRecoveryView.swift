@@ -43,6 +43,12 @@ struct StoreRecoveryView: View {
                             stillFailing = !retry()
                         }
                         SecondaryButton(title: "Save a copy of the diary file") { isSharing = true }
+                        if let contact = AppLinks.contactSupport {
+                            Link("Contact support", destination: contact)
+                                .font(.rounded(.subheadline, weight: .medium))
+                                .foregroundStyle(Theme.accent)
+                                .padding(.top, 8)
+                        }
                         Button("Start a new diary", role: .destructive) { isConfirmingNewDiary = true }
                             .font(.rounded(.subheadline, weight: .medium))
                             .padding(.top, 8)

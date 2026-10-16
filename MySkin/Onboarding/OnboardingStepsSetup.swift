@@ -341,6 +341,12 @@ struct PrivacyStep: View {
                     privacyRow("square.and.arrow.up", "Your diary isn't sent anywhere — you choose what to share. Weather, if you turn it on, uses your approximate location")
                 }
                 .glassCard()
+
+                if let privacy = AppLinks.privacy {
+                    Link("Read the privacy policy", destination: privacy)
+                        .font(.rounded(.subheadline, weight: .medium))
+                        .foregroundStyle(Theme.accent)
+                }
             }
         } footer: {
             PrimaryButton(title: "Continue", action: next)
