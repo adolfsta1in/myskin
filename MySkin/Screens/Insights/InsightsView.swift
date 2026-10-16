@@ -1,7 +1,8 @@
 import SwiftData
 import SwiftUI
 
-/// Trends over the last 3 months (itch, affected area, skin impact) and links to the report and questionnaires.
+/// Trends over the last 3 months (itch, affected area, skin impact), patterns from the diary,
+/// and links to the report and questionnaires.
 struct InsightsView: View {
     @Query private var checkIns: [DailyCheckIn]
     @Query private var assessments: [ZoneAssessment]
@@ -46,6 +47,8 @@ struct InsightsView: View {
                         LinkCard(systemImage: "list.clipboard", title: "Questionnaires", subtitle: "Skin impact and joint check · scores over time")
                     }
                     .buttonStyle(.plain)
+
+                    PatternsCard()
 
                     TrendCard(
                         title: "Itch",

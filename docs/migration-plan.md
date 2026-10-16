@@ -579,7 +579,8 @@ MySkinTests/      Swift Testing
 - **Зависимости:** 58.
 - **Готово, когда:** тесты на синтетических данных (заложенный эффект находится, шум и тренд — нет), сборка и все тесты зелёные.
 
-### Шаг 60. Insights: карточка «Patterns»
+### Шаг 60. Insights: карточка «Patterns» ✅
+- **Сделано (2026-10-17):** `Screens/Insights/PatternsCard.swift` — карточка на Insights после ссылок: до 3 находок (стрелка вверх/вниз, «Itch was higher 2–3 days after dairy», «Moderate link · 9 times · early sign»), до 21 чек-ина — «Keep logging — N more check-ins» с прогрессом, без находок — «No clear links yet». `PatternDetailView`: по каждой находке зуд «после» / «в другие дни», доля дней с признаками обострения, объяснение, пометка «Early sign»; списки «No clear link yet» и «Not enough data yet»; дисклеймер «not proof of cause». Расчёт — `Patterns.reportInBackground` (`@concurrent`) в `.task(id:)` по изменению чек-инов, оценок, лечений и отметок доз. Тесты 333/333 на iPhone A; внешний вид проверяет пользователь на телефоне (демо `-demo60` показывает находку «dairy»).
 - **Цель:** до 3 находок на Insights + экран подробностей, состояния «мало данных» и «связь не видна», дисклеймер «not proof of cause».
 - **Зависимости:** 59. Описание — в конце `docs/patterns-prompt.md`.
 
