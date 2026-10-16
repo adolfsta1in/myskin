@@ -1,0 +1,101 @@
+import StoreKit
+import SwiftUI
+
+/// Subscription paywall: trial timeline, yearly / weekly plans (yearly preselected), purchase via StoreKit.
+/// `onClose == nil` hides the close button (hard paywall).
+struct PaywallView: View {
+    var onClose: (() -> Void)?
+    var onSubscribed: () -> Void = {}
+
+    @Environment(Subscriptions.self) private var subscriptions
+    @Environment(\.purchase) private var purchase
+    @State private var selected = PaywallPlan.preselected
+    @State private var isPurchasing = false
+    @State private var canRemind = false
+    @State private var message: PaywallMessage?
+
+    var body: some View {
+        PaywallContent(
+            options: subscriptions.options,
+            loadState: subscriptions.loadState,
+            canRemind: canRemind,
+            isPurchasing: isPurchasing,
+            selected: $selected,
+            onContinue: buy,
+            onRestore: restore,
+            onRetry: { Task { await subscriptions.loadProducts() } },
+            onClose: onClose,
+            onDebugSkip: debugSkip
+        )
+        .task {
+            canRemind = await NotificationPermission.isAllowed()
+            if subscriptions.loadState != .loaded { await subscriptions.loadProducts() }
+        }
+        .alert(item: $message) { message in
+            Alert(title: Text(message.title), message: Text(message.text), dismissButton: .default(Text("OK")))
+        }
+    }
+
+    private func buy() {
+        guard let product = subscriptions.product(for: selected), !isPurchasing else { return }
+        let trialDays = subscriptions.options.first { $0.plan == selected }?.trialDays
+        isPurchasing = true
+        Task {
+            defer { isPurchasing = false }
+            do {
+                let result = try await purchase(product)
+                if case .pending = result {
+                    message = .pending
+                } else if await subscriptions.complete(result) {
+                    if let trialDays, let date = PaywallOffer.reminderDate(trialStart: .now, trialDays: trialDays) {
+                        await NotificationService.scheduleTrialReminder(at: date)
+                    }
+                    onSubscribed()
+                }
+            } catch {
+                message = .failed(error.localizedDescription)
+            }
+        }
+    }
+
+    private var debugSkip: (() -> Void)? {
+        #if DEBUG
+        return { subscriptions.debugBypass = true }
+        #else
+        return nil
+        #endif
+    }
+
+    private func restore() {
+        guard !isPurchasing else { return }
+        isPurchasing = true
+        Task {
+            defer { isPurchasing = false }
+            do {
+                try await subscriptions.restore()
+                if subscriptions.isSubscribed { onSubscribed() } else { message = .nothingToRestore }
+            } catch {
+                message = .failed(error.localizedDescription)
+            }
+        }
+    }
+}
+
+private struct PaywallMessage: Identifiable {
+    let title: String
+    let text: String
+    var id: String { title + text }
+
+    static let pending = PaywallMessage(title: "Waiting for approval",
+                                        text: "Your purchase needs approval. You'll get access as soon as it's approved.")
+    static let nothingToRestore = PaywallMessage(title: "No subscription found",
+                                                 text: "We couldn't find an active MySkin subscription for this Apple Account.")
+    static func failed(_ text: String) -> PaywallMessage { PaywallMessage(title: "Purchase didn't go through", text: text) }
+}
+
+enum PaywallLinks {
+    /// Our terms; they include subscription terms and point to Apple's standard EULA.
+    /// App Review requires both links on the paywall.
+    static let terms = AppLinks.terms
+    static let privacy = AppLinks.privacy
+}

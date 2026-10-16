@@ -20,6 +20,9 @@ final class OnboardingDraft {
     var zoneLevels: [String: Int] = [:]
     var treatments: [TreatmentDraft] = []
     var hasNoTreatment = false
+    /// Today's check-in from the onboarding step; saved only if `hasFirstCheckIn` (the step can be skipped).
+    var firstCheckIn = CheckInDraft()
+    var hasFirstCheckIn = false
 
     /// Share of a zone's reference area assumed for each quick level.
     static let coverage: [Int: Double] = [1: 0.25, 2: 0.5, 3: 0.8]
@@ -110,6 +113,15 @@ final class OnboardingDraft {
             var dated = draft
             dated.startDate = date
             context.insert(dated.makeTreatment())
+        }
+        if hasFirstCheckIn {
+            let day = Calendar.current.startOfDay(for: date)
+            let existing = try context.fetch(FetchDescriptor<DailyCheckIn>(predicate: #Predicate { $0.day == day })).first
+            if let existing {
+                firstCheckIn.apply(to: existing)
+            } else {
+                context.insert(firstCheckIn.makeCheckIn(day: date))
+            }
         }
         try context.save()
     }

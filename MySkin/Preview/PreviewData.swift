@@ -36,6 +36,17 @@ enum PreviewData {
         return settings
     }()
 
+    /// Paywall plans as StoreKit would return them (US prices, trial on yearly).
+    static let paywallOptions: [PaywallOption] = {
+        let format = Decimal.FormatStyle.Currency(code: "USD", locale: Locale(identifier: "en_US"))
+        return [
+            PaywallOption(plan: .yearly, displayPrice: "$59.99", price: Decimal(string: "59.99") ?? 0,
+                          priceFormat: format, trialDays: 7),
+            PaywallOption(plan: .weekly, displayPrice: "$9.99", price: Decimal(string: "9.99") ?? 0,
+                          priceFormat: format, trialDays: nil),
+        ]
+    }()
+
     /// Empty in-memory container, for empty states.
     static func emptyContainer() -> ModelContainer {
         do {

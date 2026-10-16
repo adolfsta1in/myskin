@@ -56,6 +56,12 @@ struct DesignCanvasView: View {
                         phone("Red flag") { RedFlagView(flags: [.widespreadPustules]) }
                         phone("Settings") { SettingsView() }
                         phone("Privacy lock") { PrivacyLockView() }
+                        phone("Paywall · yearly") {
+                            PaywallContent(options: PreviewData.paywallOptions, selected: .constant(.yearly))
+                        }
+                        phone("Paywall · weekly") {
+                            PaywallContent(options: PreviewData.paywallOptions, selected: .constant(.weekly), onClose: {})
+                        }
                     }
                 }
                 .padding(32)

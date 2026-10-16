@@ -442,29 +442,40 @@ struct PlanReadyStep: View {
                             ? "Tomorrow at \(settings.checkInTime.formatted(date: .omitted, time: .shortened)) · daily check-in"
                             : "None — you can add one anytime")
                     planRow("flag.checkered", "Starting point", startingPoint)
+                    if draft.hasFirstCheckIn {
+                        planRow("checkmark.circle", "First entry", "Itch \(draft.firstCheckIn.itch)/10 · saved for today")
+                    }
                 }
                 .glassCard()
 
-                HStack(spacing: 14) {
-                    Image(systemName: "camera.viewfinder")
-                        .font(.title2)
-                        .foregroundStyle(Theme.accent)
-                        .frame(width: 52, height: 52)
-                        .background(Theme.accentSoft, in: .circle)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Take your first photo")
-                            .font(.rounded(.headline, weight: .semibold))
-                            .foregroundStyle(Theme.ink)
-                        Text("Compare in a month — the difference will show.")
-                            .font(.rounded(.subheadline))
-                            .foregroundStyle(Theme.inkSoft)
-                    }
+                if draft.hasFirstCheckIn {
+                    ReportPreviewCard(itch: draft.firstCheckIn.itch)
+                } else {
+                    firstPhotoCard
                 }
-                .glassCard(tint: Theme.accentSoft)
             }
         } footer: {
             PrimaryButton(title: "Start", action: next)
         }
+    }
+
+    private var firstPhotoCard: some View {
+        HStack(spacing: 14) {
+            Image(systemName: "camera.viewfinder")
+                .font(.title2)
+                .foregroundStyle(Theme.accent)
+                .frame(width: 52, height: 52)
+                .background(Theme.accentSoft, in: .circle)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Take your first photo")
+                    .font(.rounded(.headline, weight: .semibold))
+                    .foregroundStyle(Theme.ink)
+                Text("Compare in a month — the difference will show.")
+                    .font(.rounded(.subheadline))
+                    .foregroundStyle(Theme.inkSoft)
+            }
+        }
+        .glassCard(tint: Theme.accentSoft)
     }
 
     private func planRow(_ symbol: String, _ title: String, _ value: String) -> some View {

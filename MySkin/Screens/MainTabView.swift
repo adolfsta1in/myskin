@@ -75,6 +75,8 @@ struct RootView: View {
     @Environment(AppLock.self) private var lock
     @Environment(AppSettings.self) private var settings
     @Environment(RemoteConfigStore.self) private var remoteConfig: RemoteConfigStore?
+    /// nil in previews and the canvas: no paywall there.
+    @Environment(Subscriptions.self) private var subscriptions: Subscriptions?
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
@@ -84,6 +86,13 @@ struct RootView: View {
                     .transition(.opacity)
             } else if !settings.hasCompletedOnboarding {
                 OnboardingFlow()
+                    .transition(.opacity)
+            } else if let subscriptions, !subscriptions.hasCheckedEntitlements {
+                // A moment on launch while StoreKit reads the (cached) entitlements.
+                WarmBackground()
+            } else if let subscriptions, !subscriptions.hasAccess {
+                // Hard paywall: no close button. Safety information stays reachable from it.
+                PaywallView()
                     .transition(.opacity)
             } else if lock.isLocked {
                 PrivacyLockView()
@@ -100,6 +109,7 @@ struct RootView: View {
         }
         .animation(.smooth, value: settings.hasCompletedOnboarding)
         .animation(.smooth, value: lock.isLocked)
+        .animation(.smooth, value: subscriptions?.hasAccess)
         .fontDesign(.rounded)
         .preferredColorScheme(.light)
         .onChange(of: scenePhase) { _, phase in

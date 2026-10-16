@@ -23,12 +23,31 @@ enum NotificationService {
         }
     }
 
+    /// Outside `ReminderPlan.idPrefix` on purpose: `sync` must not remove it.
+    static let trialReminderID = "trial.ending"
+    static let trialReminderBody = "Your free trial ends in \(PaywallOffer.reminderDaysBeforeEnd) days."
+
+    /// One-off reminder promised on the paywall timeline. Silently skipped without permission.
+    static func scheduleTrialReminder(at date: Date) async {
+        guard await NotificationPermission.isAllowed(), date > .now else { return }
+        let content = UNMutableNotificationContent()
+        content.title = ReminderPlan.title
+        content.body = trialReminderBody
+        content.sound = .default
+        let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+        try? await UNUserNotificationCenter.current().add(
+            UNNotificationRequest(identifier: trialReminderID, content: content, trigger: trigger)
+        )
+    }
+
     /// Removes all of MySkin's pending and delivered reminders (used by «Delete all data»).
     static func removeAll() async {
         let center = UNUserNotificationCenter.current()
-        let pending = await center.pendingNotificationRequests().map(\.identifier).filter { $0.hasPrefix(ReminderPlan.idPrefix) }
+        let isOurs: (String) -> Bool = { $0.hasPrefix(ReminderPlan.idPrefix) || $0 == trialReminderID }
+        let pending = await center.pendingNotificationRequests().map(\.identifier).filter(isOurs)
         center.removePendingNotificationRequests(withIdentifiers: pending)
-        let delivered = await center.deliveredNotifications().map(\.request.identifier).filter { $0.hasPrefix(ReminderPlan.idPrefix) }
+        let delivered = await center.deliveredNotifications().map(\.request.identifier).filter(isOurs)
         center.removeDeliveredNotifications(withIdentifiers: delivered)
     }
 }

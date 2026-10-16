@@ -38,6 +38,15 @@ struct CheckInDraft: Equatable, PickDraft {
         note = checkIn.note
     }
 
+    var itchDescription: String {
+        switch itch {
+        case ..<1: "Barely there"
+        case ..<4: "Noticeable"
+        case ..<7: "Hard to ignore"
+        default: "Very intense"
+        }
+    }
+
     /// Triggers in a stable order for storage.
     var orderedTriggers: [Trigger] { Trigger.allCases.filter(triggers.contains) }
 

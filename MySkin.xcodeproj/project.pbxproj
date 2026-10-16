@@ -18,6 +18,7 @@
 
 /* Begin PBXFileReference section */
 		000000000000000000000120 /* MySkin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MySkin.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FAA40E3F3082782A00B6303C /* MySkin.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = MySkin.storekit; sourceTree = "<group>"; };
 		FAA81C5E306E458500890859 /* MySkinTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MySkinTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -69,6 +70,7 @@
 		000000000000000000000001 = {
 			isa = PBXGroup;
 			children = (
+				FAA40E3F3082782A00B6303C /* MySkin.storekit */,
 				FAA81BE4306E355300890859 /* docs */,
 				000000000000000000000010 /* MySkin */,
 				FAA81C5F306E458500890859 /* MySkinTests */,

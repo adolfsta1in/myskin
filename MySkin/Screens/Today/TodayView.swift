@@ -335,15 +335,6 @@ private struct CheckInCard: View {
         )
     }
 
-    private var itchDescription: String {
-        switch draft.itch {
-        case ..<1: "Barely there"
-        case ..<4: "Noticeable"
-        case ..<7: "Hard to ignore"
-        default: "Very intense"
-        }
-    }
-
     /// One line under the itch row while the card is folded.
     private var foldedSummary: String {
         var parts = [draft.picks.isEmpty ? "No triggers" : draft.picks.map(\.title).formatted(.list(type: .and))]
@@ -367,7 +358,7 @@ private struct CheckInCard: View {
                         .font(.rounded(.title2, weight: .bold))
                         .foregroundStyle(Theme.ink)
                         .contentTransition(.numericText())
-                    Text("· \(itchDescription)")
+                    Text("· \(draft.itchDescription)")
                         .font(.rounded(.subheadline))
                         .foregroundStyle(Theme.inkSoft)
                 }

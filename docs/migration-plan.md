@@ -582,6 +582,11 @@ MySkinTests/      Swift Testing
 - **Цель:** до 3 находок на Insights + экран подробностей, состояния «мало данных» и «связь не видна», дисклеймер «not proof of cause».
 - **Зависимости:** 59. Описание — в конце `docs/patterns-prompt.md`.
 
+### Шаг 61. Пейвол (StoreKit 2) и первый чек-ин в онбординге ✅
+- **Цель:** запрос пользователя от 2026-10-16 — жёсткий пейвол после онбординга; перед ним пользователь делает первый настоящий чек-ин и видит превью отчёта врачу (вариант B, сделан основным; A/B-флаг удалён — без аналитики его нечем измерить).
+- **Файлы:** `Logic/PaywallOffer.swift` (id продуктов `app.myskin.ios.premium.yearly`/`.weekly` — не переименовывать; выгода годового против 52 недель с округлением вниз, цена в неделю, таймлайн триала, напоминание за 2 дня до конца). `Services/Subscriptions.swift` (`@Observable`: продукты, триал только при `isEligibleForIntroOffer`, покупка через `PurchaseAction`, `AppStore.sync`, `Transaction.updates`/`currentEntitlements`; `hasAccess`; `LoadState.unavailable` — продуктов нет в App Store; DEBUG — `debugBypass`). `Screens/Paywall/`: `PaywallView` (покупка, напоминание о конце триала `trial.ending` — вне префикса `myskin.`, `sync` его не трогает), `PaywallContent` (вёрстка), `PaywallPreviews` (превью отдельно — иначе thunk не собирается). `RootView`: после онбординга без подписки — пейвол без крестика; на нём «Urgent symptoms?» → `RedFlagView` (красные флаги доступны без подписки). Онбординг: шаг `firstCheckIn` после Treatments (`OnboardingStepsCheckIn.swift`, можно пропустить), `OnboardingDraft.firstCheckIn` сохраняется как чек-ин за сегодня; «Your plan is ready» — `ReportPreviewCard` (первый столбик — реальный зуд, остальные — пустые ячейки). `MySkin.storekit` (yearly $59.99 с 7-дневным триалом, weekly $9.99) подключён к схеме. DEBUG: аргумент `-onboardingDemo` — онбординг → пейвол на отдельных настройках и базе в памяти, настоящий дневник не трогается.
+- **Готово, когда:** сборка, тесты 309/310 на iPhone A (падает `PhotoStoreTests/fileIsProtectedAndNotBackedUp` — код фото не менялся); онбординг с первым чек-ином пользователь посмотрел на телефоне. Не проверено: покупка с `.storekit` на телефоне (пейвол не показался — осталась прошлая тестовая транзакция), продукты в App Store Connect не созданы.
+
 ---
 
 ## Сводка по этапам

@@ -2,14 +2,14 @@ import SwiftData
 import SwiftUI
 
 enum OnboardingStep: Int, CaseIterable, Identifiable {
-    case welcome, disclaimer, aboutYou, psoriasisProfile, joints, skinNow, goals, insight, bodyMap, treatments, notifications, privacy, plan
+    case welcome, disclaimer, aboutYou, psoriasisProfile, joints, skinNow, goals, insight, bodyMap, treatments, firstCheckIn, notifications, privacy, plan
 
     var id: Int { rawValue }
 
     /// Optional steps show a "Skip" button. The disclaimer can never be skipped.
     var isOptional: Bool {
         switch self {
-        case .aboutYou, .psoriasisProfile, .joints, .skinNow, .goals, .bodyMap, .treatments, .notifications, .privacy: true
+        case .aboutYou, .psoriasisProfile, .joints, .skinNow, .goals, .bodyMap, .treatments, .firstCheckIn, .notifications, .privacy: true
         default: false
         }
     }
@@ -27,6 +27,7 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
         case .insight: "O8 · Insight"
         case .bodyMap: "O9 · Body map"
         case .treatments: "O10 · Treatments"
+        case .firstCheckIn: "O10b · First check-in"
         case .notifications: "O11 · Notifications"
         case .privacy: "O12 · Privacy"
         case .plan: "O13 · Plan ready"
@@ -87,6 +88,7 @@ struct OnboardingFlow: View {
         case .insight: DelayInsightStep(next: advance)
         case .bodyMap: FirstBodyMapStep(next: advance)
         case .treatments: TreatmentsStep(next: advance)
+        case .firstCheckIn: FirstCheckInStep(next: advance)
         case .notifications: NotificationsStep(next: advance)
         case .privacy: PrivacyStep(next: advance)
         case .plan: PlanReadyStep(next: advance)
