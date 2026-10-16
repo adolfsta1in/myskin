@@ -113,6 +113,8 @@ enum DataReset {
         try context.save()
 
         try photoStore?.deleteAllFiles()
+        // A diary once set aside by the recovery screen.
+        try? FileManager.default.removeItem(at: AppModelContainer.setAsideDirectoryURL)
         ExportFolder.clear()
         settings.resetAll()
     }

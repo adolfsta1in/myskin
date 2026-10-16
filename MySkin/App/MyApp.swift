@@ -6,18 +6,15 @@ import UserNotifications
     @State private var settings: AppSettings
     @State private var lock: AppLock
     @State private var weather = WeatherModel()
-    private let modelContainer: ModelContainer
+    /// nil if the store couldn't be opened. Never fall back to an empty store: the user would
+    /// think their diary is gone. `StoreRecoveryView` offers retry, a copy, or a new diary.
+    @State private var modelContainer: ModelContainer?
 
     init() {
         let settings = AppSettings()
         _settings = State(initialValue: settings)
         _lock = State(initialValue: AppLock(settings: settings))
-        do {
-            modelContainer = try AppModelContainer.makePersistent()
-        } catch {
-            // Never fall back to an empty store: the user would think their diary is gone.
-            fatalError("Could not open the data store: \(error)")
-        }
+        _modelContainer = State(initialValue: Self.openStore())
         UNUserNotificationCenter.current().delegate = NotificationPresenter.shared
         // Shared files (PDF, CSV) from the last session.
         ExportFolder.clear()
@@ -25,11 +22,27 @@ import UserNotifications
 
     var body: some Scene {
         WindowGroup {
-            RootView()
-                .environment(settings)
-                .environment(lock)
-                .environment(weather)
+            if let modelContainer {
+                RootView()
+                    .environment(settings)
+                    .environment(lock)
+                    .environment(weather)
+                    .modelContainer(modelContainer)
+            } else {
+                StoreRecoveryView {
+                    modelContainer = Self.openStore()
+                    return modelContainer != nil
+                }
+            }
         }
-        .modelContainer(modelContainer)
+    }
+
+    private static func openStore() -> ModelContainer? {
+        do {
+            return try AppModelContainer.makePersistent()
+        } catch {
+            print("Could not open the data store: \(error)")
+            return nil
+        }
     }
 }
