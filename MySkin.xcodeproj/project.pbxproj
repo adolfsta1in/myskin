@@ -100,7 +100,6 @@
 			);
 			fileSystemSynchronizedGroups = (
 				000000000000000000000010 /* MySkin */,
-				FAA81BE4306E355300890859 /* docs */,
 			);
 			name = MySkin;
 			productName = MyApp;
