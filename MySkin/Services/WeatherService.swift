@@ -106,8 +106,13 @@ final class WeatherModel {
     }
 
     /// Name isn't required: on any failure the card just shows no place.
+    /// Like the weather request, the geocoder only gets coordinates rounded to about 1 km.
     private static func placeName(for location: CLLocation) async -> String? {
-        guard let request = MKReverseGeocodingRequest(location: location),
+        let coarse = CLLocation(
+            latitude: WeatherInfo.rounded(location.coordinate.latitude),
+            longitude: WeatherInfo.rounded(location.coordinate.longitude)
+        )
+        guard let request = MKReverseGeocodingRequest(location: coarse),
               let item = try? await request.mapItems.first else { return nil }
         return item.addressRepresentations?.cityName ?? item.name
     }
