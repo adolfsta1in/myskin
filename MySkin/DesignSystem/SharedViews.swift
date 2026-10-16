@@ -17,8 +17,7 @@ struct BodySilhouette: View {
     /// and are clipped to the body outline, so they can run past it.
     private static let borders: [(CGPoint, CGPoint)] = {
         var lines: [(CGPoint, CGPoint)] = [
-            (CGPoint(x: 70, y: 50), CGPoint(x: 130, y: 50)),    // head | neck
-            (CGPoint(x: 60, y: 76), CGPoint(x: 140, y: 76)),    // neck | chest
+            // No lines on the neck: it's a quick zone, too small to tap here.
             (CGPoint(x: 61, y: 150), CGPoint(x: 139, y: 150)),  // chest | abdomen
             (CGPoint(x: 50, y: 212), CGPoint(x: 150, y: 212)),  // abdomen | hips
             (CGPoint(x: 48, y: 250), CGPoint(x: 152, y: 250)),  // hips | thighs

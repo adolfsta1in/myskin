@@ -53,12 +53,28 @@ struct ZoneAssessmentDraftTests {
         #expect(ZoneAssessmentDraft.latest(zoneID: "quick.scalp", in: records)?.erythema == 1)
     }
 
+    @Test func ratingTheFaceReplacesTheOldQuickFaceRecordOfThatDay() throws {
+        let context = try makeContext()
+        context.insert(ZoneAssessment(day: .now, zoneID: "quick.face", palms: 1, erythema: 2))
+        try context.save()
+        // The old quick «Face» rating shows as the face on the map.
+        #expect(ZoneAssessmentDraft.latest(zoneID: "front.head", in: try all(context))?.erythema == 2)
+        #expect(try all(context).first?.score.zoneID == "front.head")
+
+        var draft = ZoneAssessmentDraft()
+        draft.erythema = 1
+        try draft.save(zoneID: "front.head", day: .now, in: context)
+        let records = try all(context)
+        #expect(records.map(\.zoneID) == ["front.head"])
+        #expect(records.first?.erythema == 1)
+    }
+
     @Test func clearedZoneIsStoredAsClear() throws {
         let context = try makeContext()
         var draft = ZoneAssessmentDraft()
         draft.palms = 1
-        try draft.save(zoneID: "quick.palms", day: .now, in: context)
-        try ZoneAssessmentDraft().save(zoneID: "quick.palms", day: .now, in: context)
+        try draft.save(zoneID: "quick.nails", day: .now, in: context)
+        try ZoneAssessmentDraft().save(zoneID: "quick.nails", day: .now, in: context)
 
         let stored = try #require(try all(context).first)
         #expect(!stored.score.isAffected)

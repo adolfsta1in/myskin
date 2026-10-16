@@ -119,7 +119,7 @@ struct TreatmentView: View {
 private struct TreatmentCard: View {
     let treatment: Treatment
 
-    private var zoneNames: [String] { treatment.zoneIDs.compactMap { BodyZone.zone(id: $0)?.name } }
+    private var zoneNames: [String] { treatment.zoneIDs.compactMap { BodyZone.named(id: $0)?.name } }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {

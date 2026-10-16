@@ -20,7 +20,8 @@ struct ZoneScore: Hashable, Sendable {
 
 extension ZoneAssessment {
     var score: ZoneScore {
-        ZoneScore(zoneID: zoneID, palms: palms, erythema: erythema, induration: induration, scale: scale, pustules: pustules)
+        // Ratings of retired zones (old neck, quick «Face») count for the zone that replaced them.
+        ZoneScore(zoneID: BodyZone.canonicalID(zoneID), palms: palms, erythema: erythema, induration: induration, scale: scale, pustules: pustules)
     }
 }
 
@@ -80,11 +81,11 @@ enum SeverityCalculator {
         }
     }
 
-    /// Total area of a region on the silhouette. Quick zones (scalp, palms, folds…)
-    /// lie inside silhouette zones, so they are not added — the sum caps overlaps,
-    /// e.g. `front.head` («Face») together with `quick.face`.
+    /// Total area of a region on the map. Quick zones (scalp, nails, folds…) lie inside
+    /// silhouette zones, so they are not added — the sum caps overlaps. The neck isn't drawn
+    /// on the silhouette (`isStandalone`), so it is added.
     static let regionArea: [BodyRegion: Double] = {
-        let quickIDs = Set(BodyZone.quickZones.map(\.id))
+        let quickIDs = Set(BodyZone.quickZones.filter { !$0.isStandalone }.map(\.id))
         return BodyZone.all
             .filter { !quickIDs.contains($0.id) }
             .reduce(into: [:]) { $0[$1.region, default: 0] += $1.area }

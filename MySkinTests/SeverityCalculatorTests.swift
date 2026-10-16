@@ -40,8 +40,8 @@ struct SeverityCalculatorTests {
     }
 
     @Test func overlappingQuickZonesAreCappedByRegion() {
-        // `front.head` («Face») and `quick.face` overlap; head region is 11 % in total.
-        let headIDs = ["front.head", "back.head", "front.neck", "back.neck", "quick.face", "quick.scalp"]
+        // `quick.scalp` lies inside the head zones; the neck is added (not on the silhouette). Head region is 11 % in total.
+        let headIDs = ["front.head", "back.head", "quick.neck", "quick.scalp"]
         let scores = headIDs.compactMap(BodyZone.zone(id:)).map { ZoneScore(zoneID: $0.id, palms: $0.area, erythema: 1) }
         let snapshot = SeverityCalculator.snapshot(for: scores)
         #expect(isClose(snapshot.bsa, 11))
@@ -125,7 +125,7 @@ struct SeverityCalculatorTests {
     @Test func specialSiteDoesNotLowerSevere() {
         // 12 % of the body: severe by area alone.
         let scores = ["front.torso.upper", "front.torso.lower", "back.torso.upper", "back.torso.lower"].map { ZoneScore(zoneID: $0, palms: 3, erythema: 1) }
-            + [ZoneScore(zoneID: "quick.palms", palms: 1, erythema: 1)]
+            + [ZoneScore(zoneID: "front.hand.left", palms: 1, erythema: 1)]
         let snapshot = SeverityCalculator.snapshot(for: scores)
         #expect(snapshot.category == .severe)
         #expect(snapshot.isElevated)

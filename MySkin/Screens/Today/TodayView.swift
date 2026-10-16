@@ -1127,7 +1127,7 @@ private struct RemindersCard: View {
 
     private func detail(_ row: DoseRow) -> String {
         var parts = [row.scheduledAt.formatted(date: .omitted, time: .shortened)]
-        let zones = row.treatment.zoneIDs.compactMap { BodyZone.zone(id: $0)?.name }
+        let zones = row.treatment.zoneIDs.compactMap { BodyZone.named(id: $0)?.name }
         if !zones.isEmpty { parts.append(zones.formatted(.list(type: .and))) }
         if let ftu = row.treatment.fingertipUnits {
             parts.append("\(ftu.formatted(.number.precision(.fractionLength(0...1)))) FTU")

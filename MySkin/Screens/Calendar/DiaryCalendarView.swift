@@ -432,7 +432,7 @@ private struct DayDetail: View {
             label("Body map")
             ForEach(assessments.sorted { $0.zoneID < $1.zoneID }) { assessment in
                 let level = SeverityCalculator.level(for: assessment.score)
-                row(BodyZone.zone(id: assessment.zoneID)?.name ?? assessment.zoneID, IntensityLegend.label(for: level))
+                row(BodyZone.named(id: assessment.zoneID)?.name ?? assessment.zoneID, IntensityLegend.label(for: level))
             }
         }
     }
@@ -457,7 +457,7 @@ private struct DayDetail: View {
                         StoredPhotoImage(fileName: photo.fileName, maxPixelSize: 300, cornerRadius: 14)
                             .aspectRatio(1, contentMode: .fit)
                             .overlay(alignment: .bottomLeading) {
-                                Text(BodyZone.zone(id: photo.zoneID)?.name ?? "")
+                                Text(BodyZone.named(id: photo.zoneID)?.name ?? "")
                                     .font(.rounded(.caption2, weight: .semibold))
                                     .foregroundStyle(.white)
                                     .padding(6)

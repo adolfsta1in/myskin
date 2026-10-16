@@ -35,6 +35,11 @@ struct ZoneAssessmentDraft: Equatable {
     func save(zoneID: String, day: Date, in context: ModelContext, calendar: Calendar = .current) throws {
         let start = calendar.startOfDay(for: day)
         let descriptor = FetchDescriptor<ZoneAssessment>(predicate: #Predicate { $0.day == start && $0.zoneID == zoneID })
+        // A retired id rated the same day (old «Face» or neck) would compete with this record.
+        let sameDay = try context.fetch(FetchDescriptor<ZoneAssessment>(predicate: #Predicate { $0.day == start }))
+        for record in sameDay where record.zoneID != zoneID && BodyZone.canonicalID(record.zoneID) == zoneID {
+            context.delete(record)
+        }
         if let existing = try context.fetch(descriptor).first {
             existing.palms = palms
             existing.erythema = erythema
@@ -51,9 +56,9 @@ struct ZoneAssessmentDraft: Equatable {
         try context.save()
     }
 
-    /// Latest stored state of a zone, if it was ever assessed.
+    /// Latest stored state of a zone, if it was ever assessed (including under a retired id it replaced).
     static func latest(zoneID: String, in assessments: [ZoneAssessment]) -> ZoneAssessment? {
-        assessments.filter { $0.zoneID == zoneID }.max { $0.day < $1.day }
+        assessments.filter { BodyZone.canonicalID($0.zoneID) == zoneID }.max { $0.day < $1.day }
     }
 }
 

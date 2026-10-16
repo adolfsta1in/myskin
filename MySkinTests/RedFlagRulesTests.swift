@@ -33,7 +33,7 @@ struct RedFlagRulesTests {
 
     @Test func palmAndSolePustulesWithFeverAreNotAFlag() {
         let zones = [
-            ZoneScore(zoneID: "quick.palms", palms: 1, pustules: true),
+            ZoneScore(zoneID: "front.hand.right", palms: 1, pustules: true),
             ZoneScore(zoneID: "quick.soles", palms: 1, pustules: true),
         ]
         #expect(RedFlagRules.flags(zones: zones, symptoms: RedFlagSymptoms(fever: true)).isEmpty)

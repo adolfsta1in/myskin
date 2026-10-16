@@ -195,7 +195,7 @@ struct ReportPaper: View {
                                 photo(pair.now)
                             }
                             .frame(height: 56)
-                            Text(BodyZone.zone(id: pair.zoneID)?.name ?? "")
+                            Text(BodyZone.named(id: pair.zoneID)?.name ?? "")
                                 .font(.rounded(.caption2))
                                 .foregroundStyle(Theme.inkSoft)
                         }
@@ -258,7 +258,7 @@ struct ReportPaper: View {
             if let now = report.severityNow {
                 line("Self-estimated category: \(now.category.title)\(now.isElevated ? " · raised by special sites or joint symptoms" : "")")
                 if !now.specialSiteIDs.isEmpty {
-                    line("Special sites: \(now.specialSiteIDs.compactMap { BodyZone.zone(id: $0)?.name }.formatted(.list(type: .and)))")
+                    line("Special sites: \(now.specialSiteIDs.compactMap { BodyZone.named(id: $0)?.name }.formatted(.list(type: .and)))")
                 }
             } else {
                 line("No body map assessments yet.")

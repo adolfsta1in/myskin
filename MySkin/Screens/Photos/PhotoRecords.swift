@@ -45,9 +45,9 @@ enum PhotoRecords {
 
     /// Zones that have photos, newest photo first. `photos` must be sorted newest first.
     /// Zone a photo is filed under. «Face» on the silhouette (`front.head`) and the special
-    /// «Face» area are the same place, so face photos all go to `quick.face`.
+    /// «Face» area are the same place, so face photos all go to `quick.face` (off the map since, but still the face folder).
     static func photoZone(for zone: BodyZone) -> BodyZone {
-        zone.id == "front.head" ? BodyZone.zone(id: "quick.face") ?? zone : zone
+        zone.id == "front.head" ? BodyZone.named(id: "quick.face") ?? zone : zone
     }
 
     static func zonesWithPhotos(_ photos: [Photo]) -> [(zoneID: String, latest: Photo, count: Int)] {

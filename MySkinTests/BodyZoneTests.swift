@@ -16,12 +16,35 @@ struct BodyZoneTests {
         #expect(Set(BodyZone.all.map(\.region)) == Set(BodyRegion.allCases))
     }
 
-    @Test func quickZonesAreTheSevenSpecialSites() {
+    @Test func quickZones() {
         #expect(BodyZone.quickZones.map(\.id) == [
-            "quick.scalp", "quick.face", "quick.nails", "quick.palms",
+            "quick.scalp", "quick.neck", "quick.nails",
             "quick.soles", "quick.folds", "quick.genitals",
         ])
-        #expect(BodyZone.quickZones.allSatisfy { $0.isSpecialSite })
+        // All special sites except the neck, which is here only because it's hard to tap.
+        #expect(BodyZone.quickZones.filter { !$0.isSpecialSite }.map(\.id) == ["quick.neck"])
+    }
+
+    @Test func faceAndPalmsAreOnTheSilhouetteOnly() {
+        #expect(BodyZone.zone(id: "quick.face") == nil)
+        #expect(BodyZone.zone(id: "quick.palms") == nil)
+        #expect(BodyZone.zone(id: "front.neck") == nil)
+        #expect(BodyZone.zone(id: "front.head")?.name == "Face")
+        #expect(BodyZone.zone(id: "front.hand.left")?.name == "Left palm")
+        #expect(BodyZone.zone(id: "front.hand.left")?.isSpecialSite == true)
+        #expect(BodyZone.zone(id: "back.hand.left")?.name == "Left hand")
+        #expect(BodyZone.zone(id: "back.hand.left")?.isSpecialSite == false)
+    }
+
+    @Test func retiredZonesKeepNamesAndMoveToTheirReplacement() {
+        #expect(BodyZone.named(id: "quick.face")?.name == "Face")
+        #expect(BodyZone.named(id: "quick.palms")?.name == "Palms")
+        #expect(BodyZone.canonicalID("quick.face") == "front.head")
+        #expect(BodyZone.canonicalID("front.neck") == "quick.neck")
+        #expect(BodyZone.canonicalID("back.neck") == "quick.neck")
+        #expect(BodyZone.canonicalID("front.elbow.left") == "front.elbow.left")
+        let retiredIDs = Set(BodyZone.retired.map(\.id))
+        #expect(BodyZone.all.allSatisfy { !retiredIDs.contains($0.id) })
     }
 
     @Test func silhouetteZonesKeepStableIDs() {

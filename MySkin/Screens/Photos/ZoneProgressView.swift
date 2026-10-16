@@ -20,7 +20,7 @@ struct ZoneProgressView: View {
         _photos = Query(filter: #Predicate<Photo> { $0.zoneID == zoneID }, sort: \Photo.createdAt)
     }
 
-    private var zoneName: String { BodyZone.zone(id: zoneID)?.name ?? "Area" }
+    private var zoneName: String { BodyZone.named(id: zoneID)?.name ?? "Area" }
 
     /// Treatments applied to this zone, by start date.
     private var markers: [(date: Date, title: String)] {

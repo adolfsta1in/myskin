@@ -35,7 +35,7 @@ enum DataExport {
                 name: "zone-assessments",
                 header: ["date", "zone_id", "zone", "palms", "redness", "thickness", "scaling", "pustules"],
                 rows: zones.map {
-                    [CSV.day($0.day), $0.zoneID, BodyZone.zone(id: $0.zoneID)?.name ?? "", CSV.number($0.palms),
+                    [CSV.day($0.day), $0.zoneID, BodyZone.named(id: $0.zoneID)?.name ?? "", CSV.number($0.palms),
                      "\($0.erythema)", "\($0.induration)", "\($0.scale)", $0.pustules ? "yes" : "no"]
                 }
             ),

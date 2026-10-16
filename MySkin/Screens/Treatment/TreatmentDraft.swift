@@ -51,7 +51,9 @@ struct TreatmentDraft: Hashable {
         weekday = treatment.weekday
         doseMinutes = DoseScheduler.minutes(for: treatment.doseSchedule)
         fingertipUnits = treatment.fingertipUnits
-        zoneIDs = treatment.zoneIDs
+        // Retired ids (old «Face», neck) show as the zones that replaced them.
+        var seen = Set<String>()
+        zoneIDs = treatment.zoneIDs.map(BodyZone.canonicalID).filter { seen.insert($0).inserted }
         startDate = treatment.startDate
         notes = treatment.notes
     }
@@ -84,7 +86,7 @@ struct TreatmentDraft: Hashable {
     /// Strong steroid (class I–II) on the face, skin folds or genitals: worth checking with the doctor (spec §2.4).
     var sensitiveAreaWarning: String? {
         guard isTopical, let steroidClass, steroidClass.number <= 2 else { return nil }
-        let sensitive = zoneIDs.filter(Self.sensitiveZoneIDs.contains).compactMap { BodyZone.zone(id: $0)?.name }
+        let sensitive = zoneIDs.filter(Self.sensitiveZoneIDs.contains).compactMap { BodyZone.named(id: $0)?.name }
         guard !sensitive.isEmpty else { return nil }
         return "Strong steroids on \(sensitive.formatted(.list(type: .and))) can thin the skin. Check with your doctor that this is intended."
     }
@@ -92,7 +94,8 @@ struct TreatmentDraft: Hashable {
     static let sensitiveZoneIDs: Set<String> = ["front.head", "quick.face", "quick.folds", "quick.genitals"]
 
     mutating func toggleZone(_ id: String) {
-        var ids = Set(zoneIDs)
+        // Retired ids (old «Face», neck) become the zones that replaced them.
+        var ids = Set(zoneIDs.map(BodyZone.canonicalID))
         if ids.contains(id) { ids.remove(id) } else { ids.insert(id) }
         zoneIDs = BodyZone.all.map(\.id).filter(ids.contains)
     }

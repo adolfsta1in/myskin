@@ -87,7 +87,7 @@ struct TreatmentDraftTests {
         var draft = TreatmentDraft(medication: clobetasol)
         draft.toggleZone("back.elbow.left")
         #expect(draft.sensitiveAreaWarning == nil)
-        draft.toggleZone("quick.face")
+        draft.toggleZone("front.head")
         #expect(draft.sensitiveAreaWarning?.contains("Face") == true)
         draft.steroidClass = .class6
         #expect(draft.sensitiveAreaWarning == nil)
