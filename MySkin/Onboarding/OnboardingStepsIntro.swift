@@ -204,7 +204,7 @@ struct PsoriasisProfileStep: View {
 
 // MARK: - O5 Joints
 
-/// Psoriatic arthritis. People who already know answer here; the others get the PEST card on Today.
+/// Psoriatic arthritis. People who already know answer here; the others get the joint check card on Today.
 struct JointsStep: View {
     @Environment(OnboardingDraft.self) private var draft
     let next: () -> Void
@@ -222,7 +222,7 @@ struct JointsStep: View {
         OnboardingPage(
             title: "Do you have psoriatic arthritis?",
             subtitle: "Joint pain, swelling or morning stiffness can be part of psoriasis.",
-            why: "If you're not sure, the app will offer a short joint questionnaire (PEST) after setup."
+            why: "If you're not sure, the app will offer a short joint check after setup."
         ) {
             VStack(spacing: 12) {
                 ForEach(ArthritisStatus.allCases) { status in

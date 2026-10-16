@@ -164,7 +164,7 @@ struct ResultCard: View {
     }
 }
 
-#Preview("DLQI") {
-    QuestionnaireView(kind: .dlqi)
+#Preview("Skin impact") {
+    QuestionnaireView(kind: .skinImpact)
         .previewSetup()
 }

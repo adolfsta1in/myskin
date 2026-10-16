@@ -9,26 +9,28 @@ struct QuestionOption: Hashable, Sendable {
 }
 
 struct Question: Identifiable, Hashable, Sendable {
-    /// 1-based number, as in the original questionnaire.
+    /// 1-based number.
     let id: Int
     let text: String
     let options: [QuestionOption]
 }
 
-/// Stored answers are option indices in question order (`QuestionnaireResult.answers`),
-/// so "Not relevant" stays distinguishable from "Not at all" even though both score 0.
+/// MySkin's own questionnaires (not validated clinical scores). Stored answers are option indices
+/// in question order (`QuestionnaireResult.answers`).
+/// Retired kinds (`dlqi`, `pest`) have no questions: they can't be taken again, only shown.
 enum Questionnaires {
     static func questions(for kind: QuestionnaireKind) -> [Question] {
         switch kind {
-        case .dlqi: DLQI.questions
-        case .pest: PEST.questions
+        case .skinImpact: SkinImpact.questions
+        case .jointCheck: JointCheck.questions
+        case .dlqi, .pest: []
         }
     }
 
     /// Total score, or nil if the answers are incomplete or out of range.
     static func score(_ kind: QuestionnaireKind, answers: [Int]) -> Int? {
         let questions = questions(for: kind)
-        guard answers.count == questions.count else { return nil }
+        guard !questions.isEmpty, answers.count == questions.count else { return nil }
         var total = 0
         for (question, answer) in zip(questions, answers) {
             guard question.options.indices.contains(answer) else { return nil }
@@ -36,109 +38,126 @@ enum Questionnaires {
         }
         return total
     }
+
+    /// Joint symptoms noted in the latest joint questionnaire (new or retired), if any was taken by `date`.
+    static func jointSymptomsNoted(
+        results: [(kind: QuestionnaireKind, date: Date, score: Int)],
+        by date: Date = .distantFuture
+    ) -> Bool {
+        let latest = results
+            .filter { ($0.kind == .jointCheck || $0.kind == .pest) && $0.date <= date }
+            .max { $0.date < $1.date }
+        return latest.map { needsAttention($0.kind, score: $0.score) } ?? false
+    }
 }
 
-// MARK: - DLQI
+// MARK: - Skin impact
 
-/// Dermatology Life Quality Index: 10 questions about the last week, 0–30.
-enum DLQI {
-    private static let veryMuch = QuestionOption(title: "Very much", score: 3)
-    private static let aLot = QuestionOption(title: "A lot", score: 2)
-    private static let aLittle = QuestionOption(title: "A little", score: 1)
-    private static let notAtAll = QuestionOption(title: "Not at all", score: 0)
-    private static let notRelevant = QuestionOption(title: "Not relevant", score: 0)
-
-    private static let basic = [veryMuch, aLot, aLittle, notAtAll]
-    private static let withNotRelevant = basic + [notRelevant]
-
-    static let questions: [Question] = [
-        Question(id: 1, text: "Over the last week, how itchy, sore, painful or stinging has your skin been?", options: basic),
-        Question(id: 2, text: "Over the last week, how embarrassed or self-conscious have you been because of your skin?", options: basic),
-        Question(id: 3, text: "Over the last week, how much has your skin interfered with you going shopping or looking after your home or garden?", options: withNotRelevant),
-        Question(id: 4, text: "Over the last week, how much has your skin influenced the clothes you wear?", options: withNotRelevant),
-        Question(id: 5, text: "Over the last week, how much has your skin affected any social or leisure activities?", options: withNotRelevant),
-        Question(id: 6, text: "Over the last week, how much has your skin made it difficult for you to do any sport?", options: withNotRelevant),
-        // Question 7 merges "Has your skin prevented you from working or studying?" (Yes = 3)
-        // with the follow-up "If no, how much has it been a problem at work or studying?".
-        Question(id: 7, text: "Over the last week, has your skin prevented you from working or studying? If not, how much has it been a problem at work or studying?", options: [
-            QuestionOption(title: "Yes, it prevented me", score: 3),
-            QuestionOption(title: "No, but a lot of a problem", score: 2),
-            QuestionOption(title: "No, but a little problem", score: 1),
-            QuestionOption(title: "Not at all", score: 0),
-            notRelevant,
-        ]),
-        Question(id: 8, text: "Over the last week, how much has your skin created problems with your partner or any of your close friends or relatives?", options: withNotRelevant),
-        Question(id: 9, text: "Over the last week, how much has your skin caused any sexual difficulties?", options: withNotRelevant),
-        Question(id: 10, text: "Over the last week, how much of a problem has the treatment for your skin been, for example by making your home messy, or by taking up time?", options: withNotRelevant),
+/// How much psoriasis got in the way of the last 7 days: 6 questions, 0–3 each, 0–18.
+/// Levels are plain words, not clinical bands.
+enum SkinImpact {
+    private static let scale = [
+        QuestionOption(title: "Not at all", score: 0),
+        QuestionOption(title: "A little", score: 1),
+        QuestionOption(title: "Quite a bit", score: 2),
+        QuestionOption(title: "A lot", score: 3),
     ]
 
-    static let maxScore = 30
+    static let questions: [Question] = [
+        Question(id: 1, text: "In the past 7 days, how much did your skin get in the way of your sleep?", options: scale),
+        Question(id: 2, text: "In the past 7 days, how much did your skin affect your mood — feeling low, irritable or worried?", options: scale),
+        Question(id: 3, text: "In the past 7 days, how much did your skin get in the way of work, study or everyday tasks?", options: scale),
+        Question(id: 4, text: "In the past 7 days, how much did your skin hold you back from seeing people or going out?", options: scale),
+        Question(id: 5, text: "In the past 7 days, how much did your skin affect what you chose to wear?", options: scale),
+        Question(id: 6, text: "In the past 7 days, how much of a burden was looking after your skin — time, mess or routine?", options: scale),
+    ]
 
-    /// Effect on quality of life, by the standard DLQI score bands.
-    enum Band: Sendable {
-        case none, small, moderate, veryLarge, extremelyLarge
+    static let maxScore = 18
+    /// From this score on, the result suggests talking to the doctor.
+    static let attentionThreshold = 10
+
+    enum Level: Sendable {
+        case none, small, moderate, large
 
         var title: String {
             switch self {
-            case .none: "No effect on your life"
-            case .small: "Small effect"
-            case .moderate: "Moderate effect"
-            case .veryLarge: "Very large effect"
-            case .extremelyLarge: "Extremely large effect"
+            case .none: "No impact this week"
+            case .small: "Small impact"
+            case .moderate: "Moderate impact"
+            case .large: "Large impact"
             }
         }
     }
 
-    static func band(for score: Int) -> Band {
+    static func level(for score: Int) -> Level {
         switch score {
-        case ...1: .none
-        case 2...5: .small
-        case 6...10: .moderate
-        case 11...20: .veryLarge
-        default: .extremelyLarge
+        case ...0: .none
+        case 1...4: .small
+        case 5..<attentionThreshold: .moderate
+        default: .large
         }
     }
 
-    /// 0–1 is the treatment goal (research §6).
-    static func isAtGoal(_ score: Int) -> Bool { score <= 1 }
-
-    /// Above 10 counts in the «rule of tens».
-    static func isVeryLargeEffect(_ score: Int) -> Bool { score > 10 }
+    static func needsAttention(_ score: Int) -> Bool { score >= attentionThreshold }
 
     static func interpretation(for score: Int) -> String {
-        if isVeryLargeEffect(score) {
-            return "\(band(for: score).title). Your skin is strongly affecting daily life — discuss with your doctor whether your treatment plan is right for you."
+        switch level(for: score) {
+        case .none: "Your skin didn't get in the way of your week."
+        case .small, .moderate: "Your skin affected part of your week. You can mention it at your next visit."
+        case .large: "Your skin affected a lot of your week. It's worth discussing with your doctor — show them these answers."
         }
-        if isAtGoal(score) {
-            return "\(band(for: score).title). This is the usual treatment goal."
-        }
-        return "\(band(for: score).title). Consider discussing it with your doctor at your next visit."
     }
 }
 
-// MARK: - PEST
+// MARK: - Joint check
 
-/// Psoriasis Epidemiology Screening Tool: 5 yes/no questions about joints, 0–5.
-enum PEST {
+/// Joint symptoms: 6 yes/no questions, 0–6. A reason to talk to a doctor, not a diagnosis.
+enum JointCheck {
     private static let yesNo = [QuestionOption(title: "Yes", score: 1), QuestionOption(title: "No", score: 0)]
 
     static let questions: [Question] = [
-        Question(id: 1, text: "Have you ever had a swollen joint (or joints)?", options: yesNo),
-        Question(id: 2, text: "Has a doctor ever told you that you have arthritis?", options: yesNo),
-        Question(id: 3, text: "Do your fingernails or toenails have holes or pits?", options: yesNo),
-        Question(id: 4, text: "Have you had pain in your heel?", options: yesNo),
-        Question(id: 5, text: "Have you had a finger or toe that was completely swollen and painful for no apparent reason?", options: yesNo),
+        Question(id: 1, text: "In the past month, has any joint been painful for more than a few days?", options: yesNo),
+        Question(id: 2, text: "In the past month, has any joint looked or felt swollen?", options: yesNo),
+        Question(id: 3, text: "Do your joints feel stiff for more than 30 minutes after you get up?", options: yesNo),
+        Question(id: 4, text: "In the past month, have you had pain at the back of your heel or under your foot?", options: yesNo),
+        Question(id: 5, text: "In the past month, has a whole finger or toe been swollen and sore?", options: yesNo),
+        Question(id: 6, text: "Do you have back pain that wakes you at night and eases when you move?", options: yesNo),
     ]
 
-    static let maxScore = 5
-    /// A score of 3 or more suggests a rheumatology referral.
-    static let referralThreshold = 3
+    static let maxScore = 6
+    /// From this many «yes» answers on, the result suggests discussing joints with a doctor.
+    static let attentionThreshold = 2
 
-    static func suggestsRheumatologist(_ score: Int) -> Bool { score >= referralThreshold }
+    static func needsAttention(_ score: Int) -> Bool { score >= attentionThreshold }
+
+    static func headline(for score: Int) -> String {
+        switch score {
+        case ...0: "No joint symptoms noted"
+        case ..<attentionThreshold: "One joint symptom noted"
+        default: "Discuss your joints with a doctor"
+        }
+    }
 
     static func interpretation(for score: Int) -> String {
-        suggestsRheumatologist(score)
-            ? "Your answers suggest that a rheumatologist should check your joints. Discuss a referral with your doctor."
-            : "Your answers do not point to joint problems right now. Tell your doctor if joint pain, swelling or stiffness appears."
+        switch score {
+        case ...0: "Tell your doctor if joint pain, swelling or stiffness appears."
+        case ..<attentionThreshold: "Keep an eye on it and mention it at your next visit."
+        default: "You noted symptoms in your joints. Show these answers to your doctor or a rheumatologist — psoriasis can affect joints, and it's worth checking early."
+        }
     }
+}
+
+// MARK: - Retired questionnaires
+
+/// Results of the licensed questionnaires the app used before (DLQI 0–30, PEST 0–5).
+/// Only their scores remain, for history and the arthritis mark.
+enum RetiredQuestionnaire {
+    static func maxScore(_ kind: QuestionnaireKind) -> Int { kind == .pest ? 5 : 30 }
+
+    /// The thresholds those questionnaires were used with.
+    static func needsAttention(_ kind: QuestionnaireKind, score: Int) -> Bool {
+        kind == .pest ? score >= 3 : score > 10
+    }
+
+    static let interpretation = "From an earlier version of this questionnaire. Take the new one to keep tracking."
 }

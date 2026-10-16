@@ -163,8 +163,8 @@ struct ItchMiniChart: View {
 enum ScoreScale {
     /// Affected body surface, %.
     case bsa
-    /// DLQI 0–30.
-    case dlqi
+    /// Skin impact questionnaire 0–18.
+    case skinImpact
     /// Itch 0–10.
     case itch
 
@@ -181,10 +181,10 @@ enum ScoreScale {
             Band(range: 3...10, label: "Moderate", color: Theme.intensityMild),
             Band(range: 10...100, label: "Severe", color: Theme.intensityModerate),
         ]
-        case .dlqi: [
-            Band(range: 0...1, label: "No effect", color: Theme.intensityCalm),
-            Band(range: 1...10, label: "Small–moderate", color: Theme.intensityMild),
-            Band(range: 10...30, label: "Very large", color: Theme.intensityModerate),
+        case .skinImpact: [
+            Band(range: 0...4, label: "Small", color: Theme.intensityCalm),
+            Band(range: 4...10, label: "Moderate", color: Theme.intensityMild),
+            Band(range: 10...18, label: "Large", color: Theme.intensityModerate),
         ]
         case .itch: [
             Band(range: 0...3, label: "Low", color: Theme.intensityCalm),
@@ -194,11 +194,11 @@ enum ScoreScale {
         }
     }
 
-    /// Y range: fixed for DLQI and itch, BSA grows with the data (at least 0–15 %).
+    /// Y range: fixed for skin impact and itch, BSA grows with the data (at least 0–15 %).
     func domain(for data: [DayValue]) -> ClosedRange<Double> {
         switch self {
         case .bsa: 0...max(15, ((data.map(\.value).max() ?? 0) * 1.2).rounded(.up))
-        case .dlqi: 0...30
+        case .skinImpact: 0...Double(SkinImpact.maxScore)
         case .itch: 0...10
         }
     }
@@ -206,7 +206,7 @@ enum ScoreScale {
     func axisValues(for domain: ClosedRange<Double>) -> [Double] {
         switch self {
         case .bsa: [0, 3, 10, domain.upperBound]
-        case .dlqi: [0, 10, 20, 30]
+        case .skinImpact: [0, 6, 12, 18]
         case .itch: [0, 5, 10]
         }
     }
@@ -215,7 +215,7 @@ enum ScoreScale {
     func intensity(_ value: Double) -> Double {
         switch self {
         case .bsa: min(value, 20) / 2
-        case .dlqi: value / 3
+        case .skinImpact: value / 1.8
         case .itch: value
         }
     }

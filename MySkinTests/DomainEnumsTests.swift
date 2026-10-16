@@ -46,7 +46,7 @@ struct DomainEnumsTests {
     }
 
     @Test func questionnaireKindRawValues() {
-        #expect(QuestionnaireKind.allCases.map(\.rawValue) == ["dlqi", "pest"])
+        #expect(QuestionnaireKind.allCases.map(\.rawValue) == ["dlqi", "pest", "skinImpact", "jointCheck"])
     }
 
     @Test func doseStatusRawValues() {

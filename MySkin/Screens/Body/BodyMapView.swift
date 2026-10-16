@@ -10,14 +10,12 @@ struct BodyMapView: View {
     @State private var editingZone: BodyZone?
     @State private var tapCount = 0
 
-    /// Latest DLQI and PEST feed the rule of tens and the «elevated» mark.
+    /// The latest joint check feeds the «elevated» mark.
     private var summary: BodyMapSummary {
-        let dlqi = questionnaires.first { $0.kind == .dlqi }?.score
-        let pest = questionnaires.first { $0.kind == .pest }?.score
+        let joints = Questionnaires.jointSymptomsNoted(results: questionnaires.map(\.trendPoint))
         return BodyMapSummary.make(
             zones: assessments.map(\.datedScore),
-            dlqi: dlqi,
-            arthritisSuspected: ArthritisRules.isSuspected(status: profiles.first?.arthritisStatus, pestScore: pest)
+            arthritisSuspected: ArthritisRules.isSuspected(status: profiles.first?.arthritisStatus, jointSymptomsNoted: joints)
         )
     }
 

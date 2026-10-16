@@ -65,7 +65,8 @@ enum SeverityCalculator {
     enum Threshold {
         /// BSA below this is mild (AAD).
         static let mildBSA = 3.0
-        /// BSA, index or DLQI above this is severe («rule of tens»).
+        /// BSA or index above this is severe («rule of tens»). Questionnaire scores don't count:
+        /// the app's own questionnaires are not validated clinical scores.
         static let tens = 10.0
     }
 
@@ -105,9 +106,8 @@ enum SeverityCalculator {
     /// - Parameters:
     ///   - scores: latest assessment per zone; for duplicate zone ids the last one wins.
     ///     Unknown zone ids are ignored.
-    ///   - dlqi: latest DLQI score, if any (rule of tens).
-    ///   - arthritisSuspected: e.g. positive PEST; upgrades the category like a special site.
-    static func snapshot(for scores: [ZoneScore], dlqi: Int? = nil, arthritisSuspected: Bool = false) -> SeveritySnapshot {
+    ///   - arthritisSuspected: e.g. joint symptoms in the joint check; upgrades the category like a special site.
+    static func snapshot(for scores: [ZoneScore], arthritisSuspected: Bool = false) -> SeveritySnapshot {
         var latest: [String: ZoneScore] = [:]
         for score in scores { latest[score.zoneID] = score }
 
@@ -146,7 +146,7 @@ enum SeverityCalculator {
         }
         bsa = min(bsa, 100)
 
-        let base = baseCategory(bsa: bsa, severityIndex: index, dlqi: dlqi)
+        let base = baseCategory(bsa: bsa, severityIndex: index)
         let isElevated = !specialSites.isEmpty || arthritisSuspected
         // A special site or arthritis rules out «mild» even when BSA is small.
         let category = isElevated ? max(base, .moderate) : base
@@ -160,13 +160,13 @@ enum SeverityCalculator {
         )
     }
 
-    static func snapshot(for assessments: [ZoneAssessment], dlqi: Int? = nil, arthritisSuspected: Bool = false) -> SeveritySnapshot {
-        snapshot(for: assessments.map(\.score), dlqi: dlqi, arthritisSuspected: arthritisSuspected)
+    static func snapshot(for assessments: [ZoneAssessment], arthritisSuspected: Bool = false) -> SeveritySnapshot {
+        snapshot(for: assessments.map(\.score), arthritisSuspected: arthritisSuspected)
     }
 
-    /// Category from numbers only: mild < 3 % ≤ moderate ≤ 10 % < severe; index or DLQI > 10 is severe.
-    static func baseCategory(bsa: Double, severityIndex: Double, dlqi: Int?) -> SeverityCategory {
-        if bsa > Threshold.tens || severityIndex > Threshold.tens || Double(dlqi ?? 0) > Threshold.tens {
+    /// Category from numbers only: mild < 3 % ≤ moderate ≤ 10 % < severe; index > 10 is severe.
+    static func baseCategory(bsa: Double, severityIndex: Double) -> SeverityCategory {
+        if bsa > Threshold.tens || severityIndex > Threshold.tens {
             return .severe
         }
         return bsa < Threshold.mildBSA ? .mild : .moderate

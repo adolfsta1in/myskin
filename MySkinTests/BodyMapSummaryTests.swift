@@ -59,7 +59,7 @@ struct BodyMapSummaryTests {
         #expect(summary.snapshot.specialSiteIDs == ["quick.scalp"])
     }
 
-    @Test func positivePESTIsElevated() {
+    @Test func jointSymptomsAreElevated() {
         let summary = BodyMapSummary.make(zones: [entry(0, "back.elbow.left", palms: 1)], arthritisSuspected: true, calendar: calendar)
         #expect(summary.snapshot.isElevated)
         #expect(summary.snapshot.category == .moderate)

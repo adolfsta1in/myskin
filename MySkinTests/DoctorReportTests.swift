@@ -80,12 +80,13 @@ struct DoctorReportTests {
 
     @Test func questionnaires() {
         let results: [(kind: QuestionnaireKind, date: Date, score: Int)] = [
-            (.dlqi, daysAgo(25), 12), (.dlqi, daysAgo(3), 4), (.pest, daysAgo(200), 3), (.dlqi, daysAgo(90), 20),
+            (.skinImpact, daysAgo(25), 12), (.skinImpact, daysAgo(3), 4), (.pest, daysAgo(200), 3), (.skinImpact, daysAgo(90), 16),
         ]
         let report = make(results: results)
-        #expect(report.dlqiFirst == 12)
-        #expect(report.dlqiLatest == 4)
-        #expect(report.pestLatest == 3)
+        #expect(report.skinImpactFirst == 12)
+        #expect(report.skinImpactLatest == 4)
+        #expect(report.jointLatest?.kind == .pest)
+        #expect(report.jointLatest?.score == 3)
         #expect(report.severityNow == nil)
     }
 

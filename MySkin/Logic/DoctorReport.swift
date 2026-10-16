@@ -67,10 +67,11 @@ struct DoctorReport {
     let itchNow: Double?
     let checkInDays: Int
     let flareDays: Int
-    let dlqiFirst: Int?
-    let dlqiLatest: Int?
-    /// Latest PEST at all (screening lasts beyond the period).
-    let pestLatest: Int?
+    /// Skin impact score: first (when there are 2+) and latest in the period.
+    let skinImpactFirst: Int?
+    let skinImpactLatest: Int?
+    /// Latest joint questionnaire at all (new or retired) — joint symptoms matter beyond the period.
+    let jointLatest: (kind: QuestionnaireKind, score: Int)?
     let treatments: [TreatmentLine]
     /// Logged triggers in the period, most frequent first.
     let triggers: [(trigger: Trigger, days: Int)]
@@ -118,11 +119,16 @@ struct DoctorReport {
         if let day = beforeDay, day >= start, assessedDays.count < 2 { beforeDay = nil }
         let mapBefore = beforeDay.map { Trends.map(on: $0, zones: zones, calendar: calendar) } ?? []
         let mapNow = Trends.map(on: date, zones: zones, calendar: calendar)
-        let dlqiLatestEver = results.filter { $0.kind == .dlqi && $0.date <= date }.max { $0.date < $1.date }?.score
-        let pest = results.filter { $0.kind == .pest && $0.date <= date }.max { $0.date < $1.date }?.score
-        let arthritis = ArthritisRules.isSuspected(status: patient.arthritis, pestScore: pest)
+        let joint = results
+            .filter { ($0.kind == .jointCheck || $0.kind == .pest) && $0.date <= date }
+            .max { $0.date < $1.date }
+            .map { (kind: $0.kind, score: $0.score) }
+        let arthritis = ArthritisRules.isSuspected(
+            status: patient.arthritis,
+            jointSymptomsNoted: Questionnaires.jointSymptomsNoted(results: results, by: date)
+        )
         let severityBefore = mapBefore.isEmpty ? nil : SeverityCalculator.snapshot(for: mapBefore, arthritisSuspected: arthritis)
-        let severityNow = mapNow.isEmpty ? nil : SeverityCalculator.snapshot(for: mapNow, dlqi: dlqiLatestEver, arthritisSuspected: arthritis)
+        let severityNow = mapNow.isEmpty ? nil : SeverityCalculator.snapshot(for: mapNow, arthritisSuspected: arthritis)
 
         // Itch: first vs last two weeks of the period.
         let window = min(itchWindowDays, periodDays)
@@ -135,7 +141,7 @@ struct DoctorReport {
             !FlareDetector.signals(on: $0.day, checkIns: samples, zones: zones, calendar: calendar).isEmpty
         }.count
 
-        let dlqi = Trends.scores(.dlqi, results: results, from: start, to: date, calendar: calendar)
+        let skinImpact = Trends.scores(.skinImpact, results: results, from: start, to: date, calendar: calendar)
 
         // Treatments used at any time during the period.
         let lines = treatments
@@ -170,9 +176,9 @@ struct DoctorReport {
             itchNow: itchNow,
             checkInDays: Set(inPeriod.map { calendar.startOfDay(for: $0.day) }).count,
             flareDays: flareDays,
-            dlqiFirst: dlqi.count > 1 ? dlqi.first.map { Int($0.value) } : nil,
-            dlqiLatest: dlqi.last.map { Int($0.value) },
-            pestLatest: pest,
+            skinImpactFirst: skinImpact.count > 1 ? skinImpact.first.map { Int($0.value) } : nil,
+            skinImpactLatest: skinImpact.last.map { Int($0.value) },
+            jointLatest: joint,
             treatments: lines,
             triggers: triggers,
             photos: photoPairs(photos, from: start, to: date, calendar: calendar)
@@ -195,7 +201,7 @@ struct DoctorReport {
 
     /// True if there is nothing to report in the period.
     var isEmpty: Bool {
-        severityNow == nil && checkInDays == 0 && dlqiLatest == nil && pestLatest == nil && treatments.isEmpty
+        severityNow == nil && checkInDays == 0 && skinImpactLatest == nil && jointLatest == nil && treatments.isEmpty
     }
 }
 

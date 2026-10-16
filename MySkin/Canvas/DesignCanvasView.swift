@@ -52,7 +52,7 @@ struct DesignCanvasView: View {
                         phone("Questionnaires") {
                             NavigationStack { QuestionnaireHistoryView() }
                         }
-                        phone("DLQI") { QuestionnaireView(kind: .dlqi) }
+                        phone("Skin impact") { QuestionnaireView(kind: .skinImpact) }
                         phone("Red flag") { RedFlagView(flags: [.widespreadPustules]) }
                         phone("Settings") { SettingsView() }
                         phone("Privacy lock") { PrivacyLockView() }

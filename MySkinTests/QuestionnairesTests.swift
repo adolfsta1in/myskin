@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import MySkin
 
@@ -9,73 +10,82 @@ struct QuestionnairesTests {
         }
     }
 
-    // MARK: - DLQI
+    // MARK: - Skin impact
 
-    @Test func dlqiHasTenQuestionsScoredZeroToThree() {
-        #expect(DLQI.questions.count == 10)
-        #expect(DLQI.questions.map(\.id) == Array(1...10))
-        for question in DLQI.questions {
-            #expect(question.options.map(\.score).max() == 3)
-            #expect(question.options.map(\.score).min() == 0)
-        }
+    @Test func skinImpactHasSixQuestionsScoredZeroToThree() {
+        #expect(SkinImpact.questions.count == 6)
+        #expect(SkinImpact.questions.map(\.id) == Array(1...6))
+        #expect(SkinImpact.questions.allSatisfy { $0.options.map(\.score) == [0, 1, 2, 3] })
     }
 
-    @Test func dlqiRangeIsZeroToThirty() {
-        #expect(Questionnaires.score(.dlqi, answers: answers(.dlqi, scoring: Array(repeating: 0, count: 10))) == 0)
-        #expect(Questionnaires.score(.dlqi, answers: answers(.dlqi, scoring: Array(repeating: 3, count: 10))) == DLQI.maxScore)
-    }
-
-    @Test func dlqiNotRelevantScoresZero() {
-        // Question 3 offers "Not relevant" as its last option.
-        var raw = answers(.dlqi, scoring: [1, 1, 0, 0, 0, 0, 0, 0, 0, 0])
-        raw[2] = DLQI.questions[2].options.count - 1
-        #expect(DLQI.questions[2].options[raw[2]].title == "Not relevant")
-        #expect(Questionnaires.score(.dlqi, answers: raw) == 2)
-    }
-
-    @Test func dlqiWorkQuestionYesScoresThree() {
-        #expect(DLQI.questions[6].options.first?.score == 3)
+    @Test func skinImpactRangeIsZeroToEighteen() {
+        #expect(Questionnaires.score(.skinImpact, answers: answers(.skinImpact, scoring: Array(repeating: 0, count: 6))) == 0)
+        #expect(Questionnaires.score(.skinImpact, answers: answers(.skinImpact, scoring: Array(repeating: 3, count: 6))) == SkinImpact.maxScore)
     }
 
     @Test func incompleteOrInvalidAnswersHaveNoScore() {
-        #expect(Questionnaires.score(.dlqi, answers: [0, 0, 0]) == nil)
-        #expect(Questionnaires.score(.dlqi, answers: Array(repeating: 9, count: 10)) == nil)
-        #expect(Questionnaires.score(.dlqi, answers: Array(repeating: -1, count: 10)) == nil)
+        #expect(Questionnaires.score(.skinImpact, answers: [0, 0, 0]) == nil)
+        #expect(Questionnaires.score(.skinImpact, answers: Array(repeating: 9, count: 6)) == nil)
+        #expect(Questionnaires.score(.skinImpact, answers: Array(repeating: -1, count: 6)) == nil)
     }
 
     @Test(arguments: [
-        (0, DLQI.Band.none), (1, .none), (2, .small), (5, .small), (6, .moderate),
-        (10, .moderate), (11, .veryLarge), (20, .veryLarge), (21, .extremelyLarge), (30, .extremelyLarge),
+        (0, SkinImpact.Level.none), (1, .small), (4, .small), (5, .moderate), (9, .moderate), (10, .large), (18, .large),
     ])
-    func dlqiBands(score: Int, expected: DLQI.Band) {
-        #expect(DLQI.band(for: score) == expected)
+    func skinImpactLevels(score: Int, expected: SkinImpact.Level) {
+        #expect(SkinImpact.level(for: score) == expected)
     }
 
-    @Test func dlqiGoalAndRuleOfTens() {
-        #expect(DLQI.isAtGoal(0))
-        #expect(DLQI.isAtGoal(1))
-        #expect(!DLQI.isAtGoal(2))
-        #expect(!DLQI.isVeryLargeEffect(10))
-        #expect(DLQI.isVeryLargeEffect(11))
-        #expect(DLQI.interpretation(for: 11).contains("discuss with your doctor"))
+    @Test func largeSkinImpactSuggestsTheDoctor() {
+        #expect(!Questionnaires.needsAttention(.skinImpact, score: 9))
+        #expect(Questionnaires.needsAttention(.skinImpact, score: 10))
+        #expect(SkinImpact.interpretation(for: 10).contains("doctor"))
     }
 
-    // MARK: - PEST
+    // MARK: - Joint check
 
-    @Test func pestHasFiveYesNoQuestions() {
-        #expect(PEST.questions.count == 5)
-        #expect(PEST.questions.allSatisfy { $0.options.map(\.score) == [1, 0] })
+    @Test func jointCheckHasSixYesNoQuestions() {
+        #expect(JointCheck.questions.count == 6)
+        #expect(JointCheck.questions.allSatisfy { $0.options.map(\.score) == [1, 0] })
     }
 
-    @Test(arguments: [(0, false), (2, false), (3, true), (5, true)])
-    func pestReferral(yesCount: Int, referral: Bool) throws {
-        let points = Array(repeating: 1, count: yesCount) + Array(repeating: 0, count: 5 - yesCount)
-        let score = try #require(Questionnaires.score(.pest, answers: answers(.pest, scoring: points)))
+    @Test(arguments: [(0, false), (1, false), (2, true), (6, true)])
+    func jointCheckThreshold(yesCount: Int, attention: Bool) throws {
+        let points = Array(repeating: 1, count: yesCount) + Array(repeating: 0, count: 6 - yesCount)
+        let score = try #require(Questionnaires.score(.jointCheck, answers: answers(.jointCheck, scoring: points)))
         #expect(score == yesCount)
-        #expect(PEST.suggestsRheumatologist(score) == referral)
+        #expect(Questionnaires.needsAttention(.jointCheck, score: score) == attention)
     }
 
-    @Test func pestPositiveMentionsRheumatologist() {
-        #expect(PEST.interpretation(for: 3).contains("rheumatologist"))
+    @Test func positiveJointCheckPointsToADoctorWithoutDiagnosis() {
+        let text = JointCheck.interpretation(for: 2)
+        #expect(text.contains("rheumatologist"))
+        #expect(!text.lowercased().contains("arthritis"))
+        #expect(JointCheck.headline(for: 2) == "Discuss your joints with a doctor")
+    }
+
+    // MARK: - Retired questionnaires
+
+    @Test func retiredKindsCanOnlyBeShown() {
+        #expect(QuestionnaireKind.current == [.skinImpact, .jointCheck])
+        for kind in [QuestionnaireKind.dlqi, .pest] {
+            #expect(kind.isRetired)
+            #expect(Questionnaires.questions(for: kind).isEmpty)
+            #expect(Questionnaires.score(kind, answers: []) == nil)
+        }
+        #expect(Questionnaires.maxScore(.dlqi) == 30)
+        #expect(Questionnaires.maxScore(.pest) == 5)
+        #expect(Questionnaires.needsAttention(.pest, score: 3))
+        #expect(!Questionnaires.needsAttention(.dlqi, score: 10))
+    }
+
+    @Test func latestJointQuestionnaireDecides() {
+        let now = Date.now
+        let earlier = now.addingTimeInterval(-86_400)
+        #expect(!Questionnaires.jointSymptomsNoted(results: []))
+        #expect(Questionnaires.jointSymptomsNoted(results: [(.pest, earlier, 3)]))
+        #expect(!Questionnaires.jointSymptomsNoted(results: [(.pest, earlier, 3), (.jointCheck, now, 1)]))
+        #expect(Questionnaires.jointSymptomsNoted(results: [(.jointCheck, now, 2), (.skinImpact, now, 0)]))
+        #expect(!Questionnaires.jointSymptomsNoted(results: [(.jointCheck, now, 2)], by: earlier))
     }
 }

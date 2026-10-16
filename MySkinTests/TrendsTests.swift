@@ -66,9 +66,9 @@ struct TrendsTests {
 
     @Test func scoresAreFilteredAndSorted() {
         let results: [(kind: QuestionnaireKind, date: Date, score: Int)] = [
-            (.dlqi, daysAgo(3), 4), (.pest, daysAgo(4), 2), (.dlqi, daysAgo(40), 12), (.dlqi, daysAgo(200), 20),
+            (.skinImpact, daysAgo(3), 4), (.jointCheck, daysAgo(4), 2), (.skinImpact, daysAgo(40), 12), (.skinImpact, daysAgo(200), 16),
         ]
-        let dlqi = Trends.scores(.dlqi, results: results, from: daysAgo(90), to: today, calendar: calendar)
-        #expect(dlqi.map(\.value) == [12, 4])
+        let skinImpact = Trends.scores(.skinImpact, results: results, from: daysAgo(90), to: today, calendar: calendar)
+        #expect(skinImpact.map(\.value) == [12, 4])
     }
 }

@@ -1,7 +1,7 @@
 import SwiftData
 import SwiftUI
 
-/// Trends over the last 3 months (itch, affected area, DLQI) and links to the report and questionnaires.
+/// Trends over the last 3 months (itch, affected area, skin impact) and links to the report and questionnaires.
 struct InsightsView: View {
     @Query private var checkIns: [DailyCheckIn]
     @Query private var assessments: [ZoneAssessment]
@@ -11,7 +11,7 @@ struct InsightsView: View {
         let start = Trends.periodStart(endingOn: .now)
         let itch = Trends.weeklyItch(checkIns: checkIns.map(\.sample), from: start, to: .now)
         let bsa = Trends.bsaHistory(zones: assessments.map(\.datedScore), from: start, to: .now)
-        let dlqi = Trends.scores(.dlqi, results: results.map(\.trendPoint), from: start, to: .now)
+        let skinImpact = Trends.scores(.skinImpact, results: results.map(\.trendPoint), from: start, to: .now)
 
         NavigationStack {
             ScrollView {
@@ -43,7 +43,7 @@ struct InsightsView: View {
                     NavigationLink {
                         QuestionnaireHistoryView()
                     } label: {
-                        LinkCard(systemImage: "list.clipboard", title: "Questionnaires", subtitle: "DLQI and PEST · scores over time")
+                        LinkCard(systemImage: "list.clipboard", title: "Questionnaires", subtitle: "Skin impact and joint check · scores over time")
                     }
                     .buttonStyle(.plain)
 
@@ -65,12 +65,12 @@ struct InsightsView: View {
                         emptyText: "Assess your skin on the Body tab to see how the affected area changes."
                     )
                     TrendCard(
-                        title: "Quality of life (DLQI)",
-                        subtitle: "0 = no effect, 30 = extremely large effect",
-                        data: dlqi,
-                        scale: .dlqi,
+                        title: "Skin impact",
+                        subtitle: "How much your skin got in the way, 0–18",
+                        data: skinImpact,
+                        scale: .skinImpact,
                         format: { "\(Int($0))" },
-                        emptyText: "Take the DLQI questionnaire monthly to see its trend here."
+                        emptyText: "Take the skin impact check monthly to see its trend here."
                     )
 
                     Text("Trends aren't a diagnosis. They're a starting point to talk through with your doctor.")

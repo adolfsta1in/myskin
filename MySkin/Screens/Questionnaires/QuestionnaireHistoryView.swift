@@ -1,7 +1,7 @@
 import SwiftData
 import SwiftUI
 
-/// Past DLQI and PEST scores, newest first, with a way to take each questionnaire again.
+/// Past questionnaire scores, newest first, with a way to take each questionnaire again.
 struct QuestionnaireHistoryView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \QuestionnaireResult.date, order: .reverse) private var results: [QuestionnaireResult]
@@ -10,10 +10,10 @@ struct QuestionnaireHistoryView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                ForEach(QuestionnaireKind.allCases) { kind in
+                ForEach(shownKinds) { kind in
                     section(kind, results: results.filter { $0.kind == kind })
                 }
-                Text("Scores are a self-check to discuss with your doctor, not a diagnosis.")
+                Text("These questionnaires were written for MySkin and are not validated clinical scores. Use them to talk with your doctor, not as a diagnosis.")
                     .font(.rounded(.footnote))
                     .foregroundStyle(Theme.inkSoft)
             }
@@ -25,6 +25,13 @@ struct QuestionnaireHistoryView: View {
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $taking) { kind in
             QuestionnaireView(kind: kind)
+        }
+    }
+
+    /// Current questionnaires, plus retired ones that still have saved results.
+    private var shownKinds: [QuestionnaireKind] {
+        QuestionnaireKind.current + QuestionnaireKind.allCases.filter { kind in
+            kind.isRetired && results.contains { $0.kind == kind }
         }
     }
 
@@ -55,11 +62,13 @@ struct QuestionnaireHistoryView: View {
                     }
                 }
             }
-            Button(results.isEmpty ? "Take it now" : "Take it again", systemImage: "square.and.pencil") {
-                taking = kind
+            if !kind.isRetired {
+                Button(results.isEmpty ? "Take it now" : "Take it again", systemImage: "square.and.pencil") {
+                    taking = kind
+                }
+                .font(.rounded(.subheadline, weight: .semibold))
+                .foregroundStyle(Theme.accent)
             }
-            .font(.rounded(.subheadline, weight: .semibold))
-            .foregroundStyle(Theme.accent)
         }
         .glassCard()
     }

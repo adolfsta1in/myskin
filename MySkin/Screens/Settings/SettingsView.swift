@@ -196,7 +196,7 @@ struct SettingsView: View {
                     .foregroundStyle(Theme.inkSoft)
             }
             .padding(.vertical, 4)
-            Text("DLQI © Dermatology Life Quality Index, A.Y. Finlay and G.K. Khan, 1994. PEST: Psoriasis Epidemiology Screening Tool.")
+            Text("The skin impact and joint check questionnaires were written for MySkin. They are not validated clinical scores.")
                 .font(.rounded(.footnote))
                 .foregroundStyle(Theme.inkSoft)
             if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String {

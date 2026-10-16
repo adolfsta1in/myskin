@@ -125,9 +125,9 @@ enum PreviewData {
         context.insert(DoseLog(treatment: biologic, scheduledAt: at(2, 9 * 60), timestamp: at(2, 9 * 60), status: .done, injectionSite: .thighRight))
 
         // Questionnaires.
-        context.insert(QuestionnaireResult(kind: .dlqi, date: daysAgo(60), answers: [2, 2, 1, 1, 2, 1, 1, 1, 1, 0], score: 12))
-        context.insert(QuestionnaireResult(kind: .dlqi, date: daysAgo(28), answers: [1, 1, 1, 0, 1, 1, 0, 1, 0, 0], score: 6))
-        context.insert(QuestionnaireResult(kind: .pest, date: daysAgo(60), answers: [0, 1, 0, 0, 1], score: 2))
+        context.insert(QuestionnaireResult(kind: .skinImpact, date: daysAgo(60), answers: [2, 2, 1, 2, 3, 1], score: 11))
+        context.insert(QuestionnaireResult(kind: .skinImpact, date: daysAgo(28), answers: [1, 1, 1, 0, 2, 1], score: 6))
+        context.insert(QuestionnaireResult(kind: .jointCheck, date: daysAgo(60), answers: [0, 1, 1, 1, 1, 1], score: 1))
 
         // Photos need image files, so the sample set has none; photo previews show the empty state.
     }

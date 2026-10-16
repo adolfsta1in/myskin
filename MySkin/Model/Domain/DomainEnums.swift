@@ -20,7 +20,7 @@ nonisolated enum Sex: String, Codable, CaseIterable, Identifiable, Sendable {
     }
 }
 
-/// What the user knows about psoriatic arthritis. `diagnosed` skips the PEST screening.
+/// What the user knows about psoriatic arthritis. `diagnosed` skips the joint check.
 nonisolated enum ArthritisStatus: String, Codable, CaseIterable, Identifiable, Sendable {
     case diagnosed, suspected, no, unsure
 
@@ -260,22 +260,31 @@ nonisolated enum ScheduleKind: String, Codable, CaseIterable, Identifiable, Send
 
 // MARK: - Questionnaire kind
 
+/// `dlqi` and `pest` are retired licensed questionnaires: they stay only so results saved earlier still load.
 nonisolated enum QuestionnaireKind: String, Codable, CaseIterable, Identifiable, Sendable {
     case dlqi, pest
+    case skinImpact, jointCheck
 
     var id: String { rawValue }
 
+    /// Questionnaires the app offers, in display order.
+    static let current: [QuestionnaireKind] = [.skinImpact, .jointCheck]
+
+    var isRetired: Bool { !Self.current.contains(self) }
+
     var title: String {
         switch self {
-        case .dlqi: "Quality of life (DLQI)"
-        case .pest: "Joint screening (PEST)"
+        case .skinImpact: "Skin impact"
+        case .jointCheck: "Joint check"
+        case .dlqi: "Skin impact (earlier version)"
+        case .pest: "Joint check (earlier version)"
         }
     }
 
     var systemImage: String {
         switch self {
-        case .dlqi: "heart.text.square"
-        case .pest: "figure.walk"
+        case .skinImpact, .dlqi: "heart.text.square"
+        case .jointCheck, .pest: "figure.walk"
         }
     }
 }

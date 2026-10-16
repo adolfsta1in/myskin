@@ -53,39 +53,45 @@ struct QuestionnaireSession: Equatable {
 extension Questionnaires {
     static func maxScore(_ kind: QuestionnaireKind) -> Int {
         switch kind {
-        case .dlqi: DLQI.maxScore
-        case .pest: PEST.maxScore
+        case .skinImpact: SkinImpact.maxScore
+        case .jointCheck: JointCheck.maxScore
+        case .dlqi, .pest: RetiredQuestionnaire.maxScore(kind)
         }
     }
 
     /// Short headline for a score.
     static func headline(_ kind: QuestionnaireKind, score: Int) -> String {
         switch kind {
-        case .dlqi: DLQI.band(for: score).title
-        case .pest: PEST.suggestsRheumatologist(score) ? "Tell a rheumatologist" : "No joint signals"
+        case .skinImpact: SkinImpact.level(for: score).title
+        case .jointCheck: JointCheck.headline(for: score)
+        case .dlqi: needsAttention(kind, score: score) ? "Large impact" : "Earlier version"
+        case .pest: needsAttention(kind, score: score) ? "Joint symptoms noted" : "Earlier version"
         }
     }
 
     static func interpretation(_ kind: QuestionnaireKind, score: Int) -> String {
         switch kind {
-        case .dlqi: DLQI.interpretation(for: score)
-        case .pest: PEST.interpretation(for: score)
+        case .skinImpact: SkinImpact.interpretation(for: score)
+        case .jointCheck: JointCheck.interpretation(for: score)
+        case .dlqi, .pest: RetiredQuestionnaire.interpretation
         }
     }
 
-    /// The score is worth raising with a doctor (DLQI > 10, PEST ≥ 3).
+    /// The score is worth raising with a doctor.
     static func needsAttention(_ kind: QuestionnaireKind, score: Int) -> Bool {
         switch kind {
-        case .dlqi: DLQI.isVeryLargeEffect(score)
-        case .pest: PEST.suggestsRheumatologist(score)
+        case .skinImpact: SkinImpact.needsAttention(score)
+        case .jointCheck: JointCheck.needsAttention(score)
+        case .dlqi, .pest: RetiredQuestionnaire.needsAttention(kind, score: score)
         }
     }
 
     /// What the questionnaire asks about, shown before the first question.
     static func intro(_ kind: QuestionnaireKind) -> String {
         switch kind {
-        case .dlqi: "10 questions about how your skin affected your life over the last week. About 2 minutes."
-        case .pest: "5 yes/no questions about your joints and nails. Psoriasis can affect joints, and early checks help."
+        case .skinImpact: "6 questions about how your skin affected your last 7 days. About a minute."
+        case .jointCheck: "6 yes/no questions about your joints. Psoriasis can affect joints, so it's worth checking now and then."
+        case .dlqi, .pest: RetiredQuestionnaire.interpretation
         }
     }
 }

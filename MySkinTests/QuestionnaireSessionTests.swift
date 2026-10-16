@@ -4,28 +4,29 @@ import Testing
 @testable import MySkin
 
 struct QuestionnaireSessionTests {
-    @Test func dlqiAllVeryMuchScoresThirty() throws {
-        var session = QuestionnaireSession(kind: .dlqi)
-        for _ in 0..<10 { session.answer(0) }
+    @Test func skinImpactAllALotScoresEighteen() throws {
+        var session = QuestionnaireSession(kind: .skinImpact)
+        for _ in 0..<6 { session.answer(3) }
         #expect(session.isFinished)
-        #expect(session.score == 30)
+        #expect(session.score == 18)
         let result = try #require(session.makeResult())
-        #expect(result.kind == .dlqi)
-        #expect(result.answers == Array(repeating: 0, count: 10))
-        #expect(Questionnaires.headline(.dlqi, score: 30) == "Extremely large effect")
+        #expect(result.kind == .skinImpact)
+        #expect(result.answers == Array(repeating: 3, count: 6))
+        #expect(Questionnaires.headline(.skinImpact, score: 18) == "Large impact")
     }
 
     @Test func unfinishedHasNoScore() {
-        var session = QuestionnaireSession(kind: .dlqi)
+        var session = QuestionnaireSession(kind: .skinImpact)
+        session.answer(1)
         session.answer(1)
         #expect(!session.isFinished)
         #expect(session.score == nil)
         #expect(session.makeResult() == nil)
-        #expect(session.progress == 0.1)
+        #expect(abs(session.progress - 2.0 / 6.0) < 0.000_1)
     }
 
     @Test func goingBackKeepsTheAnswerAndCanChangeIt() {
-        var session = QuestionnaireSession(kind: .pest)
+        var session = QuestionnaireSession(kind: .jointCheck)
         session.answer(0)
         session.answer(0)
         session.goBack()
@@ -37,39 +38,42 @@ struct QuestionnaireSessionTests {
     }
 
     @Test func outOfRangeOptionIsIgnored() {
-        var session = QuestionnaireSession(kind: .pest)
+        var session = QuestionnaireSession(kind: .jointCheck)
         session.answer(5)
         #expect(session.index == 0)
         #expect(session.answers[0] == nil)
     }
 
-    @Test func notRelevantScoresZeroButIsKept() {
-        var session = QuestionnaireSession(kind: .dlqi)
-        session.answer(3) // Q1: not at all
-        session.answer(3) // Q2: not at all
-        for _ in 0..<8 { session.answer(4) } // Q3–10: not relevant
+    @Test func noImpactHeadline() {
+        var session = QuestionnaireSession(kind: .skinImpact)
+        for _ in 0..<6 { session.answer(0) }
         #expect(session.score == 0)
-        #expect(session.makeResult()?.answers.last == 4)
-        #expect(Questionnaires.headline(.dlqi, score: 0) == "No effect on your life")
+        #expect(Questionnaires.headline(.skinImpact, score: 0) == "No impact this week")
     }
 
-    @Test func pestThreeYesSuggestsRheumatologist() {
-        var session = QuestionnaireSession(kind: .pest)
-        [0, 0, 0, 1, 1].forEach { session.answer($0) }
-        #expect(session.score == 3)
-        #expect(Questionnaires.headline(.pest, score: 3) == "Tell a rheumatologist")
-        #expect(Questionnaires.needsAttention(.pest, score: 3))
-        #expect(!Questionnaires.needsAttention(.pest, score: 2))
+    @Test func jointCheckTwoYesSuggestsADoctor() {
+        var session = QuestionnaireSession(kind: .jointCheck)
+        [0, 0, 1, 1, 1, 1].forEach { session.answer($0) }
+        #expect(session.score == 2)
+        #expect(Questionnaires.headline(.jointCheck, score: 2) == "Discuss your joints with a doctor")
+        #expect(Questionnaires.needsAttention(.jointCheck, score: 2))
+        #expect(!Questionnaires.needsAttention(.jointCheck, score: 1))
+    }
+
+    @Test func retiredKindIsFinishedWithoutAResult() {
+        let session = QuestionnaireSession(kind: .dlqi)
+        #expect(session.questions.isEmpty)
+        #expect(session.makeResult() == nil)
     }
 
     @Test func resultSurvivesFetch() throws {
         let context = ModelContext(try AppModelContainer.makeInMemory())
-        var session = QuestionnaireSession(kind: .dlqi)
-        for _ in 0..<10 { session.answer(2) }
+        var session = QuestionnaireSession(kind: .skinImpact)
+        for _ in 0..<6 { session.answer(2) }
         context.insert(try #require(session.makeResult()))
         try context.save()
         let stored = try context.fetch(FetchDescriptor<QuestionnaireResult>())
         #expect(stored.count == 1)
-        #expect(stored.first?.score == 10)
+        #expect(stored.first?.score == 12)
     }
 }

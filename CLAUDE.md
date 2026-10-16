@@ -71,7 +71,7 @@ docs/                  spec, research, current-state, migration-plan
 - `docs/reaserch.md` — медицинский первоисточник. Читать только при сомнениях в медицинском содержании (шкалы, препараты, триггеры).
 
 ## Статус
-- **Выпуск v1.0** (`reports/План выпуска в App Store.md`, фаза B): готовы C1 (`docs/` вне таргета), C2 (иконка `AppIcon`), C3 (Release-сборка и подписанный архив в Xcode 27.0; превью с `PreviewData` и долгое нажатие на приветствие — под `#if DEBUG`). Дальше — C4–C9, C13, C14.
+- **Выпуск v1.0** (`reports/План выпуска в App Store.md`, фаза B): готовы C1 (`docs/` вне таргета), C2 (иконка `AppIcon`), C3 (Release-сборка и подписанный архив в Xcode 27.0; превью с `PreviewData` и долгое нажатие на приветствие — под `#if DEBUG`). C5 — свои опросники: `skinImpact` (6 вопросов 0–3, 0–18, «Large impact» ≥ 10 → «worth discussing with your doctor») и `jointCheck` (6 да/нет, ≥ 2 → «Discuss your joints with a doctor», выставляет `arthritisSuspected`). `dlqi`/`pest` остались в `QuestionnaireKind` как retired: вопросов нет (тексты DLQI/PEST удалены из сборки), старые результаты видны в истории как «earlier version», PEST ≥ 3 по-прежнему отмечает суставы. Опросники больше не входят в «правило десяток» (только BSA и индекс). Тесты собраны, но не запускались (iPhone A был офлайн). Дальше — C6, затем C4, C7–C9, C13, C14.
 - **Текущий шаг:** этап E (v1.1). Готовы 45–53.1, 52.1, 58 (питание), 58.1 (компактный чек-ин) и 58.2 (иллюстрации). Дальше — шаг 59 (движок закономерностей, по `docs/patterns-prompt.md`) или 54 (Supabase), по выбору пользователя.
 - Готово: фазы анализа (spec, current-state, migration-plan), этап 0 целиком:
   - Шаг 1 — git + GitHub `adolfsta1in/myskin`, `CLAUDE.md`;

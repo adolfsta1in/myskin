@@ -11,7 +11,7 @@ struct ReportRendererTests {
             periodDays: 30, endingOn: .now, psoriasisTypes: [.plaque],
             checkIns: [DailyCheckInSample(day: .now, itch: 4, triggers: [.stress])],
             zones: [DatedZoneScore(day: .now, score: ZoneScore(zoneID: "quick.scalp", palms: 1, erythema: 2))],
-            results: [(.dlqi, .now, 6)], treatments: [], photos: []
+            results: [(.skinImpact, .now, 6)], treatments: [], photos: []
         )
         let url = try ReportRenderer.makePDF(report: report, weeklyItch: [], images: [:], folder: folder)
 
@@ -20,7 +20,7 @@ struct ReportRendererTests {
         #expect(document.pageCount == 1)
         let text = document.string ?? ""
         #expect(text.contains("Skin summary"))
-        #expect(text.contains("DLQI"))
+        #expect(text.contains("Skin impact"))
         #expect(document.page(at: 0)?.bounds(for: .mediaBox).width == ReportRenderer.pageWidth)
     }
 

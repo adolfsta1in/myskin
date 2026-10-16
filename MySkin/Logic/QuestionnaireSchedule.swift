@@ -1,12 +1,12 @@
 import Foundation
 
-/// When a questionnaire is due again (spec §2.5): DLQI once a month, PEST every 3 months.
+/// When a questionnaire is due again (spec §2.5): skin impact once a month, joint check every 3 months.
 enum QuestionnaireSchedule {
     /// Days between two runs of each questionnaire.
     static func intervalDays(_ kind: QuestionnaireKind) -> Int {
         switch kind {
-        case .dlqi: 30
-        case .pest: 91
+        case .skinImpact, .dlqi: 30
+        case .jointCheck, .pest: 91
         }
     }
 
@@ -21,17 +21,17 @@ enum QuestionnaireSchedule {
         return now >= next
     }
 
-    /// Questionnaires due on `now`, in `QuestionnaireKind.allCases` order.
+    /// Questionnaires due on `now`, in `QuestionnaireKind.current` order; retired ones are never due.
     /// `results` are (kind, date) pairs of stored results in any order.
-    /// PEST is left out once arthritis is diagnosed (`ArthritisRules.needsPEST`).
+    /// The joint check is left out once arthritis is diagnosed (`ArthritisRules.needsJointCheck`).
     static func due(
         now: Date,
         results: [(kind: QuestionnaireKind, date: Date)],
         arthritis: ArthritisStatus? = nil,
         calendar: Calendar = .current
     ) -> [QuestionnaireKind] {
-        QuestionnaireKind.allCases.filter { kind in
-            if kind == .pest && !ArthritisRules.needsPEST(arthritis) { return false }
+        QuestionnaireKind.current.filter { kind in
+            if kind == .jointCheck && !ArthritisRules.needsJointCheck(arthritis) { return false }
             let last = results.filter { $0.kind == kind }.map(\.date).max()
             return isDue(kind, lastTaken: last, now: now, calendar: calendar)
         }
@@ -44,10 +44,10 @@ enum QuestionnaireSchedule {
     /// Card text on Today.
     static func reason(_ kind: QuestionnaireKind, neverTaken: Bool) -> String {
         switch (kind, neverTaken) {
-        case (.dlqi, true): "How much your skin affects daily life. Takes about 2 minutes."
-        case (.dlqi, false): "It's been a month — a quick check of how your skin affects daily life."
-        case (.pest, true): "5 questions about your joints. Psoriasis can affect joints, so it's worth checking."
-        case (.pest, false): "It's been 3 months — a quick joint check."
+        case (.skinImpact, true), (.dlqi, true): "How much your skin gets in the way of daily life. About a minute."
+        case (.skinImpact, false), (.dlqi, false): "It's been a month — a quick check of how your skin affects daily life."
+        case (.jointCheck, true), (.pest, true): "6 questions about your joints. Psoriasis can affect joints, so it's worth checking."
+        case (.jointCheck, false), (.pest, false): "It's been 3 months — a quick joint check."
         }
     }
 }

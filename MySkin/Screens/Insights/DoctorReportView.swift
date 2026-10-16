@@ -146,13 +146,15 @@ struct ReportPaper: View {
 
             label("Questionnaires")
             VStack(alignment: .leading, spacing: 4) {
-                line(report.dlqiLatest.map { score in
-                    let change = report.dlqiFirst.map { "\($0) → " } ?? ""
-                    return "DLQI: \(change)\(score) of 30 · \(DLQI.band(for: score).title.lowercased())"
-                } ?? "DLQI: not taken in this period")
-                line(report.pestLatest.map {
-                    "PEST (joints): \($0) of 5\(PEST.suggestsRheumatologist($0) ? " · suggests a rheumatology referral" : "")"
-                } ?? "PEST (joints): not taken")
+                line(report.skinImpactLatest.map { score in
+                    let change = report.skinImpactFirst.map { "\($0) → " } ?? ""
+                    return "Skin impact: \(change)\(score) of \(SkinImpact.maxScore) · \(SkinImpact.level(for: score).title.lowercased())"
+                } ?? "Skin impact: not taken in this period")
+                line(report.jointLatest.map { joint in
+                    let noted = Questionnaires.needsAttention(joint.kind, score: joint.score) ? " · joint symptoms noted" : ""
+                    return "\(joint.kind.title): \(joint.score) of \(Questionnaires.maxScore(joint.kind))\(noted)"
+                } ?? "Joint check: not taken")
+                line("Patient-reported questionnaires written for MySkin; not validated clinical scores.")
                 if let arthritis = ArthritisRules.reportText(report.patient.arthritis) {
                     line(arthritis)
                 }

@@ -26,7 +26,6 @@ struct BodyMapSummary: Equatable {
 
     static func make(
         zones: [DatedZoneScore],
-        dlqi: Int? = nil,
         arthritisSuspected: Bool = false,
         calendar: Calendar = .current
     ) -> BodyMapSummary {
@@ -35,10 +34,10 @@ struct BodyMapSummary: Equatable {
         let earlier = sorted.filter { calendar.startOfDay(for: $0.day) < lastDay }
 
         let current = latest(sorted)
-        let snapshot = SeverityCalculator.snapshot(for: Array(current.values), dlqi: dlqi, arthritisSuspected: arthritisSuspected)
+        let snapshot = SeverityCalculator.snapshot(for: Array(current.values), arthritisSuspected: arthritisSuspected)
         let previous = earlier.isEmpty
             ? nil
-            : SeverityCalculator.snapshot(for: Array(latest(earlier).values), dlqi: dlqi, arthritisSuspected: arthritisSuspected)
+            : SeverityCalculator.snapshot(for: Array(latest(earlier).values), arthritisSuspected: arthritisSuspected)
         return BodyMapSummary(current: current, snapshot: snapshot, previous: previous, lastAssessed: lastDay)
     }
 

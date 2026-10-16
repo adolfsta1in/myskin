@@ -1,17 +1,18 @@
 import Foundation
 
-/// Psoriatic arthritis: what the user told us in onboarding plus the PEST screening.
+/// Psoriatic arthritis: what the user told us in onboarding plus the joint check.
 enum ArthritisRules {
-    /// Known or suspected arthritis raises the severity category like a special site.
-    static func isSuspected(status: ArthritisStatus?, pestScore: Int?) -> Bool {
+    /// Known or suspected arthritis, or joint symptoms in the latest joint check,
+    /// raise the severity category like a special site.
+    static func isSuspected(status: ArthritisStatus?, jointSymptomsNoted: Bool) -> Bool {
         switch status {
         case .diagnosed, .suspected: true
-        default: pestScore.map(PEST.suggestsRheumatologist) ?? false
+        default: jointSymptomsNoted
         }
     }
 
-    /// PEST is a screening test; it isn't needed once a doctor has diagnosed arthritis.
-    static func needsPEST(_ status: ArthritisStatus?) -> Bool {
+    /// The joint check isn't needed once a doctor has diagnosed arthritis.
+    static func needsJointCheck(_ status: ArthritisStatus?) -> Bool {
         status != .diagnosed
     }
 

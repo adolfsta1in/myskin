@@ -84,17 +84,12 @@ struct SeverityCalculatorTests {
 
     @Test(arguments: [(2.9, SeverityCategory.mild), (3.0, .moderate), (10.0, .moderate), (10.1, .severe)])
     func bsaBands(bsa: Double, expected: SeverityCategory) {
-        #expect(SeverityCalculator.baseCategory(bsa: bsa, severityIndex: 0, dlqi: nil) == expected)
+        #expect(SeverityCalculator.baseCategory(bsa: bsa, severityIndex: 0) == expected)
     }
 
     @Test func severityIndexAboveTenIsSevere() {
-        #expect(SeverityCalculator.baseCategory(bsa: 1, severityIndex: 10, dlqi: nil) == .mild)
-        #expect(SeverityCalculator.baseCategory(bsa: 1, severityIndex: 10.1, dlqi: nil) == .severe)
-    }
-
-    @Test func dlqiAboveTenIsSevere() {
-        #expect(SeverityCalculator.snapshot(for: [ZoneScore](), dlqi: 10).category == .mild)
-        #expect(SeverityCalculator.snapshot(for: [ZoneScore](), dlqi: 11).category == .severe)
+        #expect(SeverityCalculator.baseCategory(bsa: 1, severityIndex: 10) == .mild)
+        #expect(SeverityCalculator.baseCategory(bsa: 1, severityIndex: 10.1) == .severe)
     }
 
     // MARK: - Special sites
@@ -128,7 +123,10 @@ struct SeverityCalculatorTests {
     }
 
     @Test func specialSiteDoesNotLowerSevere() {
-        let snapshot = SeverityCalculator.snapshot(for: [ZoneScore(zoneID: "quick.palms", palms: 1, erythema: 1)], dlqi: 15)
+        // 12 % of the body: severe by area alone.
+        let scores = ["front.torso.upper", "front.torso.lower", "back.torso.upper", "back.torso.lower"].map { ZoneScore(zoneID: $0, palms: 3, erythema: 1) }
+            + [ZoneScore(zoneID: "quick.palms", palms: 1, erythema: 1)]
+        let snapshot = SeverityCalculator.snapshot(for: scores)
         #expect(snapshot.category == .severe)
         #expect(snapshot.isElevated)
     }

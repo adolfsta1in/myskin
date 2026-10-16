@@ -9,42 +9,47 @@ struct QuestionnaireScheduleTests {
 
     @Test func cleanInstallHasBothDue() {
         let none: [(kind: QuestionnaireKind, date: Date)] = []
-        #expect(QuestionnaireSchedule.due(now: now, results: none, calendar: calendar) == [.dlqi, .pest])
+        #expect(QuestionnaireSchedule.due(now: now, results: none, calendar: calendar) == [.skinImpact, .jointCheck])
     }
 
-    @Test func diagnosedArthritisSkipsPEST() {
+    @Test func diagnosedArthritisSkipsJointCheck() {
         let none: [(kind: QuestionnaireKind, date: Date)] = []
-        #expect(QuestionnaireSchedule.due(now: now, results: none, arthritis: .diagnosed, calendar: calendar) == [.dlqi])
+        #expect(QuestionnaireSchedule.due(now: now, results: none, arthritis: .diagnosed, calendar: calendar) == [.skinImpact])
         for status in [ArthritisStatus.suspected, .no, .unsure] {
-            #expect(QuestionnaireSchedule.due(now: now, results: none, arthritis: status, calendar: calendar) == [.dlqi, .pest])
+            #expect(QuestionnaireSchedule.due(now: now, results: none, arthritis: status, calendar: calendar) == [.skinImpact, .jointCheck])
         }
     }
 
-    @Test func arthritisRaisesSeverityWhenKnownOrScreenedPositive() {
-        #expect(ArthritisRules.isSuspected(status: .diagnosed, pestScore: nil))
-        #expect(ArthritisRules.isSuspected(status: .suspected, pestScore: 0))
-        #expect(!ArthritisRules.isSuspected(status: .no, pestScore: 1))
-        #expect(ArthritisRules.isSuspected(status: .unsure, pestScore: 3))
-        #expect(!ArthritisRules.isSuspected(status: nil, pestScore: nil))
+    @Test func arthritisRaisesSeverityWhenKnownOrJointSymptomsNoted() {
+        #expect(ArthritisRules.isSuspected(status: .diagnosed, jointSymptomsNoted: false))
+        #expect(ArthritisRules.isSuspected(status: .suspected, jointSymptomsNoted: false))
+        #expect(!ArthritisRules.isSuspected(status: .no, jointSymptomsNoted: false))
+        #expect(ArthritisRules.isSuspected(status: .unsure, jointSymptomsNoted: true))
+        #expect(!ArthritisRules.isSuspected(status: nil, jointSymptomsNoted: false))
     }
 
     @Test func takenTodayIsNotDue() {
-        let results: [(kind: QuestionnaireKind, date: Date)] = [(.dlqi, now), (.pest, now)]
+        let results: [(kind: QuestionnaireKind, date: Date)] = [(.skinImpact, now), (.jointCheck, now)]
         #expect(QuestionnaireSchedule.due(now: now, results: results, calendar: calendar).isEmpty)
     }
 
-    @Test func dlqiIsDueAfterThirtyDays() {
-        #expect(!QuestionnaireSchedule.isDue(.dlqi, lastTaken: daysAgo(29), now: now, calendar: calendar))
-        #expect(QuestionnaireSchedule.isDue(.dlqi, lastTaken: daysAgo(30), now: now, calendar: calendar))
+    @Test func retiredResultsDontCountAndAreNeverDue() {
+        let results: [(kind: QuestionnaireKind, date: Date)] = [(.dlqi, now), (.pest, now)]
+        #expect(QuestionnaireSchedule.due(now: now, results: results, calendar: calendar) == [.skinImpact, .jointCheck])
     }
 
-    @Test func pestIsDueAfterThreeMonths() {
-        #expect(!QuestionnaireSchedule.isDue(.pest, lastTaken: daysAgo(60), now: now, calendar: calendar))
-        #expect(QuestionnaireSchedule.isDue(.pest, lastTaken: daysAgo(91), now: now, calendar: calendar))
+    @Test func skinImpactIsDueAfterThirtyDays() {
+        #expect(!QuestionnaireSchedule.isDue(.skinImpact, lastTaken: daysAgo(29), now: now, calendar: calendar))
+        #expect(QuestionnaireSchedule.isDue(.skinImpact, lastTaken: daysAgo(30), now: now, calendar: calendar))
+    }
+
+    @Test func jointCheckIsDueAfterThreeMonths() {
+        #expect(!QuestionnaireSchedule.isDue(.jointCheck, lastTaken: daysAgo(60), now: now, calendar: calendar))
+        #expect(QuestionnaireSchedule.isDue(.jointCheck, lastTaken: daysAgo(91), now: now, calendar: calendar))
     }
 
     @Test func latestResultCounts() {
-        let results: [(kind: QuestionnaireKind, date: Date)] = [(.dlqi, daysAgo(5)), (.dlqi, daysAgo(80)), (.pest, daysAgo(100))]
-        #expect(QuestionnaireSchedule.due(now: now, results: results, calendar: calendar) == [.pest])
+        let results: [(kind: QuestionnaireKind, date: Date)] = [(.skinImpact, daysAgo(5)), (.skinImpact, daysAgo(80)), (.jointCheck, daysAgo(100))]
+        #expect(QuestionnaireSchedule.due(now: now, results: results, calendar: calendar) == [.jointCheck])
     }
 }
