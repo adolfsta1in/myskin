@@ -217,7 +217,7 @@ struct TreatmentEditor: View {
         } header: {
             Text("Schedule")
         } footer: {
-            Text("Follow the schedule your doctor gave you. Typical schedules are only a starting point.")
+            Text("Typical schedule — use what your doctor prescribed.")
         }
     }
 

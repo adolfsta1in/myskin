@@ -261,7 +261,7 @@ struct SkinNowStep: View {
         @Bindable var draft = draft
         OnboardingPage(
             title: "How is your skin right now?",
-            why: "This becomes your baseline, so progress is measured from where you are today."
+            why: "This becomes your baseline, so progress is tracked from where you are today."
         ) {
             VStack(spacing: 24) {
                 SkinMoodIllustration(level: draft.skinNow)

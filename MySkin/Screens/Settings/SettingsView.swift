@@ -199,6 +199,9 @@ struct SettingsView: View {
             Text("The skin impact and joint check questionnaires were written for MySkin. They are not validated clinical scores.")
                 .font(.rounded(.footnote))
                 .foregroundStyle(Theme.inkSoft)
+            Text("Safety information is based on the American Academy of Dermatology psoriasis guidelines and NICE guideline CG153 (Psoriasis: assessment and management). Medication schedules are typical examples — use what your doctor prescribed.")
+                .font(.rounded(.footnote))
+                .foregroundStyle(Theme.inkSoft)
             if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String {
                 LabeledContent("Version", value: version)
             }

@@ -12,7 +12,7 @@ struct FirstBodyMapStep: View {
         OnboardingPage(
             title: "Where is your skin affected?",
             subtitle: "Tap areas on the body. Tap again for more: mild, moderate, severe.",
-            why: "Doctors estimate how much skin is involved — this helps you both see change over time."
+            why: "Your own estimate of how much skin is involved helps you and your doctor see change over time."
         ) {
             VStack(spacing: 14) {
                 Picker("Side", selection: $side) {
@@ -86,7 +86,7 @@ struct TreatmentsStep: View {
         @Bindable var draft = draft
         OnboardingPage(
             title: "What are you using right now?",
-            subtitle: "Pick from the list, search, or type your own. Schedules can be adjusted later in Treatment.",
+            subtitle: "Pick from the list, search, or type your own. We fill in a typical schedule — change it in Treatment to what your doctor prescribed.",
             why: "Knowing when a treatment started lets you see whether it's making a difference."
         ) {
             VStack(alignment: .leading, spacing: 18) {

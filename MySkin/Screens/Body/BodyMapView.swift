@@ -124,7 +124,7 @@ struct BodyMapView: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .center, spacing: 16) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Estimated area")
+                    Text("Your estimated area")
                         .font(.rounded(.subheadline, weight: .medium))
                         .foregroundStyle(Theme.inkSoft)
                     Text("≈ \(snapshot.bsa, format: .number.precision(.fractionLength(0...1)))%")
@@ -143,7 +143,7 @@ struct BodyMapView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 5)
                         .background(Theme.intensity(level: snapshot.category.rawValue + 1).opacity(0.6), in: .capsule)
-                    Text("Severity index \(snapshot.severityIndex, format: .number.precision(.fractionLength(1)))")
+                    Text("Self-rated index \(snapshot.severityIndex, format: .number.precision(.fractionLength(1)))")
                         .font(.rounded(.caption))
                         .foregroundStyle(Theme.inkSoft)
                 }
@@ -169,7 +169,7 @@ struct BodyMapView: View {
             }
 
             if let day = summary.lastAssessed {
-                Text("Last updated \(day.formatted(.dateTime.month().day()))")
+                Text("Your own estimate, not a clinical measurement · updated \(day.formatted(.dateTime.month().day()))")
                     .font(.rounded(.caption))
                     .foregroundStyle(Theme.inkSoft)
             }
@@ -187,10 +187,10 @@ struct BodyMapView: View {
             Image(systemName: "exclamationmark.circle")
                 .foregroundStyle(Theme.intensitySevere)
             VStack(alignment: .leading, spacing: 2) {
-                Text("Elevated · \(reason)")
+                Text("Worth discussing · \(reason)")
                     .font(.rounded(.subheadline, weight: .semibold))
                     .foregroundStyle(Theme.ink)
-                Text("This may be a reason to discuss systemic treatment with your doctor.")
+                Text("Show this to your doctor at your next visit.")
                     .font(.rounded(.footnote))
                     .foregroundStyle(Theme.inkSoft)
             }

@@ -123,16 +123,14 @@ private struct ModeBanner: View {
 
                 if showsReasons {
                     VStack(alignment: .leading, spacing: 6) {
-                        if let day = status.signalDay, !Calendar.current.isDateInToday(day) {
-                            Text("Seen on \(day.formatted(.dateTime.weekday(.wide).month().day())):")
-                                .font(.rounded(.footnote, weight: .medium))
-                                .foregroundStyle(Theme.inkSoft)
-                        }
+                        Text(entriesHeading)
+                            .font(.rounded(.footnote, weight: .medium))
+                            .foregroundStyle(Theme.inkSoft)
                         ForEach(status.reasons, id: \.self) { reason in
                             Label(reason.explanation, systemImage: "circle.fill")
                                 .labelStyle(BulletLabelStyle())
                         }
-                        Text("Flare mode ends after \(FlareDetector.Threshold.calmDays) days in a row without these signs. If you're worried, discuss it with your doctor.")
+                        Text("Flare mode is a label based on your entries, not a diagnosis. It ends after \(FlareDetector.Threshold.calmDays) days in a row without these signs. Discuss any changes in your skin with your doctor.")
                             .font(.rounded(.footnote))
                             .foregroundStyle(Theme.inkSoft)
                             .padding(.top, 4)
@@ -142,6 +140,13 @@ private struct ModeBanner: View {
             }
             .glassCard(tint: Theme.intensityMild.opacity(0.35))
         }
+    }
+}
+
+extension ModeBanner {
+    private var entriesHeading: String {
+        guard let day = status.signalDay, !Calendar.current.isDateInToday(day) else { return "Based on your entries today:" }
+        return "Based on your entries on \(day.formatted(.dateTime.weekday(.wide).month().day())):"
     }
 }
 
@@ -172,7 +177,7 @@ private struct RedFlagCard: View {
                     Text("Seek medical care now")
                         .font(.rounded(.headline, weight: .semibold))
                         .foregroundStyle(Theme.ink)
-                    Text("Your body map shows signs that need urgent attention. Tap for details.")
+                    Text("What you marked on the body map can need urgent care. Tap for safety information.")
                         .font(.rounded(.subheadline))
                         .foregroundStyle(Theme.inkSoft)
                         .multilineTextAlignment(.leading)

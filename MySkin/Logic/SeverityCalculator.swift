@@ -51,7 +51,7 @@ struct SeveritySnapshot: Equatable, Sendable {
     let specialSiteIDs: [String]
     /// Category after the special-site / arthritis upgrade.
     let category: SeverityCategory
-    /// Special site or suspected arthritis: "may be a reason to discuss systemic therapy".
+    /// Special site or suspected arthritis: worth discussing with the doctor.
     let isElevated: Bool
 
     static let empty = SeveritySnapshot(bsa: 0, severityIndex: 0, specialSiteIDs: [], category: .mild, isElevated: false)

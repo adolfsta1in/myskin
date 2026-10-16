@@ -243,8 +243,8 @@ struct ReportPaper: View {
 
     private var stats: some View {
         HStack(spacing: 8) {
-            stat("Body area", change(report.severityBefore?.bsa, report.severityNow?.bsa) { "\($0.formatted(.number.precision(.fractionLength(0...1))))%" })
-            stat("Severity index", change(report.severityBefore?.severityIndex, report.severityNow?.severityIndex) { $0.formatted(.number.precision(.fractionLength(1))) })
+            stat("Body area (est.)", change(report.severityBefore?.bsa, report.severityNow?.bsa) { "\($0.formatted(.number.precision(.fractionLength(0...1))))%" })
+            stat("Self-rated index", change(report.severityBefore?.severityIndex, report.severityNow?.severityIndex) { $0.formatted(.number.precision(.fractionLength(1))) })
             stat("Avg itch", change(report.itchBefore, report.itchNow) { $0.formatted(.number.precision(.fractionLength(1))) })
         }
     }
@@ -253,7 +253,7 @@ struct ReportPaper: View {
     private var severity: some View {
         VStack(alignment: .leading, spacing: 4) {
             if let now = report.severityNow {
-                line("Category: \(now.category.title)\(now.isElevated ? " · elevated" : "")")
+                line("Self-estimated category: \(now.category.title)\(now.isElevated ? " · raised by special sites or joint symptoms" : "")")
                 if !now.specialSiteIDs.isEmpty {
                     line("Special sites: \(now.specialSiteIDs.compactMap { BodyZone.zone(id: $0)?.name }.formatted(.list(type: .and)))")
                 }

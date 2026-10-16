@@ -26,15 +26,15 @@ nonisolated enum RedFlag: String, CaseIterable, Identifiable, Sendable {
 
     var title: String { "Seek medical care now" }
 
-    /// Neutral wording: describes the signs, does not name a diagnosis.
+    /// Safety information: «if you have these signs, get care». Names no diagnosis.
     var message: String {
         switch self {
         case .widespreadPustules:
-            "Widespread pus-filled bumps together with fever or feeling unwell need urgent medical attention."
+            "If you have pus-filled bumps over a large area together with fever or feeling unwell, seek medical care now."
         case .widespreadRedness:
-            "Redness over most of your body needs urgent medical attention, especially with chills or peeling."
+            "If redness covers most of your body — especially with chills or peeling — seek medical care now."
         case .flareAfterSteroidWithdrawal:
-            "Your skin is getting worse after stopping steroid tablets or injections. Contact your doctor today."
+            "If your skin gets worse after stopping steroid tablets or injections, contact your doctor today."
         }
     }
 }
