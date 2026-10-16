@@ -207,8 +207,10 @@ private struct TodayHeader: View {
                     .foregroundStyle(Theme.ink)
                     .lineLimit(2)
                     .minimumScaleFactor(0.7)
+                    #if DEBUG
                     // Hidden entry point to the design canvas (debug builds only).
                     .onLongPressGesture(perform: onLongPress)
+                    #endif
             }
             Spacer()
             Button(action: onSettings) {
@@ -1219,6 +1221,7 @@ private struct TrendBadge: View {
         .previewSetup()
 }
 
+#if DEBUG
 #Preview("Today · Flare") {
     TodayView()
         .modelContainer(PreviewData.flareContainer)
@@ -1230,3 +1233,4 @@ private struct TrendBadge: View {
         .modelContainer(PreviewData.emptyContainer())
         .previewSetup()
 }
+#endif

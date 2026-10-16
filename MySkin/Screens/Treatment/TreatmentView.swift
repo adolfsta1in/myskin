@@ -310,8 +310,10 @@ private struct InjectionSitesCard: View {
         .previewSetup()
 }
 
+#if DEBUG
 #Preview("Empty") {
     TreatmentView()
         .modelContainer(PreviewData.emptyContainer())
         .previewSetup()
 }
+#endif

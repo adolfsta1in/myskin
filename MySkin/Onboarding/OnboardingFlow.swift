@@ -287,8 +287,10 @@ struct PermissionButtons: View {
     }
 }
 
+#if DEBUG
 #Preview {
     OnboardingFlow()
         .modelContainer(PreviewData.emptyContainer())
         .previewSetup()
 }
+#endif

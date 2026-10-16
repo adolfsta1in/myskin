@@ -157,8 +157,10 @@ private struct TrendCard: View {
         .previewSetup()
 }
 
+#if DEBUG
 #Preview("Empty") {
     InsightsView()
         .modelContainer(PreviewData.emptyContainer())
         .previewSetup()
 }
+#endif
