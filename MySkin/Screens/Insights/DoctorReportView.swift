@@ -43,7 +43,10 @@ struct DoctorReportView: View {
             zones: assessments.map(\.datedScore),
             results: results.map(\.trendPoint),
             treatments: treatments.map(\.reportInput),
-            photos: photos.map { DoctorReport.PhotoInput(zoneID: $0.zoneID, day: $0.day, fileName: $0.fileName) }
+            // Photos aren't in device backups: after a restore, records can outlive their files.
+            photos: photos
+                .filter { PhotoStore.shared?.exists(fileName: $0.fileName) == true }
+                .map { DoctorReport.PhotoInput(zoneID: $0.zoneID, day: $0.day, fileName: $0.fileName) }
         )
     }
 

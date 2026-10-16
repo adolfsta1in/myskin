@@ -39,7 +39,7 @@ struct WelcomeStep: View {
             }
         } footer: {
             PrimaryButton(title: "Get started", action: next)
-            Label("No account needed. Your diary stays in the app on this phone.", systemImage: "lock.fill")
+            Label("No account needed. Your diary is stored in the app on this phone.", systemImage: "lock.fill")
                 .font(.rounded(.footnote))
                 .foregroundStyle(Theme.inkSoft)
         }

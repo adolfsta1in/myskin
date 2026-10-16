@@ -65,12 +65,14 @@ enum PhotoRecords {
 }
 
 /// Photo from the protected folder, decoded off the main actor. Shows a neutral placeholder while loading.
+/// Photos aren't in device backups, so after a restore the record can be there without its file.
 struct StoredPhotoImage: View {
     let fileName: String
     var maxPixelSize = 400
     var cornerRadius: CGFloat = 18
 
     @State private var image: UIImage?
+    @State private var isMissing = false
 
     var body: some View {
         Color.clear
@@ -83,15 +85,30 @@ struct StoredPhotoImage: View {
                     Rectangle()
                         .fill(Theme.sand)
                         .overlay {
-                            Image(systemName: "photo")
-                                .foregroundStyle(Theme.inkSoft.opacity(0.5))
+                            if isMissing {
+                                VStack(spacing: 6) {
+                                    Image(systemName: "photo.badge.exclamationmark")
+                                    // Small tiles only have room for the icon.
+                                    if maxPixelSize >= 1000 {
+                                        Text("This photo isn't on this iPhone")
+                                            .font(.rounded(.footnote))
+                                    }
+                                }
+                                .foregroundStyle(Theme.inkSoft)
+                                .accessibilityElement(children: .ignore)
+                                .accessibilityLabel("This photo isn't on this iPhone")
+                            } else {
+                                Image(systemName: "photo")
+                                    .foregroundStyle(Theme.inkSoft.opacity(0.5))
+                            }
                         }
                 }
             }
             .clipShape(.rect(cornerRadius: cornerRadius))
             .task(id: fileName) {
-                guard let store = PhotoStore.shared,
-                      let data = await store.thumbnailInBackground(fileName: fileName, maxPixelSize: maxPixelSize) else { return }
+                guard let store = PhotoStore.shared else { return }
+                guard store.exists(fileName: fileName) else { isMissing = true; return }
+                guard let data = await store.thumbnailInBackground(fileName: fileName, maxPixelSize: maxPixelSize) else { return }
                 image = UIImage(data: data)
             }
     }

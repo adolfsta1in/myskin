@@ -335,8 +335,8 @@ struct PrivacyStep: View {
                     .glassCard()
 
                 VStack(alignment: .leading, spacing: 14) {
-                    privacyRow("photo.badge.checkmark", "Photos never go to your shared photo library")
-                    privacyRow("iphone", "Your diary is stored in the app on this iPhone")
+                    privacyRow("photo.badge.checkmark", "Photos never go to your shared photo library or device backups")
+                    privacyRow("iphone", "Your diary is stored in the app on this iPhone and included in your iPhone backup")
                     privacyRow("person.crop.circle.badge.xmark", "No account needed")
                     privacyRow("square.and.arrow.up", "Your diary isn't sent anywhere — you choose what to share. Weather, if you turn it on, uses your approximate location")
                 }
