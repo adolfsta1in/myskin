@@ -806,7 +806,7 @@ private struct WeatherCard: View {
             .frame(maxWidth: .infinity, minHeight: 72)
         case .failed:
             prompt(systemImage: "cloud.fill", title: "Weather", text: "Couldn't load the weather.")
-            Button("Try again") { Task { await weather.refresh() } }
+            Button("Try again") { Task { await weather.refresh(isManual: true) } }
                 .font(.rounded(.subheadline, weight: .semibold))
                 .tint(Theme.accent)
         case .loaded(let reading):

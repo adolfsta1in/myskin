@@ -67,12 +67,19 @@ final class WeatherModel {
     /// City (or area) name for the card, from Apple's reverse geocoder; nil if unknown.
     private(set) var placeName: String?
     private let provider: any WeatherProvider
+    @ObservationIgnored private let defaults: UserDefaults
+    @ObservationIgnored private var isFetching = false
+    @ObservationIgnored private var failedAt: Date?
 
-    /// Readings younger than this are reused.
-    static let freshFor: TimeInterval = 30 * 60
+    /// Daily request count (no location). Never rename: existing installs read these.
+    enum Key {
+        static let requestDay = "weatherRequestDay"
+        static let requestCount = "weatherRequestCount"
+    }
 
-    init(provider: any WeatherProvider = OpenMeteoWeather()) {
+    init(provider: any WeatherProvider = OpenMeteoWeather(), defaults: UserDefaults = .standard) {
         self.provider = provider
+        self.defaults = defaults
         state = LocationProvider.status == .notDetermined ? .needsPermission
             : LocationProvider.isDenied ? .denied : .loading
     }
@@ -81,27 +88,54 @@ final class WeatherModel {
         if case .loaded(let reading) = state { reading } else { nil }
     }
 
-    /// Loads the weather if location is allowed. With `askPermission` the system prompt may appear.
-    func refresh(askPermission: Bool = false) async {
-        if let updatedAt, reading != nil, Date.now.timeIntervalSince(updatedAt) < Self.freshFor { return }
+    /// Loads the weather if location is allowed and `WeatherRequestPolicy` lets a request go out.
+    /// With `askPermission` the system prompt may appear; `isManual` is the «Try again» button.
+    func refresh(askPermission: Bool = false, isManual: Bool = false) async {
         if LocationProvider.isDenied { state = .denied; return }
         if LocationProvider.status == .notDetermined && !askPermission { state = .needsPermission; return }
+        guard !isFetching, WeatherRequestPolicy.mayRequest(
+            now: .now,
+            lastSuccess: reading == nil ? nil : updatedAt,
+            lastFailure: failedAt,
+            isManual: isManual || askPermission,
+            daily: dailyCount
+        ) else {
+            // Nothing new to show and no request allowed: don't spin forever.
+            if state == .loading { state = .failed }
+            return
+        }
+        isFetching = true
+        defer { isFetching = false }
         state = .loading
         do {
             let location = try await withTimeout(seconds: 20) {
                 try await LocationProvider.currentLocation(askPermission: askPermission)
             }
+            dailyCount = (dailyCount ?? WeatherRequestPolicy.DailyCount(day: .now, count: 0)).adding(on: .now)
             let reading = try await provider.reading(
                 latitude: location.coordinate.latitude,
                 longitude: location.coordinate.longitude
             )
             state = .loaded(reading)
             updatedAt = .now
+            failedAt = nil
             placeName = await Self.placeName(for: location)
         } catch LocationProvider.LocationError.denied {
             state = LocationProvider.status == .notDetermined ? .needsPermission : .denied
         } catch {
             state = .failed
+            failedAt = .now
+        }
+    }
+
+    private var dailyCount: WeatherRequestPolicy.DailyCount? {
+        get {
+            guard let day = defaults.object(forKey: Key.requestDay) as? Date else { return nil }
+            return WeatherRequestPolicy.DailyCount(day: day, count: defaults.integer(forKey: Key.requestCount))
+        }
+        set {
+            defaults.set(newValue?.day, forKey: Key.requestDay)
+            defaults.set(newValue?.count, forKey: Key.requestCount)
         }
     }
 
