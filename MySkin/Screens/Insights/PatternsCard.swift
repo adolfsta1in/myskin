@@ -261,6 +261,7 @@ struct PatternDetailView: View {
     }
 }
 
+#if DEBUG
 #Preview("Patterns") {
     NavigationStack {
         ScrollView { PatternsCard().padding() }
@@ -269,3 +270,4 @@ struct PatternDetailView: View {
     .modelContainer(PreviewData.container)
     .previewSetup()
 }
+#endif
