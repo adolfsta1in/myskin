@@ -11,7 +11,7 @@ struct InsightsView: View {
     var body: some View {
         let start = Trends.periodStart(endingOn: .now)
         let itch = Trends.weeklyItch(checkIns: checkIns.map(\.sample), from: start, to: .now)
-        let bsa = Trends.bsaHistory(zones: assessments.map(\.datedScore), from: start, to: .now)
+        let bsa = Trends.bsaHistory(zones: assessments.datedScores, from: start, to: .now)
         let skinImpact = Trends.scores(.skinImpact, results: results.map(\.trendPoint), from: start, to: .now)
 
         NavigationStack {

@@ -21,6 +21,8 @@ struct DataExportTests {
         #expect(CSV.food(nil) == "")
         #expect(CSV.food([]) == "none")
         #expect(CSV.food(["dairy", "coffee"]) == "dairy;coffee")
+        // Only custom foods: not «None of these».
+        #expect(CSV.food([], custom: ["Eggs"]) == "")
     }
 
     @Test func datesUseTheLocalDay() throws {

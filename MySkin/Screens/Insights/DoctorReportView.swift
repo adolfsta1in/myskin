@@ -40,7 +40,7 @@ struct DoctorReportView: View {
                 arthritis: profiles.first?.arthritisStatus
             ),
             checkIns: checkIns.map(\.reportSample),
-            zones: assessments.map(\.datedScore),
+            zones: assessments.datedScores,
             results: results.map(\.trendPoint),
             treatments: treatments.map(\.reportInput),
             // Photos aren't in device backups: after a restore, records can outlive their files.

@@ -19,7 +19,7 @@ struct DiaryCalendarView: View {
         let marks = DiaryCalendar.marks(
             month: month,
             checkIns: checkIns.map(\.sample),
-            zones: assessments.map(\.datedScore),
+            zones: assessments.datedScores,
             photoDays: photos.map(\.day),
             doseDays: doses.filter { $0.status == .done }.map(\.timestamp)
         )

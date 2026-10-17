@@ -16,7 +16,7 @@ struct BodyMapView: View {
     private var summary: BodyMapSummary {
         let joints = Questionnaires.jointSymptomsNoted(results: questionnaires.map(\.trendPoint))
         return BodyMapSummary.make(
-            zones: assessments.map(\.datedScore),
+            zones: assessments.datedScores,
             arthritisSuspected: ArthritisRules.isSuspected(status: profiles.first?.arthritisStatus, jointSymptomsNoted: joints)
         )
     }

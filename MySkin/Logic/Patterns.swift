@@ -37,7 +37,7 @@ extension DailyCheckIn {
 }
 
 /// A treatment's schedule with its dose marks, for the «missed doses» factor.
-struct PatternTreatment {
+struct PatternTreatment: Hashable {
     let schedule: DoseSchedule
     let logs: [LoggedDose]
 }

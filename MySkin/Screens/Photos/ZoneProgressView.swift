@@ -17,15 +17,19 @@ struct ZoneProgressView: View {
 
     init(zoneID: String) {
         self.zoneID = zoneID
-        _photos = Query(filter: #Predicate<Photo> { $0.zoneID == zoneID }, sort: \Photo.createdAt)
+        // Old photos of retired zones (e.g. the neck before it became a quick zone) show here too.
+        let ids = PhotoRecords.storedZoneIDs(forPhotoZone: zoneID)
+        _photos = Query(filter: #Predicate<Photo> { ids.contains($0.zoneID) }, sort: \Photo.createdAt)
     }
 
     private var zoneName: String { BodyZone.named(id: zoneID)?.name ?? "Area" }
 
-    /// Treatments applied to this zone, by start date.
+    /// Treatments applied to this zone, by start date. Ids are compared after `canonicalID`:
+    /// face photos live in `quick.face`, treatments save `front.head`.
     private var markers: [(date: Date, title: String)] {
-        treatments
-            .filter { $0.zoneIDs.contains(zoneID) }
+        let zone = BodyZone.canonicalID(zoneID)
+        return treatments
+            .filter { $0.zoneIDs.contains { BodyZone.canonicalID($0) == zone } }
             .map { ($0.startDate, $0.name) }
             .sorted { $0.date < $1.date }
     }

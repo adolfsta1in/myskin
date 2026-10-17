@@ -54,40 +54,74 @@ nonisolated struct RemoteConfig: Equatable, Sendable {
 
     // MARK: Parsing
 
+    /// Only `schema` is required. Every other part is decoded on its own, so a typo in one
+    /// (a date-only `until`, a number instead of a string) can't take the minimum version down with it.
     private struct File: Decodable {
         struct Announcement: Decodable {
             let id: String
             let title: String
             let message: String
             let link: String?
-            let until: Date?
+            let until: String?
         }
+        /// Decodes to nil instead of failing.
+        private struct Lenient<T: Decodable>: Decodable {
+            let value: T?
+            init(from decoder: Decoder) throws { value = try? T(from: decoder) }
+        }
+        private enum CodingKeys: String, CodingKey {
+            case schema, minimumVersion, updateURL, disabledFeatures, announcement
+        }
+
         let schema: Int
         let minimumVersion: String?
         let updateURL: String?
-        let disabledFeatures: [String]?
+        let disabledFeatures: [String]
         let announcement: Announcement?
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            schema = try container.decode(Int.self, forKey: .schema)
+            minimumVersion = try? container.decodeIfPresent(String.self, forKey: .minimumVersion)
+            updateURL = try? container.decodeIfPresent(String.self, forKey: .updateURL)
+            let features = try? container.decodeIfPresent([Lenient<String>].self, forKey: .disabledFeatures)
+            disabledFeatures = (features ?? []).compactMap(\.value)
+            announcement = try? container.decodeIfPresent(Announcement.self, forKey: .announcement)
+        }
+    }
+
+    /// `until`: ISO 8601 date-time, or a date alone (`2026-11-01` — through that day, UTC).
+    /// nil for an unreadable value.
+    static func parseDate(_ string: String) -> Date? {
+        let trimmed = string.trimmingCharacters(in: .whitespaces)
+        if let date = try? Date(trimmed, strategy: .iso8601) { return date }
+        let day = try? Date(trimmed, strategy: Date.ISO8601FormatStyle().year().month().day())
+        return day?.addingTimeInterval(24 * 60 * 60)
     }
 
     /// Parses and checks the file; nil means "ignore it, keep the last good config".
-    /// Bad optional parts (a non-https link, an empty announcement) are dropped, not fatal.
+    /// Bad optional parts (a non-https link, an empty announcement, a wrong type) are dropped, not fatal.
     static func parse(_ data: Data) -> RemoteConfig? {
         guard data.count <= maxBytes else { return nil }
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        guard let file = try? decoder.decode(File.self, from: data), file.schema == schemaVersion else { return nil }
+        guard let file = try? JSONDecoder().decode(File.self, from: data), file.schema == schemaVersion else { return nil }
 
         let minimumVersion = file.minimumVersion.flatMap { AppVersion.components($0) == nil ? nil : $0 }
         let updateURL = file.updateURL.flatMap { safeURL($0, hosts: ["apps.apple.com"]) }
-        let features = Set((file.disabledFeatures ?? []).compactMap(RemoteFeature.init(rawValue:)))
+        let features = Set(file.disabledFeatures.compactMap(RemoteFeature.init(rawValue:)))
         let announcement = file.announcement.flatMap { item -> RemoteAnnouncement? in
             let id = item.id.trimmingCharacters(in: .whitespacesAndNewlines)
             let title = item.title.trimmingCharacters(in: .whitespacesAndNewlines)
             let message = item.message.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !id.isEmpty, !title.isEmpty,
                   title.count <= maxTitleLength, message.count <= maxMessageLength else { return nil }
+            // An unreadable end date would show the notice forever: drop the notice instead.
+            var until: Date?
+            if let raw = item.until {
+                guard let date = parseDate(raw) else { return nil }
+                until = date
+            }
             return RemoteAnnouncement(id: id, title: title, message: message,
-                                      link: item.link.flatMap { safeURL($0, hosts: nil) }, until: item.until)
+                                      link: item.link.flatMap { safeURL($0, hosts: nil) }, until: until)
         }
         return RemoteConfig(minimumVersion: minimumVersion, updateURL: updateURL,
                             disabledFeatures: features, announcement: announcement)

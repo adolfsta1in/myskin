@@ -19,6 +19,26 @@ struct RemoteConfigTests {
         #expect(config.announcement?.link != nil)
     }
 
+    @Test func badOptionalPartKeepsTheRest() throws {
+        let config = try #require(parse("""
+        {"schema":1,"minimumVersion":"1.2","updateURL":42,"disabledFeatures":["weather",7],
+         "announcement":{"id":"a1","title":"Hello","message":"News","until":"soon"}}
+        """))
+        #expect(config.minimumVersion == "1.2")
+        #expect(config.updateURL == nil)
+        #expect(config.disabledFeatures == [.weather])
+        // An unreadable end date drops the notice instead of showing it forever.
+        #expect(config.announcement == nil)
+    }
+
+    @Test func dateOnlyUntilLastsThroughThatDay() throws {
+        let config = try #require(parse("""
+        {"schema":1,"announcement":{"id":"a1","title":"Hello","message":"","until":"2026-11-01"}}
+        """))
+        let until = try #require(config.announcement?.until)
+        #expect(until == Date(timeIntervalSince1970: 1_793_577_600)) // 2026-11-02T00:00:00Z
+    }
+
     @Test func wrongSchemaOrBrokenJSONIsIgnored() {
         #expect(parse(#"{"schema":2}"#) == nil)
         #expect(parse(#"{"minimumVersion":"1.0"}"#) == nil)

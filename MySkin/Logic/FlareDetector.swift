@@ -19,8 +19,42 @@ struct DatedZoneScore: Hashable, Sendable {
     let score: ZoneScore
 }
 
+extension DatedZoneScore {
+    /// Same-day ratings that land on one zone (retired neck/face ids moved by `canonicalID`) become one:
+    /// area adds up (the zone's area still caps it), each sign takes the highest, pustules if any.
+    /// Order of first appearance is kept.
+    static func merged(_ zones: [DatedZoneScore], calendar: Calendar = .current) -> [DatedZoneScore] {
+        struct Key: Hashable { let day: Date; let zoneID: String }
+        var order: [Key] = []
+        var byKey: [Key: DatedZoneScore] = [:]
+        for entry in zones {
+            let key = Key(day: calendar.startOfDay(for: entry.day), zoneID: entry.score.zoneID)
+            guard let existing = byKey[key] else {
+                order.append(key)
+                byKey[key] = entry
+                continue
+            }
+            let a = existing.score, b = entry.score
+            byKey[key] = DatedZoneScore(day: existing.day, score: ZoneScore(
+                zoneID: a.zoneID,
+                palms: a.palms + b.palms,
+                erythema: max(a.erythema, b.erythema),
+                induration: max(a.induration, b.induration),
+                scale: max(a.scale, b.scale),
+                pustules: a.pustules || b.pustules
+            ))
+        }
+        return order.compactMap { byKey[$0] }
+    }
+}
+
 extension ZoneAssessment {
     var datedScore: DatedZoneScore { DatedZoneScore(day: day, score: score) }
+}
+
+extension Sequence<ZoneAssessment> {
+    /// Dated scores with same-day ratings of one zone merged — use this, not `map(\.datedScore)`.
+    var datedScores: [DatedZoneScore] { DatedZoneScore.merged(map(\.datedScore)) }
 }
 
 // MARK: - Output
@@ -110,7 +144,7 @@ enum FlareDetector {
         assessments: [ZoneAssessment],
         calendar: Calendar = .current
     ) -> FlareStatus {
-        status(on: date, checkIns: checkIns.map(\.sample), zones: assessments.map(\.datedScore), calendar: calendar)
+        status(on: date, checkIns: checkIns.map(\.sample), zones: assessments.datedScores, calendar: calendar)
     }
 
     /// Check-ins with an unsaved draft in place of the stored check-in of its day,

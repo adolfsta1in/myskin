@@ -18,12 +18,12 @@ struct TodayView: View {
     /// Calm / Flare is computed from the data (`FlareDetector`), never chosen by hand.
     private var status: FlareStatus {
         let samples = FlareDetector.checkIns(checkIns.map(\.sample), replacingWith: draftSample)
-        return FlareDetector.status(on: .now, checkIns: samples, zones: assessments.map(\.datedScore))
+        return FlareDetector.status(on: .now, checkIns: samples, zones: assessments.datedScores)
     }
 
     /// Latest assessment of each zone.
     private var currentZones: [ZoneScore] {
-        Array(BodyMapSummary.make(zones: assessments.map(\.datedScore)).current.values)
+        Array(BodyMapSummary.make(zones: assessments.datedScores).current.values)
     }
 
     var body: some View {
@@ -748,7 +748,7 @@ private struct CalmDaysCard: View {
     @Query private var assessments: [ZoneAssessment]
 
     private var calmDays: Int {
-        TodayStats.calmDaysThisMonth(on: .now, checkIns: checkIns.map(\.sample), zones: assessments.map(\.datedScore))
+        TodayStats.calmDaysThisMonth(on: .now, checkIns: checkIns.map(\.sample), zones: assessments.datedScores)
     }
 
     var body: some View {

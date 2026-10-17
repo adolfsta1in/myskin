@@ -7,6 +7,8 @@ struct UpdateRequiredView: View {
     let updateURL: URL?
 
     @Environment(\.openURL) private var openURL
+    /// Safety information stays reachable even when the app itself isn't.
+    @State private var showsSafety = false
 
     var body: some View {
         ZStack {
@@ -40,10 +42,16 @@ struct UpdateRequiredView: View {
                             .foregroundStyle(Theme.ink)
                             .multilineTextAlignment(.center)
                     }
+                    Button("Urgent symptoms?") { showsSafety = true }
+                        .font(.rounded(.subheadline, weight: .semibold))
+                        .foregroundStyle(Theme.accent)
                 }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 24)
             }
+        }
+        .fullScreenCover(isPresented: $showsSafety) {
+            RedFlagView(flags: RedFlag.allCases)
         }
     }
 }

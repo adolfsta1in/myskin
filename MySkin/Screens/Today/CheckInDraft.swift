@@ -155,6 +155,8 @@ struct CheckInDraft: Equatable, PickDraft {
         checkIns
             .filter { $0.day < day }
             .sorted { $0.day > $1.day }
+            // `QuickPicks` reads only the newest entries; drafts for the rest would be wasted on every redraw.
+            .prefix(QuickPicks.Threshold.window)
             .map { CheckInDraft($0).picks }
     }
 

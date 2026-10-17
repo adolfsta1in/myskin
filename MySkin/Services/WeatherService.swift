@@ -136,7 +136,9 @@ final class WeatherModel {
         }
         isFetching = true
         defer { isFetching = false }
-        state = .loading
+        // Today's reading stays on the card (and goes into the check-in) while a newer one loads.
+        let kept = keptReading
+        if kept == nil { state = .loading }
         do {
             let location = try await withTimeout(seconds: 20) {
                 try await LocationProvider.currentLocation(askPermission: askPermission)
@@ -157,9 +159,15 @@ final class WeatherModel {
             // Domain and code only: the description can carry the request URL with coordinates.
             let nsError = error as NSError
             Self.log.error("Weather failed: \(nsError.domain, privacy: .public) \(nsError.code, privacy: .public)")
-            state = .failed
+            state = kept.map { .loaded($0) } ?? .failed
             failedAt = .now
         }
+    }
+
+    /// The current reading if it was fetched today; an older one isn't today's weather.
+    private var keptReading: WeatherReading? {
+        guard let reading, let updatedAt, Calendar.current.isDateInToday(updatedAt) else { return nil }
+        return reading
     }
 
     private var dailyCount: WeatherRequestPolicy.DailyCount? {

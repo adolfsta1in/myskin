@@ -94,6 +94,10 @@ struct RootView: View {
             } else if !settings.hasCompletedOnboarding {
                 OnboardingFlow()
                     .transition(.opacity)
+            } else if lock.isLocked {
+                // Before the paywall: it offers a full diary export.
+                PrivacyLockView()
+                    .transition(.opacity)
             } else if let subscriptions, !subscriptions.hasCheckedEntitlements {
                 // A moment on launch while StoreKit reads the (cached) entitlements.
                 WarmBackground()
@@ -104,9 +108,6 @@ struct RootView: View {
                     // No access, no diary reminders: a lapsed subscriber shouldn't be nudged into a locked app.
                     // `ReminderSync` plans them again once the tabs are back.
                     .task { await NotificationService.removeAll() }
-            } else if lock.isLocked {
-                PrivacyLockView()
-                    .transition(.opacity)
             } else {
                 MainTabView()
                     .transition(.opacity)

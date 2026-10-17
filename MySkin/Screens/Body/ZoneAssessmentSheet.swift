@@ -27,7 +27,8 @@ struct ZoneAssessmentSheet: View {
         _draft = State(initialValue: draft)
         let photoZoneID = PhotoRecords.photoZone(for: zone).id
         self.photoZoneID = photoZoneID
-        _photos = Query(filter: #Predicate<Photo> { $0.zoneID == photoZoneID })
+        let ids = PhotoRecords.storedZoneIDs(forPhotoZone: photoZoneID)
+        _photos = Query(filter: #Predicate<Photo> { ids.contains($0.zoneID) })
     }
 
     var body: some View {

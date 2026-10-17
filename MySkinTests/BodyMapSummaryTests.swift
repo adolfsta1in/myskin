@@ -21,6 +21,27 @@ struct BodyMapSummaryTests {
         DatedZoneScore(day: day(offset), score: ZoneScore(zoneID: zoneID, palms: palms, erythema: signs, induration: signs, scale: signs))
     }
 
+    @Test func sameDayRetiredNeckRatingsAreMerged() {
+        // Front and back of the neck from before they became one quick zone.
+        let zones = DatedZoneScore.merged([
+            DatedZoneScore(day: day(0), score: ZoneScore(zoneID: BodyZone.canonicalID("front.neck"), palms: 1, erythema: 1)),
+            DatedZoneScore(day: day(0), score: ZoneScore(zoneID: BodyZone.canonicalID("back.neck"), palms: 0.5, erythema: 3, pustules: true)),
+            entry(0, "front.elbow.left", palms: 1),
+        ], calendar: calendar)
+        #expect(zones.count == 2)
+        let neck = zones.first { $0.score.zoneID == "quick.neck" }?.score
+        #expect(neck?.palms == 1.5)
+        #expect(neck?.erythema == 3)
+        #expect(neck?.pustules == true)
+        let summary = BodyMapSummary.make(zones: zones, calendar: calendar)
+        #expect(abs(summary.snapshot.bsa - 1.9) < 0.001)
+    }
+
+    @Test func ratingsOnDifferentDaysAreNotMerged() {
+        let zones = DatedZoneScore.merged([entry(-1, "quick.neck", palms: 1), entry(0, "quick.neck", palms: 0.5)], calendar: calendar)
+        #expect(zones.count == 2)
+    }
+
     @Test func emptyWithoutAssessments() {
         #expect(BodyMapSummary.make(zones: [], calendar: calendar) == .empty)
     }

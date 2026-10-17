@@ -11,6 +11,8 @@ struct StoreRecoveryView: View {
     @State private var isConfirmingNewDiary = false
     @State private var stillFailing = false
     @State private var error: String?
+    /// Safety information stays reachable even when the diary isn't.
+    @State private var showsSafety = false
 
     var body: some View {
         ZStack {
@@ -52,6 +54,10 @@ struct StoreRecoveryView: View {
                         Button("Start a new diary", role: .destructive) { isConfirmingNewDiary = true }
                             .font(.rounded(.subheadline, weight: .medium))
                             .padding(.top, 8)
+                        Button("Urgent symptoms?") { showsSafety = true }
+                            .font(.rounded(.subheadline, weight: .semibold))
+                            .foregroundStyle(Theme.accent)
+                            .padding(.top, 8)
                     }
                 }
                 .padding(.horizontal, 24)
@@ -63,6 +69,9 @@ struct StoreRecoveryView: View {
         // The store can be unreadable while the iPhone is still locked; retry once it's in use.
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { _ = retry() }
+        }
+        .fullScreenCover(isPresented: $showsSafety) {
+            RedFlagView(flags: RedFlag.allCases)
         }
         .healthDataShare(isPresented: $isSharing) {
             try AppModelContainer.copyStoreFiles()

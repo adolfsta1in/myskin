@@ -43,19 +43,35 @@ enum PhotoRecords {
         try context.save()
     }
 
-    /// Zones that have photos, newest photo first. `photos` must be sorted newest first.
     /// Zone a photo is filed under. «Face» on the silhouette (`front.head`) and the special
     /// «Face» area are the same place, so face photos all go to `quick.face` (off the map since, but still the face folder).
     static func photoZone(for zone: BodyZone) -> BodyZone {
         zone.id == "front.head" ? BodyZone.named(id: "quick.face") ?? zone : zone
     }
 
+    /// Folder of a stored photo zone id: retired ids join their replacement (old neck photos → `quick.neck`),
+    /// the face stays `quick.face`.
+    static func photoZoneID(_ id: String) -> String {
+        let id = BodyZone.canonicalID(id)
+        return id == "front.head" ? "quick.face" : id
+    }
+
+    /// Stored zone ids whose photos belong to this folder.
+    static func storedZoneIDs(forPhotoZone id: String) -> [String] {
+        let folder = photoZoneID(id)
+        let known = [id] + BodyZone.all.map(\.id) + BodyZone.retired.map(\.id)
+        var seen: Set<String> = []
+        return known.filter { photoZoneID($0) == folder && seen.insert($0).inserted }
+    }
+
+    /// Zones that have photos, newest photo first. `photos` must be sorted newest first.
     static func zonesWithPhotos(_ photos: [Photo]) -> [(zoneID: String, latest: Photo, count: Int)] {
         var order: [String] = []
         var groups: [String: [Photo]] = [:]
         for photo in photos {
-            if groups[photo.zoneID] == nil { order.append(photo.zoneID) }
-            groups[photo.zoneID, default: []].append(photo)
+            let folder = photoZoneID(photo.zoneID)
+            if groups[folder] == nil { order.append(folder) }
+            groups[folder, default: []].append(photo)
         }
         return order.compactMap { id in
             guard let group = groups[id], let latest = group.first else { return nil }

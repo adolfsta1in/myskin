@@ -17,10 +17,22 @@ struct PatternsCard: View {
     @Query private var doseLogs: [DoseLog]
     @State private var report: PatternReport?
 
-    /// Changes whenever the diary could give a different report.
-    private var signature: String {
-        let latest = checkIns.map(\.updatedAt).max()?.timeIntervalSince1970 ?? 0
-        return "\(checkIns.count)|\(latest)|\(assessments.count)|\(treatments.count)|\(doseLogs.count)"
+    /// Everything the report reads, so an edit that keeps the counts (a re-rated zone,
+    /// a changed schedule) still recomputes it.
+    private struct Inputs: Hashable {
+        let checkIns: [PatternDay]
+        let zones: [DatedZoneScore]
+        let treatments: [PatternTreatment]
+    }
+
+    private var inputs: Inputs {
+        // `doseLogs` is queried only so that a new mark refreshes the card; treatments carry their logs.
+        _ = doseLogs.count
+        return Inputs(
+            checkIns: checkIns.map(\.patternDay),
+            zones: assessments.datedScores,
+            treatments: treatments.map { PatternTreatment(schedule: $0.doseSchedule, logs: $0.doses.map(\.logged)) }
+        )
     }
 
     var body: some View {
@@ -29,11 +41,12 @@ struct PatternsCard: View {
             content
         }
         .glassCard()
-        .task(id: signature) {
+        .task(id: inputs) {
+            let inputs = inputs
             let days = PatternInput.days(
-                checkIns: checkIns.map(\.patternDay),
-                zones: assessments.map(\.datedScore),
-                treatments: treatments.map { PatternTreatment(schedule: $0.doseSchedule, logs: $0.doses.map(\.logged)) },
+                checkIns: inputs.checkIns,
+                zones: inputs.zones,
+                treatments: inputs.treatments,
                 asOf: .now
             )
             report = await Patterns.reportInBackground(days: days)

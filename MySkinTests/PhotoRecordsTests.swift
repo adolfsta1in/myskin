@@ -62,6 +62,20 @@ struct PhotoRecordsTests {
         #expect(PhotoRecords.photoZone(for: elbow).id == "front.elbow.left")
     }
 
+    @Test func retiredZonesJoinTheirReplacementFolder() {
+        #expect(PhotoRecords.photoZoneID("front.neck") == "quick.neck")
+        #expect(PhotoRecords.photoZoneID("front.head") == "quick.face")
+        #expect(PhotoRecords.photoZoneID("quick.face") == "quick.face")
+        #expect(Set(PhotoRecords.storedZoneIDs(forPhotoZone: "quick.neck")) == ["quick.neck", "front.neck", "back.neck"])
+        #expect(Set(PhotoRecords.storedZoneIDs(forPhotoZone: "quick.face")) == ["quick.face", "front.head"])
+
+        let old = Photo(day: .now.addingTimeInterval(-86_400), zoneID: "front.neck", fileName: "a.jpg")
+        let new = Photo(day: .now, zoneID: "quick.neck", fileName: "b.jpg")
+        let zones = PhotoRecords.zonesWithPhotos([new, old])
+        #expect(zones.map(\.zoneID) == ["quick.neck"])
+        #expect(zones.first?.count == 2)
+    }
+
     @Test func zonesAreGroupedNewestFirst() {
         let old = Photo(day: .now.addingTimeInterval(-86_400 * 3), zoneID: "quick.scalp", fileName: "a.jpg")
         let mid = Photo(day: .now.addingTimeInterval(-86_400), zoneID: "back.elbow.left", fileName: "b.jpg")
