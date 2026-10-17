@@ -595,6 +595,30 @@ MySkinTests/      Swift Testing
 ### Шаг 61.2. Чек-лист США: возраст и сайт ✅
 - **Сделано (2026-10-17):** `Logic/AgeGate.swift` (порог 16; `status(isRequired:answer:)`: не требуется / разрешено / младше 16 / неизвестно — при ошибке не блокируем, повтор при следующем запуске), `Services/AgeAssurance.swift` (`isEligibleForAgeFeatures` под iOS 26.2+, затем `requestAgeRange(ageGates: 16)`; раз за запуск; ничего не хранит; `AgeRestrictedView` с «Urgent symptoms?»). `RootView`: младше 16 — экран ограничения вместо приложения. Сайт (`~/Desktop/myskinsite`, задеплоен): Terms — 16+ и оговорка про закономерности; Consumer Health Data Privacy — источники (локация с устройства), согласие, исключение про Apple, порядок апелляции. Тесты 337/337 на iPhone A. Entitlement `com.apple.developer.declared-age-range` добавлен после включения capability (пользователь — через Xcode); подписанное приложение его содержит, запуск на iPhone A без ошибок. Сам запрос возраста вне регулируемых регионов не показывается — экран ограничения на устройстве не проверялся.
 
+### Локализация (v1.0): de, pt-BR, es-419
+Решение пользователя от 2026-10-17: Supabase (шаги 54–57) не входит в v1.0, вместо этого первый выпуск локализуется. Языки: немецкий, португальский (Бразилия), латиноамериканский испанский. Переводит Claude, отдельной вычитки нет. В данных по-прежнему только id и rawValue, схема не меняется; свой текст пользователя не переводится.
+
+### Шаг 62.0. Инфраструктура локализации ✅
+- **Сделано (2026-10-17):** `MySkin/Localizable.xcstrings` (Xcode при сборке извлёк 362 ключа) и `MySkin/InfoPlist.xcstrings` (usage descriptions камеры, Face ID и геолокации переведены на 3 языка); `knownRegions` += `de`, `pt-BR`, `es-419`. Тесты в схеме идут на `en` (`TestAction language`), чтобы тесты с английскими строками не зависели от языка телефона. `SectionHeader`, `WhyWeAskText`, `TagChip`, `PrimaryButton`, `SecondaryButton` принимают текст как `Text`: литерал — ключ `LocalizedStringResource`, значение `String` (`@_disfavoredOverload`) показывается как есть. `LocalizationTests`: языки в бандле, переводы usage descriptions. Тесты 349/349 на iPhone A (6 файловых тестов упали при заблокированном телефоне и прошли при повторе).
+
+### Шаг 62.1. Строки логики и домена
+- `title`/`explanation`/`message`/`summary` в `Model/Domain/` и `Logic/` → `String(localized:comment:)` (тип `String` прежний). Имена зон, МНН в `MedicationCatalog` (бренды без перевода), опросники, Flare, красные флаги, Patterns, отчёт, тексты уведомлений, `DoseScheduler.summary`, `InjectionPlan.countdownText`, ошибки сервисов. Счётные строки — plural-варианты в каталоге. `EmergencyNumber`: BR 192 и страны es-419 (сверить с официальными источниками).
+
+### Шаг 62.2. Экраны и форматы
+- Строки, собранные во view в `String` (`PaywallContent` «Yearly/Weekly», `"Continue"` после `??`, `greeting`, `OnboardingPage.why`…), → `String(localized:)`/`LocalizedStringResource`; пользовательский текст — `Text(verbatim:)`. PDF — на языке приложения; CSV — английские стабильные заголовки и значения. `RemoteAnnouncement.localizedMessages` с откатом на `message`. `AppLinks` — страница сайта на языке пользователя с откатом на английскую.
+
+### Шаг 62.3. Переводы
+- `docs/localization-glossary.md` (Calm/Flare, BSA, self-rated, зоны, FTU; de — du, pt-BR — você, es-419 — tú; единая формула «discuss with your doctor»), затем все ключи на 3 языка, включая plural-формы.
+
+### Шаг 62.4. Проверка вёрстки
+- iPhone A в каждом языке (de — самый длинный): онбординг, пейвол, Today, карта, лечение, Insights, PDF, уведомления, системные запросы, AX5.
+
+### Шаг 62.5. App Store Connect
+- `reports/App Store localization.md`: метаданные для de-DE, pt-BR, es-MX (es-419 в ASC нет), группа подписок и оба продукта; скриншоты на 3 языках.
+
+### Шаг 62.6. Сайт myskin.cc
+- Privacy, Terms & Medical Disclaimer, FAQ, страница о медданных на de/pt-BR/es (`/de/…`, `/pt-br/…`, `/es/…`, `hreflang`); английская версия — основная, переводы без юриста.
+
 ---
 
 ## Сводка по этапам

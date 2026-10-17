@@ -1,0 +1,1211 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    " " : {
+
+    },
+    "%@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
+    "%@ fingertip unit%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ fingertip unit%2$@"
+          }
+        }
+      }
+    },
+    "%@ – %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ – %2$@"
+          }
+        }
+      }
+    },
+    "%@ → %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ → %2$@"
+          }
+        }
+      }
+    },
+    "%@%% %@ vs previous assessment" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@%% %2$@ vs previous assessment"
+          }
+        }
+      }
+    },
+    "%@%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@%2$@"
+          }
+        }
+      }
+    },
+    "%lld" : {
+
+    },
+    "%lld active" : {
+
+    },
+    "%lld calm %@ this month" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld calm %2$@ this month"
+          }
+        }
+      }
+    },
+    "%lld percent" : {
+
+    },
+    "%lld photo%@ · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld photo%2$@ · %3$@"
+          }
+        }
+      }
+    },
+    "%lld time%@ a day" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld time%2$@ a day"
+          }
+        }
+      }
+    },
+    "%lld times" : {
+
+    },
+    "%lld · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld · %2$@"
+          }
+        }
+      }
+    },
+    "%lld-day free trial" : {
+
+    },
+    "0" : {
+
+    },
+    "10" : {
+
+    },
+    "A line from the fingertip to the first crease. One unit covers about two adult palms." : {
+
+    },
+    "A line of cream from the fingertip to the first crease" : {
+
+    },
+    "A rough start — you can refine each area in the Body tab" : {
+
+    },
+    "About" : {
+
+    },
+    "About 10 seconds" : {
+
+    },
+    "About you" : {
+
+    },
+    "Add" : {
+
+    },
+    "Add another photo of this area to compare before and after." : {
+
+    },
+    "Add pain, sleep, mood or a note" : {
+
+    },
+    "Add photo" : {
+
+    },
+    "Add the creams, tablets or injections your doctor prescribed to get reminders and track how they work." : {
+
+    },
+    "Add treatment" : {
+
+    },
+    "Add your treatments in the Treatment tab to see today's doses here." : {
+
+    },
+    "Add “%@” as custom" : {
+
+    },
+    "Affected area" : {
+
+    },
+    "Age" : {
+
+    },
+    "All photos" : {
+
+    },
+    "Allow notifications for MySkin in the Settings app to get reminders." : {
+
+    },
+    "Almost clear" : {
+
+    },
+    "Any of these today?" : {
+
+    },
+    "Anything else? (optional)" : {
+
+    },
+    "Anything that could matter today?" : {
+
+    },
+    "Anything that might matter?" : {
+
+    },
+    "Apple Weather" : {
+
+    },
+    "Areas" : {
+
+    },
+    "Back" : {
+
+    },
+    "Based on %lld check-ins." : {
+
+    },
+    "Before and after comparison" : {
+
+    },
+    "Body" : {
+
+    },
+    "Body map" : {
+
+    },
+    "Call %@" : {
+
+    },
+    "Calm mode" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Change plan or cancel in your Apple Account. Cancel at least a day before renewal to avoid being charged." : {
+
+    },
+    "Check in daily and calm days will add up here." : {
+
+    },
+    "Check-ins, body maps, photos, treatments and questionnaires will be removed from this iPhone." : {
+
+    },
+    "Checked, and itch looked about the same with or without" : {
+
+    },
+    "Checking the weather…" : {
+
+    },
+    "Chills" : {
+
+    },
+    "Choose the site when you mark an injection on Today." : {
+
+    },
+    "Clear this area" : {
+
+    },
+    "Close" : {
+
+    },
+    "Compare in a month — the difference will show." : {
+
+    },
+    "Contact support" : {
+
+    },
+    "Continue" : {
+
+    },
+    "Couldn't add the photo" : {
+
+    },
+    "Couldn't delete" : {
+
+    },
+    "Couldn't delete the photo" : {
+
+    },
+    "Couldn't export" : {
+
+    },
+    "Couldn't load subscription options. Check your connection and try again." : {
+
+    },
+    "Couldn't save" : {
+
+    },
+    "Couldn't save your answers" : {
+
+    },
+    "Couldn't start a new diary" : {
+
+    },
+    "Custom medication — check the name and strength on the package." : {
+
+    },
+    "Custom medication…" : {
+
+    },
+    "Daily check-in" : {
+
+    },
+    "Data sources" : {
+
+    },
+    "Date" : {
+
+    },
+    "Day" : {
+
+    },
+    "Day 1" : {
+
+    },
+    "Day by day these entries build your trends — and the report you can show your doctor." : {
+
+    },
+    "Days with flare signs: %@ vs %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Days with flare signs: %1$@ vs %2$@."
+          }
+        }
+      }
+    },
+    "Days you checked in without signs of a flare." : {
+
+    },
+    "Delete" : {
+
+    },
+    "Delete all data" : {
+
+    },
+    "Delete all data?" : {
+
+    },
+    "Delete everything" : {
+
+    },
+    "Delete photo" : {
+
+    },
+    "Delete this photo?" : {
+
+    },
+    "Delete this treatment and all its marked doses?" : {
+
+    },
+    "Delete treatment" : {
+
+    },
+    "Deleting your data…" : {
+
+    },
+    "Diary calendar" : {
+
+    },
+    "Dismiss" : {
+
+    },
+    "Doctor report" : {
+
+    },
+    "Done" : {
+
+    },
+    "Dose %lld" : {
+
+    },
+    "Early sign — fewer than six weeks of check-ins. Keep logging to see if it holds." : {
+
+    },
+    "Edit treatment" : {
+
+    },
+    "Every %lld day%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Every %1$lld day%2$@"
+          }
+        }
+      }
+    },
+    "Every %lld week%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Every %1$lld week%2$@"
+          }
+        }
+      }
+    },
+    "Export diary as CSV" : {
+
+    },
+    "Export your diary first if you might need it later." : {
+
+    },
+    "Extreme" : {
+
+    },
+    "Feeling weak or unwell" : {
+
+    },
+    "Fever" : {
+
+    },
+    "Fingertip units" : {
+
+    },
+    "First name" : {
+
+    },
+    "Flare check-in" : {
+
+    },
+    "Flare mode is a label based on your entries, not a diagnosis. It ends after %lld days in a row without these signs. Discuss any changes in your skin with your doctor." : {
+
+    },
+    "Flare mode · why?" : {
+
+    },
+    "Fold check-in" : {
+
+    },
+    "Forms" : {
+
+    },
+    "From" : {
+
+    },
+    "Get full access to your diary" : {
+
+    },
+    "Get started" : {
+
+    },
+    "Got it" : {
+
+    },
+    "Hard to point at on the map" : {
+
+    },
+    "Hard-to-draw areas" : {
+
+    },
+    "Hides the medications" : {
+
+    },
+    "Hides the reasons" : {
+
+    },
+    "High" : {
+
+    },
+    "Higher itch" : {
+
+    },
+    "How does it look?" : {
+
+    },
+    "How much skin is affected?" : {
+
+    },
+    "How often" : {
+
+    },
+    "How your free trial works" : {
+
+    },
+    "Humidity" : {
+
+    },
+    "Humidity on check-in days" : {
+
+    },
+    "Humidity, %" : {
+
+    },
+    "I understand" : {
+
+    },
+    "I understand that MySkin is not medical advice" : {
+
+    },
+    "If your age is wrong, update it in Settings › [your name] › Personal Information." : {
+
+    },
+    "Injection sites" : {
+
+    },
+    "Insights" : {
+
+    },
+    "It does not diagnose, and it does not prescribe or change treatment. Discuss your results with your doctor. If you feel very unwell, contact your doctor or emergency services." : {
+
+    },
+    "Itch" : {
+
+    },
+    "Itch %lld/10 today. After a few weeks of check-ins this becomes your itch trend, triggers and treatment summary — a PDF to share with your doctor." : {
+
+    },
+    "Itch over the last 14 days" : {
+
+    },
+    "Itch today" : {
+
+    },
+    "Itch, pain and sleep this month" : {
+
+    },
+    "Keep logging — %lld more %@ to look for patterns." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Keep logging — %1$lld more %2$@ to look for patterns."
+          }
+        }
+      }
+    },
+    "Learn more" : {
+
+    },
+    "Let's get started" : {
+
+    },
+    "Loading plans…" : {
+
+    },
+    "Lock MySkin with %@" : {
+
+    },
+    "Lock MySkin with your passcode" : {
+
+    },
+    "Log triggers and food on most days: links between them and your itch show up after about three weeks." : {
+
+    },
+    "Logging a few seconds a day makes these delayed links easier to notice." : {
+
+    },
+    "Looking for patterns…" : {
+
+    },
+    "Low" : {
+
+    },
+    "Lower itch" : {
+
+    },
+    "Manage subscription" : {
+
+    },
+    "Mark as done" : {
+
+    },
+    "Medication" : {
+
+    },
+    "Moderate" : {
+
+    },
+    "Mood" : {
+
+    },
+    "More" : {
+
+    },
+    "MySkin" : {
+
+    },
+    "MySkin Premium" : {
+
+    },
+    "MySkin Premium · %@" : {
+
+    },
+    "MySkin can't open your diary" : {
+
+    },
+    "MySkin is a diary, not a medical device." : {
+
+    },
+    "MySkin is for people %lld and older" : {
+
+    },
+    "MySkin is locked" : {
+
+    },
+    "MySkin will open with an empty diary. The current diary file is set aside on this iPhone, not deleted, so it may still be recovered. Photos stay. «Delete all data» in Settings removes it." : {
+
+    },
+    "MySkin · Skin summary" : {
+
+    },
+    "Name" : {
+
+    },
+    "Needs at least %lld separate times, with days without it in between" : {
+
+    },
+    "New or spreading spots" : {
+
+    },
+    "New spots appeared" : {
+
+    },
+    "New treatment" : {
+
+    },
+    "Next month" : {
+
+    },
+    "No account needed. Your diary is stored in the app on this phone." : {
+
+    },
+    "No calm days logged yet" : {
+
+    },
+    "No check-ins this month yet. Your itch, pain and sleep will appear here." : {
+
+    },
+    "No clear link yet" : {
+
+    },
+    "No clear links yet. Keep logging triggers and food — patterns need a few repeats to show." : {
+
+    },
+    "No free trial" : {
+
+    },
+    "No photos of this area yet." : {
+
+    },
+    "No photos yet" : {
+
+    },
+    "No treatments yet" : {
+
+    },
+    "None of these" : {
+
+    },
+    "Not a steroid" : {
+
+    },
+    "Not enough data yet" : {
+
+    },
+    "Not now" : {
+
+    },
+    "Not set" : {
+
+    },
+    "Not sure" : {
+
+    },
+    "Not taken yet." : {
+
+    },
+    "Notes" : {
+
+    },
+    "Nothing logged on this day." : {
+
+    },
+    "Nothing planned for today." : {
+
+    },
+    "Nothing right now" : {
+
+    },
+    "Notifications are off" : {
+
+    },
+    "OK" : {
+
+    },
+    "One entry so far: %@, %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "One entry so far: %1$@, %2$@."
+          }
+        }
+      }
+    },
+    "Only share it with people you trust, such as your doctor. Once it leaves MySkin, the app can't protect it." : {
+
+    },
+    "Open Settings" : {
+
+    },
+    "Open the App Store" : {
+
+    },
+    "Open the App Store and update MySkin." : {
+
+    },
+    "Opens the diary calendar" : {
+
+    },
+    "Opens the rating for this area" : {
+
+    },
+    "Opens the treatment" : {
+
+    },
+    "Optional, e.g. after a shower" : {
+
+    },
+    "Patterns" : {
+
+    },
+    "Patterns from your own diary, not proof of cause. Discuss with your doctor before changing your diet or treatment." : {
+
+    },
+    "Payment handled by Apple" : {
+
+    },
+    "Period" : {
+
+    },
+    "Photo from %@" : {
+
+    },
+    "Photos" : {
+
+    },
+    "Photos are kept inside MySkin. They are not added to your photo library and are not included in device backups." : {
+
+    },
+    "Photos of the same area over time make changes easier to see — for you and your doctor." : {
+
+    },
+    "Please update MySkin" : {
+
+    },
+    "Previous month" : {
+
+    },
+    "Privacy" : {
+
+    },
+    "Progress" : {
+
+    },
+    "Psoriasis" : {
+
+    },
+    "Psoriasis · %@" : {
+
+    },
+    "Psoriatic arthritis" : {
+
+    },
+    "Pus-filled bumps" : {
+
+    },
+    "Pus-filled bumps on a large area" : {
+
+    },
+    "Question %lld of %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Question %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "Questionnaires" : {
+
+    },
+    "Quick check-in" : {
+
+    },
+    "Quick zones" : {
+
+    },
+    "Rate the worst patch in this area." : {
+
+    },
+    "Read the privacy policy" : {
+
+    },
+    "Reason (optional)" : {
+
+    },
+    "Recently stopped steroid tablets or injections" : {
+
+    },
+    "Redeem a code" : {
+
+    },
+    "Redness over most of my body" : {
+
+    },
+    "Reminders" : {
+
+    },
+    "Reminders end today. The history stays." : {
+
+    },
+    "Reminders never mention your condition or medicines." : {
+
+    },
+    "Removes it" : {
+
+    },
+    "Renews automatically. Cancel anytime in Settings › Apple Account." : {
+
+    },
+    "Restore purchases" : {
+
+    },
+    "Resume treatment" : {
+
+    },
+    "Rotating helps your skin recover" : {
+
+    },
+    "Safety information is based on the American Academy of Dermatology psoriasis guidelines and NICE guideline CG153 (Psoriasis: assessment and management). Medication schedules are typical examples — use what your doctor prescribed." : {
+
+    },
+    "Same angle, same distance — so change is easy to see." : {
+
+    },
+    "Same area as the previous assessment" : {
+
+    },
+    "Save" : {
+
+    },
+    "Save check-in" : {
+
+    },
+    "Saved" : {
+
+    },
+    "Saved to your diary" : {
+
+    },
+    "Saved with today's check-in" : {
+
+    },
+    "Saving photo…" : {
+
+    },
+    "Schedule" : {
+
+    },
+    "Score" : {
+
+    },
+    "Search, e.g. clobetasol" : {
+
+    },
+    "See progress" : {
+
+    },
+    "Seek medical care now" : {
+
+    },
+    "Selected" : {
+
+    },
+    "Self-rated index %@" : {
+
+    },
+    "Self-reported diary data from the MySkin app. Severity index and area are the patient's own estimates, not a clinical PASI. Not a diagnosis." : {
+
+    },
+    "Series" : {
+
+    },
+    "Set a device passcode in Settings to use the lock." : {
+
+    },
+    "Set as before" : {
+
+    },
+    "Set as now" : {
+
+    },
+    "Settings" : {
+
+    },
+    "Severe flare" : {
+
+    },
+    "Sex" : {
+
+    },
+    "Share PDF" : {
+
+    },
+    "Show check-in details" : {
+
+    },
+    "Show this to your doctor at your next visit." : {
+
+    },
+    "Show weather" : {
+
+    },
+    "Shown next to your itch, so you can spot patterns yourself. It doesn't mean one causes the other." : {
+
+    },
+    "Shows the medications" : {
+
+    },
+    "Shows why Flare mode is on" : {
+
+    },
+    "Side" : {
+
+    },
+    "Skip" : {
+
+    },
+    "Skip paywall (debug build)" : {
+
+    },
+    "Small white or yellow blisters (pustules)." : {
+
+    },
+    "Special areas" : {
+
+    },
+    "Start" : {
+
+    },
+    "Start a new diary" : {
+
+    },
+    "Start a new diary?" : {
+
+    },
+    "Started" : {
+
+    },
+    "Steroid strength" : {
+
+    },
+    "Still can't open it." : {
+
+    },
+    "Stop" : {
+
+    },
+    "Stop treatment" : {
+
+    },
+    "Stopped" : {
+
+    },
+    "Subscription" : {
+
+    },
+    "Subscriptions aren't available right now. Please try again later." : {
+
+    },
+    "Take it again" : {
+
+    },
+    "Take it now" : {
+
+    },
+    "Take your first photo" : {
+
+    },
+    "Tap a day" : {
+
+    },
+    "Tap an area on the map to start. The total updates as you go." : {
+
+    },
+    "Tap an area to rate it." : {
+
+    },
+    "Tap the area you're photographing" : {
+
+    },
+    "Tap to set “before”. Touch and hold to set “now” or delete." : {
+
+    },
+    "Terms" : {
+
+    },
+    "The export contains check-ins, body map assessments, treatments, doses and questionnaires. Photos aren't included." : {
+
+    },
+    "The photo is removed from MySkin for good." : {
+
+    },
+    "The skin impact and joint check questionnaires were written for MySkin. They are not validated clinical scores." : {
+
+    },
+    "These questionnaires were written for MySkin and are not validated clinical scores. Use them to talk with your doctor, not as a diagnosis." : {
+
+    },
+    "This can't be undone" : {
+
+    },
+    "This contains health data" : {
+
+    },
+    "This is safety information based on what you entered. MySkin is a diary and can't assess you. If you feel very unwell, call emergency services or go to the nearest emergency department." : {
+
+    },
+    "This month" : {
+
+    },
+    "This photo isn't on this iPhone" : {
+
+    },
+    "This version has a problem that's fixed in a newer one. Your diary is safe and will be here after the update." : {
+
+    },
+    "Time" : {
+
+    },
+    "Time for: %@" : {
+
+    },
+    "To" : {
+
+    },
+    "Today" : {
+
+    },
+    "Treatment" : {
+
+    },
+    "Treatment doses" : {
+
+    },
+    "Treatment today" : {
+
+    },
+    "Trends aren't a diagnosis. They're a starting point to talk through with your doctor." : {
+
+    },
+    "Trends from your last 3 months" : {
+
+    },
+    "Try again" : {
+
+    },
+    "Type" : {
+
+    },
+    "Typical schedule — use what your doctor prescribed." : {
+
+    },
+    "UV" : {
+
+    },
+    "UV index" : {
+
+    },
+    "UV index on check-in days" : {
+
+    },
+    "UV today" : {
+
+    },
+    "Unlock to open your diary." : {
+
+    },
+    "Unlock with %@" : {
+
+    },
+    "Update check-in" : {
+
+    },
+    "Urgent symptoms?" : {
+
+    },
+    "Uses your approximate location, sent to Apple for the weather and the place name. It isn't stored." : {
+
+    },
+    "Value" : {
+
+    },
+    "Version" : {
+
+    },
+    "Weather on check-in days" : {
+
+    },
+    "What went with your itch, from your own diary" : {
+
+    },
+    "What you marked on the body map can need urgent care. Tap for safety information." : {
+
+    },
+    "When did it start?" : {
+
+    },
+    "When on, MySkin locks each time you leave the app and hides its content in the app switcher." : {
+
+    },
+    "Where did you inject?" : {
+
+    },
+    "Where you apply it" : {
+
+    },
+    "Which area?" : {
+
+    },
+    "Whole area" : {
+
+    },
+    "Why we ask:" : {
+
+    },
+    "Worth discussing · %@" : {
+
+    },
+    "Year it started" : {
+
+    },
+    "Your Apple Account says you're younger than %lld. If you have psoriasis, a parent or your doctor can help you keep track of it." : {
+
+    },
+    "Your answers stay in your diary. This is not a diagnosis — discuss the result with your doctor." : {
+
+    },
+    "Your data" : {
+
+    },
+    "Your diary is still on this iPhone · Export it" : {
+
+    },
+    "Your doctor report" : {
+
+    },
+    "Your entries haven't been deleted. Try again — restarting your iPhone often helps. If it keeps happening, save a copy of the diary file and send it to us so we can help." : {
+
+    },
+    "Your estimated area" : {
+
+    },
+    "Your first name" : {
+
+    },
+    "Your itch chart will appear after a few check-ins." : {
+
+    },
+    "Your own estimate, not a clinical measurement · updated %@" : {
+
+    },
+    "Your palm with fingers is about 1 % of your body." : {
+
+    },
+    "Your psoriasis" : {
+
+    },
+    "last" : {
+
+    },
+    "next" : {
+
+    },
+    "now" : {
+
+    },
+    "of %lld" : {
+
+    },
+    "of %lld · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "of %1$lld · %2$@"
+          }
+        }
+      }
+    },
+    "of body surface" : {
+
+    },
+    "once" : {
+
+    },
+    "· %@" : {
+
+    },
+    "· changes automatically from your check-ins" : {
+
+    },
+    "≈ %@ %% of body" : {
+
+    },
+    "≈ %@%%" : {
+
+    },
+    "≈ %@%% of body area" : {
+
+    }
+  },
+  "version" : "1.0"
+}

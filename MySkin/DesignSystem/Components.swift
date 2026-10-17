@@ -33,10 +33,26 @@ extension View {
 
 // MARK: - Text helpers
 
+// Components take text the way `Text` does: a literal is a localized key (`LocalizedStringResource`),
+// a `String` value is shown as is — it is already localized (`String(localized:)`) or the user's own text.
+
 struct SectionHeader: View {
-    let title: String
-    var subtitle: String?
+    let title: Text
+    var subtitle: Text?
     var systemImage: String?
+
+    init(title: LocalizedStringResource, subtitle: LocalizedStringResource? = nil, systemImage: String? = nil) {
+        self.title = Text(title)
+        self.subtitle = subtitle.map { Text($0) }
+        self.systemImage = systemImage
+    }
+
+    @_disfavoredOverload
+    init(title: String, subtitle: String? = nil, systemImage: String? = nil) {
+        self.title = Text(verbatim: title)
+        self.subtitle = subtitle.map { Text(verbatim: $0) }
+        self.systemImage = systemImage
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
@@ -45,12 +61,12 @@ struct SectionHeader: View {
                     Image(systemName: systemImage)
                         .foregroundStyle(Theme.accent)
                 }
-                Text(title)
+                title
                     .font(.rounded(.headline, weight: .semibold))
                     .foregroundStyle(Theme.ink)
             }
             if let subtitle {
-                Text(subtitle)
+                subtitle
                     .font(.rounded(.subheadline))
                     .foregroundStyle(Theme.inkSoft)
             }
@@ -61,7 +77,12 @@ struct SectionHeader: View {
 
 /// Small "Why we ask" line shown under onboarding questions.
 struct WhyWeAskText: View {
-    let text: String
+    let text: Text
+
+    init(text: LocalizedStringResource) { self.text = Text(text) }
+
+    @_disfavoredOverload
+    init(text: String) { self.text = Text(verbatim: text) }
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 6) {
@@ -77,10 +98,26 @@ struct WhyWeAskText: View {
 // MARK: - Chips
 
 struct TagChip: View {
-    let title: String
+    let title: Text
     var systemImage: String?
     var isSelected: Bool = false
     var action: () -> Void = {}
+
+    init(title: LocalizedStringResource, systemImage: String? = nil, isSelected: Bool = false, action: @escaping () -> Void = {}) {
+        self.init(title: Text(title), systemImage: systemImage, isSelected: isSelected, action: action)
+    }
+
+    @_disfavoredOverload
+    init(title: String, systemImage: String? = nil, isSelected: Bool = false, action: @escaping () -> Void = {}) {
+        self.init(title: Text(verbatim: title), systemImage: systemImage, isSelected: isSelected, action: action)
+    }
+
+    private init(title: Text, systemImage: String?, isSelected: Bool, action: @escaping () -> Void) {
+        self.title = title
+        self.systemImage = systemImage
+        self.isSelected = isSelected
+        self.action = action
+    }
 
     var body: some View {
         Button(action: action) {
@@ -88,7 +125,7 @@ struct TagChip: View {
                 if let systemImage {
                     Image(systemName: systemImage)
                 }
-                Text(title)
+                title
             }
             .font(.rounded(.subheadline, weight: .medium))
             .foregroundStyle(isSelected ? Theme.ink : Theme.ink.opacity(0.85))
@@ -152,14 +189,27 @@ struct FlowLayout: Layout {
 // MARK: - Buttons
 
 struct PrimaryButton: View {
-    let title: String
+    let title: Text
     var systemImage: String?
     var action: () -> Void
+
+    init(title: LocalizedStringResource, systemImage: String? = nil, action: @escaping () -> Void) {
+        self.title = Text(title)
+        self.systemImage = systemImage
+        self.action = action
+    }
+
+    @_disfavoredOverload
+    init(title: String, systemImage: String? = nil, action: @escaping () -> Void) {
+        self.title = Text(verbatim: title)
+        self.systemImage = systemImage
+        self.action = action
+    }
 
     var body: some View {
         Button(action: action) {
             Label {
-                Text(title)
+                title
             } icon: {
                 if let systemImage { Image(systemName: systemImage) }
             }
@@ -174,12 +224,23 @@ struct PrimaryButton: View {
 }
 
 struct SecondaryButton: View {
-    let title: String
+    let title: Text
     var action: () -> Void
+
+    init(title: LocalizedStringResource, action: @escaping () -> Void) {
+        self.title = Text(title)
+        self.action = action
+    }
+
+    @_disfavoredOverload
+    init(title: String, action: @escaping () -> Void) {
+        self.title = Text(verbatim: title)
+        self.action = action
+    }
 
     var body: some View {
         Button(action: action) {
-            Text(title)
+            title
                 .font(.rounded(.headline, weight: .medium))
                 .foregroundStyle(Theme.ink)
                 .frame(maxWidth: .infinity)
