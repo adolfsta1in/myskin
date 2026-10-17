@@ -18,7 +18,7 @@ _Дата исследования: 2026-10-14. Это не юридическа
 | D3 — App Privacy | ✅ Coarse Location (App Functionality) и Product Interaction (Analytics), обе «Not linked to you», без трекинга — совпадает с `PrivacyInfo.xcprivacy`. |
 | D6 — DSA (трейдер в ЕС) | ⏳ Данные трейдера отправлены, ждём одобрения Apple. Сборку отправляем на ревью, не дожидаясь; выпуск — **вручную** после одобрения DSA. |
 | D1, D4, D7, D8 | ✅ Карточка, рейтинг 16+, скриншоты, заметки для ревью (сделал владелец). |
-| G — настройки подписки | ✅ Billing Grace Period, цены yearly $59.99 / weekly $9.99. ⏳ Small Business Program — проверить, подана ли заявка. |
+| G — настройки подписки | ✅ Billing Grace Period, цены yearly $59.99 / weekly $9.99. ⏳ Small Business Program — заявка подана 2026-10-18 (без связанных аккаунтов), ждём ответа. |
 | Страны | Россия пока в списке (решение за владельцем: покупки там не проходят, при жёстком пейволе — только онбординг). |
 | C10 (iPhone) | ✅ Погода, Face ID, камера, экстренный звонок, PDF/CSV — проверил владелец. |
 | Release-сборка 2026-10-18 | ✅ После шага 63: без ошибок и предупреждений; в бинаре нет `PreviewData`/`ScreenshotMode`/`-onboardingDemo`; кнопка «Skip paywall» есть только как строка (в Release не показывается); entitlements WeatherKit и Declared Age Range, privacy manifest с Coarse Location и Product Interaction; `.storekit` только в Run-схеме. |
