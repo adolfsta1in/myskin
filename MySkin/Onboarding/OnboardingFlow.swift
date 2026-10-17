@@ -73,6 +73,8 @@ struct OnboardingFlow: View {
             VStack(spacing: 0) {
                 OnboardingTopBar(
                     progress: Double(step.rawValue + 1) / Double(OnboardingStep.allCases.count),
+                    // Welcome sells the result; the long questionnaire shows up from the next screen.
+                    showsProgress: step != .welcome,
                     canGoBack: step != .welcome,
                     showSkip: step.isOptional,
                     onBack: goBack,
@@ -163,6 +165,7 @@ struct OnboardingFlow: View {
 
 struct OnboardingTopBar: View {
     let progress: Double
+    var showsProgress = true
     let canGoBack: Bool
     let showSkip: Bool
     let onBack: () -> Void
@@ -191,9 +194,11 @@ struct OnboardingTopBar: View {
             }
             .frame(height: 6)
             .animation(.smooth, value: progress)
+            .opacity(showsProgress ? 1 : 0)
             .accessibilityElement()
             .accessibilityLabel("Progress")
             .accessibilityValue("\(Int(progress * 100)) percent")
+            .accessibilityHidden(!showsProgress)
 
             Button("Skip", action: onSkip)
                 .font(.rounded(.subheadline, weight: .medium))

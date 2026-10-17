@@ -2,47 +2,53 @@ import SwiftUI
 
 // MARK: - O1 Welcome
 
+/// First screen: one promise — your own entries become a report for your doctor.
+/// The picture shows that result (body map, falling chart, report), so it comes first.
 struct WelcomeStep: View {
     let next: () -> Void
 
-    private let promises: [(String, String)] = [
-        ("magnifyingglass", String(localized: "Log itch, flares and possible triggers")),
-        ("chart.xyaxis.line", String(localized: "See how your skin changes with treatment")),
-        ("doc.text", String(localized: "Arrive at your doctor with a ready report")),
-    ]
-
     var body: some View {
-        OnboardingPage(title: String(localized: "Understand your skin")) {
-            VStack(alignment: .leading, spacing: 24) {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
                 Image("WelcomeHero")
                     .resizable()
                     .scaledToFit()
-                    .frame(height: 210)
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity, maxHeight: 320)
                     .accessibilityHidden(true)
-                GlassEffectContainer(spacing: 14) {
-                VStack(alignment: .leading, spacing: 14) {
-                    ForEach(promises.indices, id: \.self) { index in
-                        let (symbol, text) = promises[index]
-                        HStack(spacing: 14) {
-                            Image(systemName: symbol)
-                                .foregroundStyle(Theme.accent)
-                                .frame(width: 40, height: 40)
-                                .glassEffect(.regular, in: .circle)
-                            Text(text)
-                                .font(.rounded(.body, weight: .medium))
-                                .foregroundStyle(Theme.ink)
-                        }
-                    }
-                }
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Your psoriasis, on the record.")
+                        .font(.rounded(.largeTitle, weight: .bold))
+                        .foregroundStyle(Theme.ink)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityAddTraits(.isHeader)
+                    Text("A quick daily check-in, a body map and photos — turned into a clear report for your doctor.")
+                        .font(.rounded(.title3))
+                        .foregroundStyle(Theme.inkSoft)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
-        } footer: {
-            PrimaryButton(title: "Get started", action: next)
-            Label("No account needed. Your diary is stored in the app on this phone.", systemImage: "lock.fill")
-                .font(.rounded(.footnote))
-                .foregroundStyle(Theme.inkSoft)
+            .padding(.horizontal, 24)
+            .padding(.top, 8)
+            .padding(.bottom, 24)
         }
+        .scrollIndicators(.hidden)
+        // Same footer as OnboardingPage.
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            VStack(spacing: 10) {
+                footer
+            }
+            .padding(.horizontal, 24)
+            .padding(.top, 12)
+            .padding(.bottom, 8)
+        }
+    }
+
+    @ViewBuilder
+    private var footer: some View {
+        PrimaryButton(title: "Get started", action: next)
+        Label("No account needed. Your diary is stored in the app on this phone.", systemImage: "lock.fill")
+            .font(.rounded(.footnote))
+            .foregroundStyle(Theme.inkSoft)
     }
 }
 

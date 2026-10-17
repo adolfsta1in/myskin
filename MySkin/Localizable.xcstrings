@@ -2145,6 +2145,28 @@
         }
       }
     },
+    "A quick daily check-in, a body map and photos — turned into a clear report for your doctor." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein kurzer täglicher Check-in, eine Körperkarte und Fotos – daraus wird ein übersichtlicher Bericht für deinen Arzt oder deine Ärztin."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un registro diario rápido, un mapa corporal y fotos, convertidos en un informe claro para tu médico."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um registro diário rápido, um mapa do corpo e fotos — transformados em um relatório claro para seu médico."
+          }
+        }
+      }
+    },
     "A rough start — you can refine each area in the Body tab" : {
       "localizations" : {
         "de" : {
@@ -3049,28 +3071,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Braços"
-          }
-        }
-      }
-    },
-    "Arrive at your doctor with a ready report" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Komm mit einem fertigen Bericht zu deinem Arzt oder deiner Ärztin"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Llega a tu médico con un informe listo"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chegue ao médico com um relatório pronto"
           }
         }
       }
@@ -9921,28 +9921,6 @@
         }
       }
     },
-    "Log itch, flares and possible triggers" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erfasse Juckreiz, Schübe und mögliche Auslöser"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Registra picazón, brotes y posibles desencadenantes"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Registre coceira, crises e possíveis gatilhos"
-          }
-        }
-      }
-    },
     "Log triggers and food on most days: links between them and your itch show up after about three weeks." : {
       "localizations" : {
         "de" : {
@@ -14945,28 +14923,6 @@
         }
       }
     },
-    "See how your skin changes with treatment" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sieh, wie sich deine Haut mit der Behandlung verändert"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mira cómo cambia tu piel con el tratamiento"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Veja como sua pele muda com o tratamento"
-          }
-        }
-      }
-    },
     "See humidity and UV where you are. Dry air and strong sun can affect psoriasis." : {
       "localizations" : {
         "de" : {
@@ -18801,28 +18757,6 @@
         }
       }
     },
-    "Understand your skin" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Versteh deine Haut"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entiende tu piel"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entenda sua pele"
-          }
-        }
-      }
-    },
     "Unlock to open your diary." : {
       "localizations" : {
         "de" : {
@@ -20643,6 +20577,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sua psoríase"
+          }
+        }
+      }
+    },
+    "Your psoriasis, on the record." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Psoriasis, schwarz auf weiß."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu psoriasis, todo registrado."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sua psoríase, tudo registrado."
           }
         }
       }
