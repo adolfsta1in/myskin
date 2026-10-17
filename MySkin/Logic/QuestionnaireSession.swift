@@ -64,8 +64,8 @@ extension Questionnaires {
         switch kind {
         case .skinImpact: SkinImpact.level(for: score).title
         case .jointCheck: JointCheck.headline(for: score)
-        case .dlqi: needsAttention(kind, score: score) ? "Large impact" : "Earlier version"
-        case .pest: needsAttention(kind, score: score) ? "Joint symptoms noted" : "Earlier version"
+        case .dlqi: needsAttention(kind, score: score) ? String(localized: "Large impact") : String(localized: "Earlier version")
+        case .pest: needsAttention(kind, score: score) ? String(localized: "Joint symptoms noted") : String(localized: "Earlier version")
         }
     }
 
@@ -89,8 +89,8 @@ extension Questionnaires {
     /// What the questionnaire asks about, shown before the first question.
     static func intro(_ kind: QuestionnaireKind) -> String {
         switch kind {
-        case .skinImpact: "6 questions about how your skin affected your last 7 days. About a minute."
-        case .jointCheck: "6 yes/no questions about your joints. Psoriasis can affect joints, so it's worth checking now and then."
+        case .skinImpact: String(localized: "6 questions about how your skin affected your last 7 days. About a minute.")
+        case .jointCheck: String(localized: "6 yes/no questions about your joints. Psoriasis can affect joints, so it's worth checking now and then.")
         case .dlqi, .pest: RetiredQuestionnaire.interpretation
         }
     }

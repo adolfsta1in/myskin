@@ -28,11 +28,11 @@ nonisolated enum UVLevel: Equatable, Sendable {
 
     var title: String {
         switch self {
-        case .low: "Low"
-        case .moderate: "Moderate"
-        case .high: "High"
-        case .veryHigh: "Very high"
-        case .extreme: "Extreme"
+        case .low: String(localized: "uv.low", defaultValue: "Low", comment: "UV index level")
+        case .moderate: String(localized: "uv.moderate", defaultValue: "Moderate", comment: "UV index level")
+        case .high: String(localized: "uv.high", defaultValue: "High", comment: "UV index level")
+        case .veryHigh: String(localized: "uv.veryHigh", defaultValue: "Very high", comment: "UV index level")
+        case .extreme: String(localized: "uv.extreme", defaultValue: "Extreme", comment: "UV index level")
         }
     }
 }
@@ -45,23 +45,23 @@ nonisolated enum WeatherInfo {
     static let humidHumidity = 70.0
 
     static func humidityTitle(_ humidity: Double) -> String {
-        if humidity < dryHumidity { return "Dry" }
-        if humidity > humidHumidity { return "Humid" }
-        return "Comfortable"
+        if humidity < dryHumidity { return String(localized: "Dry") }
+        if humidity > humidHumidity { return String(localized: "Humid") }
+        return String(localized: "Comfortable")
     }
 
     static func notes(for reading: WeatherReading) -> [String] {
         var notes: [String] = []
         if reading.humidity < dryHumidity {
-            notes.append("Dry air can make skin feel tighter and itchier.")
+            notes.append(String(localized: "Dry air can make skin feel tighter and itchier."))
         }
         switch UVLevel(index: reading.uvIndexMax) {
         case .low:
             break
         case .moderate:
-            notes.append("Some people find a little sun helps their psoriasis, but sunburn can trigger a flare. Ask your doctor how much sun is right for you.")
+            notes.append(String(localized: "Some people find a little sun helps their psoriasis, but sunburn can trigger a flare. Ask your doctor how much sun is right for you."))
         case .high, .veryHigh, .extreme:
-            notes.append("Strong sun today — sunburn can trigger a flare. Ask your doctor how much sun is right for you.")
+            notes.append(String(localized: "Strong sun today — sunburn can trigger a flare. Ask your doctor how much sun is right for you."))
         }
         return notes
     }

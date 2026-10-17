@@ -17,7 +17,7 @@ struct AddTreatmentSheet: View {
                         path.append(TreatmentDraft(customName: query))
                     } label: {
                         Label(
-                            query.trimmingCharacters(in: .whitespaces).isEmpty ? "Custom medication…" : "Add “\(query.trimmingCharacters(in: .whitespaces))” as custom",
+                            query.trimmingCharacters(in: .whitespaces).isEmpty ? String(localized: "Custom medication…") : String(localized: "Add “\(query.trimmingCharacters(in: .whitespaces))” as custom"),
                             systemImage: "square.and.pencil"
                         )
                         .foregroundStyle(Theme.accent)
@@ -118,7 +118,7 @@ struct TreatmentEditor: View {
         .scrollContentBackground(.hidden)
         .background(WarmBackground())
         .tint(Theme.accent)
-        .navigationTitle(treatment == nil ? "New treatment" : "Edit treatment")
+        .navigationTitle(treatment == nil ? String(localized: "New treatment") : String(localized: "Edit treatment"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
@@ -168,7 +168,7 @@ struct TreatmentEditor: View {
                     ForEach(SteroidClass.allCases) { Text($0.title).tag(Optional($0)) }
                 }
                 Stepper(value: Binding(get: { draft.fingertipUnits ?? 0 }, set: { draft.fingertipUnits = $0 == 0 ? nil : $0 }), in: 0...20, step: 0.5) {
-                    LabeledContent("Fingertip units", value: draft.fingertipUnits.map { $0.formatted(.number.precision(.fractionLength(0...1))) } ?? "Not set")
+                    LabeledContent(String(localized: "Fingertip units"), value: draft.fingertipUnits.map { $0.formatted(.number.precision(.fractionLength(0...1))) } ?? String(localized: "Not set"))
                 }
             }
         } header: {
@@ -189,7 +189,7 @@ struct TreatmentEditor: View {
             }
             switch draft.scheduleKind {
             case .timesPerDay:
-                Stepper("\(draft.timesPerDay) time\(draft.timesPerDay == 1 ? "" : "s") a day", value: $draft.timesPerDay, in: 1...6)
+                Stepper("\(draft.timesPerDay) times a day", value: $draft.timesPerDay, in: 1...6)
             case .weekly:
                 Picker("Day", selection: Binding(
                     get: { draft.weekday ?? Calendar.current.component(.weekday, from: draft.startDate) },
@@ -200,15 +200,15 @@ struct TreatmentEditor: View {
                     }
                 }
             case .everyNDays:
-                Stepper("Every \(draft.interval) day\(draft.interval == 1 ? "" : "s")", value: $draft.interval, in: 1...30)
+                Stepper("Every \(draft.interval) days", value: $draft.interval, in: 1...30)
             case .everyNWeeks:
-                Stepper("Every \(draft.interval) week\(draft.interval == 1 ? "" : "s")", value: $draft.interval, in: 1...12)
+                Stepper("Every \(draft.interval) weeks", value: $draft.interval, in: 1...12)
             case .asNeeded:
                 EmptyView()
             }
             ForEach(0..<draft.timeCount, id: \.self) { index in
                 DatePicker(
-                    draft.timeCount == 1 ? "Time" : "Dose \(index + 1)",
+                    draft.timeCount == 1 ? String(localized: "Time") : String(localized: "Dose \(index + 1)"),
                     selection: timeBinding(index),
                     displayedComponents: .hourAndMinute
                 )
@@ -226,7 +226,7 @@ struct TreatmentEditor: View {
             NavigationLink {
                 ZonePicker(selection: $draft)
             } label: {
-                LabeledContent("Areas", value: draft.zoneIDs.isEmpty ? "None" : "\(draft.zoneIDs.count) selected")
+                LabeledContent(String(localized: "Areas"), value: draft.zoneIDs.isEmpty ? String(localized: "None") : String(localized: "\(draft.zoneIDs.count) selected"))
             }
             if let warning = draft.sensitiveAreaWarning {
                 Label(warning, systemImage: "exclamationmark.triangle")
@@ -301,9 +301,9 @@ private struct ZonePicker: View {
     private var sections: [(title: String, zones: [BodyZone])] {
         let quickIDs = Set(BodyZone.quickZones.map(\.id))
         return [
-            ("Special areas", BodyZone.quickZones),
-            ("Front", BodyZone.all.filter { $0.id.hasPrefix("front.") && !quickIDs.contains($0.id) }),
-            ("Back", BodyZone.all.filter { $0.id.hasPrefix("back.") && !quickIDs.contains($0.id) }),
+            (String(localized: "Special areas"), BodyZone.quickZones),
+            (BodySide.front.title, BodyZone.all.filter { $0.id.hasPrefix("front.") && !quickIDs.contains($0.id) }),
+            (BodySide.back.title, BodyZone.all.filter { $0.id.hasPrefix("back.") && !quickIDs.contains($0.id) }),
         ]
     }
 

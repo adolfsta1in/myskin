@@ -11,8 +11,8 @@ enum PhotoSource: Identifiable {
 
     var title: String {
         switch self {
-        case .camera: "Take photo"
-        case .library: "Choose from library"
+        case .camera: String(localized: "Take photo")
+        case .library: String(localized: "Choose from library")
         }
     }
 
@@ -155,7 +155,7 @@ struct PhotoZonePicker: View {
                     .animation(.smooth, value: side)
 
                     VStack(alignment: .leading, spacing: 10) {
-                        SectionHeader(title: "Special areas", subtitle: "Hard to point at on the map")
+                        SectionHeader(title: String(localized: "Special areas"), subtitle: String(localized: "Hard to point at on the map"))
                         GlassEffectContainer(spacing: 8) {
                             FlowLayout(spacing: 8) {
                                 ForEach(BodyZone.quickZones) { zone in

@@ -6,13 +6,13 @@ struct WelcomeStep: View {
     let next: () -> Void
 
     private let promises: [(String, String)] = [
-        ("magnifyingglass", "Log itch, flares and possible triggers"),
-        ("chart.xyaxis.line", "See how your skin changes with treatment"),
-        ("doc.text", "Arrive at your doctor with a ready report"),
+        ("magnifyingglass", String(localized: "Log itch, flares and possible triggers")),
+        ("chart.xyaxis.line", String(localized: "See how your skin changes with treatment")),
+        ("doc.text", String(localized: "Arrive at your doctor with a ready report")),
     ]
 
     var body: some View {
-        OnboardingPage(title: "Understand your skin") {
+        OnboardingPage(title: String(localized: "Understand your skin")) {
             VStack(alignment: .leading, spacing: 24) {
                 Image("WelcomeHero")
                     .resizable()
@@ -54,14 +54,14 @@ struct DisclaimerStep: View {
     let next: () -> Void
 
     private let points: [(String, String)] = [
-        ("book.closed", "MySkin is a diary. It helps you notice patterns and talk to your doctor."),
-        ("stethoscope", "It does not diagnose, and it does not prescribe or change treatment."),
-        ("exclamationmark.triangle", "If something worries you — or you feel very unwell — contact your doctor or emergency services."),
+        ("book.closed", String(localized: "MySkin is a diary. It helps you notice patterns and talk to your doctor.")),
+        ("stethoscope", String(localized: "It does not diagnose, and it does not prescribe or change treatment.")),
+        ("exclamationmark.triangle", String(localized: "If something worries you — or you feel very unwell — contact your doctor or emergency services.")),
     ]
 
     var body: some View {
         @Bindable var draft = draft
-        OnboardingPage(title: "Before we start") {
+        OnboardingPage(title: String(localized: "Before we start")) {
             VStack(alignment: .leading, spacing: 16) {
                 VStack(alignment: .leading, spacing: 14) {
                     ForEach(points.indices, id: \.self) { index in
@@ -104,9 +104,9 @@ struct AboutYouStep: View {
     var body: some View {
         @Bindable var draft = draft
         OnboardingPage(
-            title: "A little about you",
-            subtitle: "All optional.",
-            why: "Your name is only for the greeting. Age and sex help your doctor read the report."
+            title: String(localized: "A little about you"),
+            subtitle: String(localized: "All optional."),
+            why: String(localized: "Your name is only for the greeting. Age and sex help your doctor read the report.")
         ) {
             VStack(alignment: .leading, spacing: 18) {
                 TextField("Your first name", text: $draft.name)
@@ -164,9 +164,9 @@ struct PsoriasisProfileStep: View {
     var body: some View {
         @Bindable var draft = draft
         OnboardingPage(
-            title: "Tell us about your psoriasis",
-            subtitle: "Pick every form you have, if you know. It's fine to skip.",
-            why: "Some forms — scalp, nails, folds, palms — matter more for your doctor than their size suggests."
+            title: String(localized: "Tell us about your psoriasis"),
+            subtitle: String(localized: "Pick every form you have, if you know. It's fine to skip."),
+            why: String(localized: "Some forms — scalp, nails, folds, palms — matter more for your doctor than their size suggests.")
         ) {
             VStack(alignment: .leading, spacing: 18) {
                 GlassEffectContainer(spacing: 10) {
@@ -220,9 +220,9 @@ struct JointsStep: View {
 
     var body: some View {
         OnboardingPage(
-            title: "Do you have psoriatic arthritis?",
-            subtitle: "Joint pain, swelling or morning stiffness can be part of psoriasis.",
-            why: "If you're not sure, the app will offer a short joint check after setup."
+            title: String(localized: "Do you have psoriatic arthritis?"),
+            subtitle: String(localized: "Joint pain, swelling or morning stiffness can be part of psoriasis."),
+            why: String(localized: "If you're not sure, the app will offer a short joint check after setup.")
         ) {
             VStack(spacing: 12) {
                 ForEach(ArthritisStatus.allCases) { status in
@@ -249,19 +249,19 @@ struct SkinNowStep: View {
 
     private var label: String {
         switch draft.skinNow {
-        case ..<0.2: "Almost clear"
-        case ..<0.4: "Mild"
-        case ..<0.6: "Moderate"
-        case ..<0.8: "Noticeable flare"
-        default: "Severe flare"
+        case ..<0.2: String(localized: "Almost clear")
+        case ..<0.4: String(localized: "Mild")
+        case ..<0.6: String(localized: "Moderate")
+        case ..<0.8: String(localized: "Noticeable flare")
+        default: String(localized: "Severe flare")
         }
     }
 
     var body: some View {
         @Bindable var draft = draft
         OnboardingPage(
-            title: "How is your skin right now?",
-            why: "This becomes your baseline, so progress is tracked from where you are today."
+            title: String(localized: "How is your skin right now?"),
+            why: String(localized: "This becomes your baseline, so progress is tracked from where you are today.")
         ) {
             VStack(spacing: 24) {
                 SkinMoodIllustration(level: draft.skinNow)
@@ -326,9 +326,9 @@ struct GoalsStep: View {
 
     var body: some View {
         OnboardingPage(
-            title: "What matters most to you?",
-            subtitle: "Pick as many as you like.",
-            why: "It helps you remember why you're keeping the diary — and what to bring to your doctor."
+            title: String(localized: "What matters most to you?"),
+            subtitle: String(localized: "Pick as many as you like."),
+            why: String(localized: "It helps you remember why you're keeping the diary — and what to bring to your doctor.")
         ) {
             GlassEffectContainer(spacing: 10) {
                 FlowLayout(spacing: 10) {
@@ -354,16 +354,16 @@ struct DelayInsightStep: View {
 
     var body: some View {
         OnboardingPage(
-            title: "Flares can show up days or weeks after a trigger",
-            subtitle: "That's why links are hard to spot on your own. A short daily note helps you and your doctor see patterns."
+            title: String(localized: "Flares can show up days or weeks after a trigger"),
+            subtitle: String(localized: "That's why links are hard to spot on your own. A short daily note helps you and your doctor see patterns.")
         ) {
             VStack(spacing: 20) {
                 HStack(spacing: 0) {
-                    timelineNode("bolt", "Trigger", "Stress, infection, skin injury, cold dry air", Theme.accentSoft)
+                    timelineNode("bolt", String(localized: "Trigger"), String(localized: "Stress, infection, skin injury, cold dry air"), Theme.accentSoft)
                     dashedGap
-                    timelineNode("hourglass", "Pause", "Days to a few weeks", Theme.sand)
+                    timelineNode("hourglass", String(localized: "Pause"), String(localized: "Days to a few weeks"), Theme.sand)
                     dashedGap
-                    timelineNode("flame", "Flare", "New patches, itch", Theme.intensityMild)
+                    timelineNode("flame", String(localized: "Flare"), String(localized: "New patches, itch"), Theme.intensityMild)
                 }
                 .padding(.vertical, 12)
                 Text("Logging a few seconds a day makes these delayed links easier to notice.")

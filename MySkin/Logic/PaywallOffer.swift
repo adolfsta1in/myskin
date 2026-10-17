@@ -103,22 +103,22 @@ nonisolated enum PaywallOffer {
         }
         var steps = [TrialStep(
             icon: .unlock,
-            title: "Today",
-            detail: "Check-ins, body map and photos — know your patterns over time and share a report with your doctor."
+            title: String(localized: "Today"),
+            detail: String(localized: "Check-ins, body map and photos — know your patterns over time and share a report with your doctor.")
         )]
         if let offset = reminderOffsetDays(trialDays: trialDays) {
             steps.append(TrialStep(
                 icon: .reminder,
                 title: title(offset),
                 detail: canRemind
-                    ? "We'll remind you that your trial ends in \(reminderDaysBeforeEnd) days."
-                    : "Your trial ends in \(reminderDaysBeforeEnd) days. Cancel anytime in Settings."
+                    ? String(localized: "We'll remind you that your trial ends in \(reminderDaysBeforeEnd) days.")
+                    : String(localized: "Your trial ends in \(reminderDaysBeforeEnd) days. Cancel anytime in Settings.")
             ))
         }
         steps.append(TrialStep(
             icon: .renewal,
             title: title(trialDays),
-            detail: "Your subscription starts. Cancel at least a day before to avoid being charged."
+            detail: String(localized: "Your subscription starts. Cancel at least a day before to avoid being charged.")
         ))
         return steps
     }
@@ -128,28 +128,30 @@ nonisolated enum PaywallOffer {
         [
             TrialStep(
                 icon: .unlock,
-                title: "Today",
-                detail: "Check-ins, body map and photos — know your patterns over time and share a report with your doctor."
+                title: String(localized: "Today"),
+                detail: String(localized: "Check-ins, body map and photos — know your patterns over time and share a report with your doctor.")
             ),
             TrialStep(
                 icon: .renewal,
-                title: option.plan == .weekly ? "Every week" : "Every year",
-                detail: "\(option.displayPrice) renews automatically. Cancel anytime in Settings."
+                title: option.plan == .weekly ? String(localized: "Every week") : String(localized: "Every year"),
+                detail: String(localized: "\(option.displayPrice) renews automatically. Cancel anytime in Settings.")
             ),
         ]
     }
 
     /// Main price line under the plans, e.g. "7 days free, then $59.99/year".
     static func priceLine(for option: PaywallOption) -> String {
-        let period = option.plan == .yearly ? "year" : "week"
-        if let days = option.trialDays {
-            return "\(days) days free, then \(option.displayPrice)/\(period)"
+        let price = option.displayPrice
+        return switch (option.plan, option.trialDays) {
+        case (.yearly, let days?): String(localized: "\(days) days free, then \(price)/year")
+        case (.weekly, let days?): String(localized: "\(days) days free, then \(price)/week")
+        case (.yearly, nil): String(localized: "\(price)/year")
+        case (.weekly, nil): String(localized: "\(price)/week")
         }
-        return "\(option.displayPrice)/\(period)"
     }
 
     static func buttonTitle(for option: PaywallOption) -> String {
-        option.trialDays.map { "Start \($0)-day free trial" } ?? "Continue"
+        option.trialDays.map { String(localized: "Start \($0)-day free trial") } ?? String(localized: "Continue")
     }
 
     /// Trial length from an introductory offer period (StoreKit gives value + unit).

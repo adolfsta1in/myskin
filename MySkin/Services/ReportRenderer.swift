@@ -10,7 +10,7 @@ enum ReportRenderer {
     enum RenderError: Error, LocalizedError {
         case couldNotCreatePDF
 
-        var errorDescription: String? { "The PDF couldn't be created." }
+        var errorDescription: String? { String(localized: "The PDF couldn't be created.") }
     }
 
     /// Writes the PDF into the app's private export folder and returns its URL.
@@ -29,7 +29,7 @@ enum ReportRenderer {
         let renderer = ImageRenderer(content: page)
         renderer.proposedSize = ProposedViewSize(width: pageWidth, height: nil)
 
-        let url = try ExportFolder.prepare(folder).appending(path: "MySkin report \(fileDate(report.end)).pdf")
+        let url = try ExportFolder.prepare(folder).appending(path: String(localized: "MySkin report \(fileDate(report.end)).pdf"))
         var written = false
         renderer.render { size, render in
             var box = CGRect(origin: .zero, size: size)

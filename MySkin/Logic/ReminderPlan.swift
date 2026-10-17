@@ -33,8 +33,8 @@ extension Treatment {
 enum ReminderPlan {
     static let idPrefix = "myskin."
     static let title = "MySkin"
-    static let checkInBody = "Time for your diary check-in."
-    static let doseBody = "Time for your treatment."
+    static let checkInBody = String(localized: "Time for your diary check-in.")
+    static let doseBody = String(localized: "Time for your treatment.")
 
     /// Dose reminders are planned this many days ahead and refreshed whenever the app is opened.
     static let daysAhead = 7

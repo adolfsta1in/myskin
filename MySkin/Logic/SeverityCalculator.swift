@@ -33,9 +33,9 @@ nonisolated enum SeverityCategory: Int, Comparable, Sendable {
 
     var title: String {
         switch self {
-        case .mild: "Mild"
-        case .moderate: "Moderate"
-        case .severe: "Severe"
+        case .mild: String(localized: "Mild")
+        case .moderate: String(localized: "Moderate")
+        case .severe: String(localized: "Severe")
         }
     }
 

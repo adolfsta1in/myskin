@@ -114,7 +114,7 @@ struct PhotosView: View {
                 Text(BodyZone.named(id: zoneID)?.name ?? "Other area")
                     .font(.rounded(.headline, weight: .semibold))
                     .foregroundStyle(Theme.ink)
-                Text("\(count) photo\(count == 1 ? "" : "s") · \(latest.day.formatted(.dateTime.month(.abbreviated).day()))")
+                Text("\(count) photos · \(latest.day.formatted(.dateTime.month(.abbreviated).day()))")
                     .font(.rounded(.caption))
                     .foregroundStyle(Theme.inkSoft)
             }

@@ -12,10 +12,10 @@ enum BiometricAuth {
 
         var title: String {
             switch self {
-            case .faceID: "Face ID"
-            case .touchID: "Touch ID"
-            case .opticID: "Optic ID"
-            case .passcode, .unavailable: "passcode"
+            case .faceID: String(localized: "Face ID")
+            case .touchID: String(localized: "Touch ID")
+            case .opticID: String(localized: "Optic ID")
+            case .passcode, .unavailable: String(localized: "passcode")
             }
         }
 
@@ -69,7 +69,7 @@ final class AppLock {
     }
 
     func unlock() async {
-        if await BiometricAuth.authenticate(reason: "Unlock your skin diary") {
+        if await BiometricAuth.authenticate(reason: String(localized: "Unlock your skin diary")) {
             isLocked = false
         }
     }

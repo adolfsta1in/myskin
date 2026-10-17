@@ -24,17 +24,17 @@ nonisolated enum RedFlag: String, CaseIterable, Identifiable, Sendable {
 
     var id: String { rawValue }
 
-    var title: String { "Seek medical care now" }
+    var title: String { String(localized: "Seek medical care now") }
 
     /// Safety information: «if you have these signs, get care». Names no diagnosis.
     var message: String {
         switch self {
         case .widespreadPustules:
-            "If you have pus-filled bumps over a large area together with fever or feeling unwell, seek medical care now."
+            String(localized: "If you have pus-filled bumps over a large area together with fever or feeling unwell, seek medical care now.")
         case .widespreadRedness:
-            "If redness covers most of your body — especially with chills or peeling — seek medical care now."
+            String(localized: "If redness covers most of your body — especially with chills or peeling — seek medical care now.")
         case .flareAfterSteroidWithdrawal:
-            "If your skin gets worse after stopping steroid tablets or injections, contact your doctor today."
+            String(localized: "If your skin gets worse after stopping steroid tablets or injections, contact your doctor today.")
         }
     }
 }

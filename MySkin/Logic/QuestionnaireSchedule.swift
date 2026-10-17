@@ -44,10 +44,10 @@ enum QuestionnaireSchedule {
     /// Card text on Today.
     static func reason(_ kind: QuestionnaireKind, neverTaken: Bool) -> String {
         switch (kind, neverTaken) {
-        case (.skinImpact, true), (.dlqi, true): "How much your skin gets in the way of daily life. About a minute."
-        case (.skinImpact, false), (.dlqi, false): "It's been a month — a quick check of how your skin affects daily life."
-        case (.jointCheck, true), (.pest, true): "6 questions about your joints. Psoriasis can affect joints, so it's worth checking."
-        case (.jointCheck, false), (.pest, false): "It's been 3 months — a quick joint check."
+        case (.skinImpact, true), (.dlqi, true): String(localized: "How much your skin gets in the way of daily life. About a minute.")
+        case (.skinImpact, false), (.dlqi, false): String(localized: "It's been a month — a quick check of how your skin affects daily life.")
+        case (.jointCheck, true), (.pest, true): String(localized: "6 questions about your joints. Psoriasis can affect joints, so it's worth checking.")
+        case (.jointCheck, false), (.pest, false): String(localized: "It's been 3 months — a quick joint check.")
         }
     }
 }

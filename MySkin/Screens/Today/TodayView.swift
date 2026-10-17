@@ -126,7 +126,7 @@ private struct ModeBanner: View {
                     .contentShape(.rect)
                 }
                 .buttonStyle(.plain)
-                .accessibilityHint(showsReasons ? "Hides the reasons" : "Shows why Flare mode is on")
+                .accessibilityHint(showsReasons ? String(localized: "Hides the reasons") : String(localized: "Shows why Flare mode is on"))
 
                 if showsReasons {
                     VStack(alignment: .leading, spacing: 6) {
@@ -152,8 +152,8 @@ private struct ModeBanner: View {
 
 extension ModeBanner {
     private var entriesHeading: String {
-        guard let day = status.signalDay, !Calendar.current.isDateInToday(day) else { return "Based on your entries today:" }
-        return "Based on your entries on \(day.formatted(.dateTime.weekday(.wide).month().day())):"
+        guard let day = status.signalDay, !Calendar.current.isDateInToday(day) else { return String(localized: "Based on your entries today:") }
+        return String(localized: "Based on your entries on \(day.formatted(.dateTime.weekday(.wide).month().day())):")
     }
 }
 
@@ -337,10 +337,10 @@ private struct CheckInCard: View {
 
     /// One line under the itch row while the card is folded.
     private var foldedSummary: String {
-        var parts = [draft.picks.isEmpty ? "No triggers" : draft.picks.map(\.title).formatted(.list(type: .and))]
-        if draft.newSpots { parts.insert("New spots", at: 0) }
-        if let sleep = draft.sleep { parts.append("Sleep \(sleep)") }
-        if let pain = draft.pain { parts.append("Pain \(pain)") }
+        var parts = [draft.picks.isEmpty ? String(localized: "No triggers") : draft.picks.map(\.title).formatted(.list(type: .and))]
+        if draft.newSpots { parts.insert(String(localized: "New spots"), at: 0) }
+        if let sleep = draft.sleep { parts.append(String(localized: "Sleep \(sleep)")) }
+        if let pain = draft.pain { parts.append(String(localized: "Pain \(pain)")) }
         return parts.joined(separator: " · ")
     }
 
@@ -417,13 +417,13 @@ private struct CheckInCard: View {
         }
         .sheet(isPresented: $isPickingTriggers) {
             LogPickerSheet(
-                title: "Triggers",
+                title: String(localized: "Triggers"),
                 sections: [
-                    .init(title: "Common triggers", picks: Trigger.allCases.map(LogPick.trigger)),
-                    .init(title: "Your tags", picks: customTags.map(LogPick.custom)),
+                    .init(title: String(localized: "Common triggers"), picks: Trigger.allCases.map(LogPick.trigger)),
+                    .init(title: String(localized: "Your tags"), picks: customTags.map(LogPick.custom)),
                 ],
-                addTitle: "Add your own",
-                addPlaceholder: "e.g. Hot shower",
+                addTitle: String(localized: "Add your own"),
+                addPlaceholder: String(localized: "e.g. Hot shower"),
                 known: customTags,
                 draft: $draft,
                 systemImage: Self.systemImage
@@ -439,9 +439,9 @@ private struct CheckInCard: View {
     private var header: some View {
         HStack {
             SectionHeader(
-                title: mode == .calm ? "Quick check-in" : "Flare check-in",
+                title: mode == .calm ? String(localized: "Quick check-in") : String(localized: "Flare check-in"),
                 // Folded and saved: the "Saved" label says enough.
-                subtitle: isSaved && !isExpanded ? nil : (mode == .calm ? "About 10 seconds" : "A little more detail helps spot patterns")
+                subtitle: isSaved && !isExpanded ? nil : (mode == .calm ? String(localized: "About 10 seconds") : String(localized: "A little more detail helps spot patterns"))
             )
             Spacer()
             if isSaved {
@@ -462,7 +462,7 @@ private struct CheckInCard: View {
                         .contentShape(.rect)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(isExpanded ? "Fold check-in" : "Show check-in details")
+                .accessibilityLabel(isExpanded ? String(localized: "Fold check-in") : String(localized: "Show check-in details"))
             }
         }
     }
@@ -516,8 +516,8 @@ private struct CheckInCard: View {
                 safetyQuestions
                 Divider()
             }
-            OptionalScaleRow(title: "Burning or pain", value: $draft.pain, range: 0...10, lowLabel: "None", highLabel: "Worst")
-            OptionalScaleRow(title: "Sleep last night", value: $draft.sleep, range: 0...10, lowLabel: "Poor", highLabel: "Great")
+            OptionalScaleRow(title: String(localized: "Burning or pain"), value: $draft.pain, range: 0...10, lowLabel: String(localized: "None"), highLabel: String(localized: "Worst"))
+            OptionalScaleRow(title: String(localized: "Sleep last night"), value: $draft.sleep, range: 0...10, lowLabel: String(localized: "Poor"), highLabel: String(localized: "Great"))
 
             VStack(alignment: .leading, spacing: 6) {
                 Text("Mood")
@@ -592,11 +592,11 @@ private struct CheckInCard: View {
 
     private static func moodTitle(_ value: Int) -> String {
         switch value {
-        case 1: "Low"
-        case 2: "Meh"
-        case 3: "Okay"
-        case 4: "Good"
-        default: "Great"
+        case 1: String(localized: "Low")
+        case 2: String(localized: "Meh")
+        case 3: String(localized: "Okay")
+        case 4: String(localized: "Good")
+        default: String(localized: "Great")
         }
     }
 }
@@ -640,8 +640,8 @@ private struct FoodLogCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             SectionHeader(
-                title: "Food today",
-                subtitle: existing == nil ? "Save today's check-in first, then log what you ate" : "Tap what you ate — saved right away"
+                title: String(localized: "Food today"),
+                subtitle: existing == nil ? String(localized: "Save today's check-in first, then log what you ate") : String(localized: "Tap what you ate — saved right away")
             )
             if existing != nil {
                 GlassEffectContainer(spacing: 8) {
@@ -676,13 +676,13 @@ private struct FoodLogCard: View {
         }
         .sheet(isPresented: $isPickingFoods) {
             LogPickerSheet(
-                title: "Food today",
+                title: String(localized: "Food today"),
                 sections: [
-                    .init(title: "Common foods", picks: Food.allCases.map(LogPick.food)),
-                    .init(title: "Your foods", picks: customFoods.map(LogPick.custom)),
+                    .init(title: String(localized: "Common foods"), picks: Food.allCases.map(LogPick.food)),
+                    .init(title: String(localized: "Your foods"), picks: customFoods.map(LogPick.custom)),
                 ],
-                addTitle: "Add a food",
-                addPlaceholder: "e.g. Eggs",
+                addTitle: String(localized: "Add a food"),
+                addPlaceholder: String(localized: "e.g. Eggs"),
                 known: customFoods,
                 draft: $draft,
                 systemImage: Self.systemImage
@@ -760,7 +760,7 @@ private struct CalmDaysCard: View {
                 .frame(width: 48, height: 48)
                 .background(Theme.sageSoft, in: .circle)
             VStack(alignment: .leading, spacing: 2) {
-                Text(count == 0 ? "No calm days logged yet" : "\(count) calm \(count == 1 ? "day" : "days") this month")
+                Text(count == 0 ? "No calm days logged yet" : "\(count) calm days this month")
                     .font(.rounded(.headline, weight: .semibold))
                     .foregroundStyle(Theme.ink)
                     .contentTransition(.numericText())
@@ -798,8 +798,8 @@ private struct WeatherCard: View {
         case .needsPermission:
             prompt(
                 systemImage: "cloud.sun.fill",
-                title: "Weather for your skin",
-                text: "See humidity and UV where you are. Dry air and strong sun can affect psoriasis."
+                title: String(localized: "Weather for your skin"),
+                text: String(localized: "See humidity and UV where you are. Dry air and strong sun can affect psoriasis.")
             )
             Button {
                 Task { await weather.refresh(askPermission: true) }
@@ -817,8 +817,8 @@ private struct WeatherCard: View {
         case .denied:
             prompt(
                 systemImage: "location.slash",
-                title: "Weather is off",
-                text: "Location is off for MySkin, so humidity and UV can't be shown."
+                title: String(localized: "Weather is off"),
+                text: String(localized: "Location is off for MySkin, so humidity and UV can't be shown.")
             )
             Button("Open Settings") {
                 if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
@@ -835,12 +835,12 @@ private struct WeatherCard: View {
             }
             .frame(maxWidth: .infinity, minHeight: 72)
         case .failed:
-            prompt(systemImage: "cloud.fill", title: "Weather", text: "Couldn't load the weather.")
+            prompt(systemImage: "cloud.fill", title: String(localized: "Weather"), text: String(localized: "Couldn't load the weather."))
             Button("Try again") { Task { await weather.refresh(isManual: true) } }
                 .font(.rounded(.subheadline, weight: .semibold))
                 .tint(Theme.accent)
         case .limitReached:
-            prompt(systemImage: "cloud.fill", title: "Weather", text: "The weather has been checked many times today. It will be back tomorrow.")
+            prompt(systemImage: "cloud.fill", title: String(localized: "Weather"), text: String(localized: "The weather has been checked many times today. It will be back tomorrow."))
         case .loaded(let reading):
             loaded(reading)
         }
@@ -902,13 +902,13 @@ private struct WeatherCard: View {
             HStack(spacing: 10) {
                 tile(
                     systemImage: "humidity.fill",
-                    title: "Humidity",
+                    title: String(localized: "Humidity"),
                     value: "\(Int(reading.humidity.rounded())) %",
                     detail: WeatherInfo.humidityTitle(reading.humidity)
                 )
                 tile(
                     systemImage: "sun.min",
-                    title: "UV now",
+                    title: String(localized: "UV now"),
                     value: reading.uvIndex.formatted(.number.precision(.fractionLength(0))),
                     detail: UVLevel(index: reading.uvIndex).title
                 )
@@ -1060,8 +1060,8 @@ private struct RemindersCard: View {
             SectionHeader(title: "Treatment today", systemImage: "calendar")
             if rows.isEmpty {
                 Text(treatments.isEmpty
-                     ? "Add your treatments in the Treatment tab to see today's doses here."
-                     : "Nothing planned for today.")
+                     ? String(localized: "Add your treatments in the Treatment tab to see today's doses here.")
+                     : String(localized: "Nothing planned for today."))
                     .font(.rounded(.subheadline))
                     .foregroundStyle(Theme.inkSoft)
             }
@@ -1092,20 +1092,20 @@ private struct RemindersCard: View {
                     }
                     .buttonStyle(.plain)
                     .sensoryFeedback(.success, trigger: row.isDone) { _, done in done }
-                    .accessibilityLabel(row.isDone ? "Done" : "Mark as done")
+                    .accessibilityLabel(row.isDone ? String(localized: "Done") : String(localized: "Mark as done"))
                 }
             }
         }
         .glassCard()
         .confirmationDialog(
-            "Where did you inject?",
+            String(localized: "Where did you inject?"),
             isPresented: Binding(get: { pendingInjection != nil }, set: { if !$0 { pendingInjection = nil } }),
             titleVisibility: .visible,
             presenting: pendingInjection
         ) { row in
             let suggested = InjectionPlan.suggestedSite(after: InjectionPlan.lastSite(row.treatment.doses.map(\.injectionRecord)))
             ForEach([suggested] + InjectionSite.allCases.filter { $0 != suggested }) { site in
-                Button(site == suggested ? "\(site.title) (suggested)" : site.title) {
+                Button(site == suggested ? String(localized: "\(site.title) (suggested)") : site.title) {
                     mark(row, site: site)
                 }
             }
@@ -1123,7 +1123,7 @@ private struct RemindersCard: View {
         let zones = row.treatment.zoneIDs.compactMap { BodyZone.named(id: $0)?.name }
         if !zones.isEmpty { parts.append(zones.formatted(.list(type: .and))) }
         if let ftu = row.treatment.fingertipUnits {
-            parts.append("\(ftu.formatted(.number.precision(.fractionLength(0...1)))) FTU")
+            parts.append(String(localized: "\(ftu.formatted(.number.precision(.fractionLength(0...1)))) FTU"))
         }
         return parts.joined(separator: " · ")
     }
@@ -1222,9 +1222,9 @@ private struct TrendBadge: View {
 
     private var title: String {
         switch trend {
-        case .down: "Trending down"
-        case .steady: "Steady"
-        case .up: "Trending up"
+        case .down: String(localized: "Trending down")
+        case .steady: String(localized: "Steady")
+        case .up: String(localized: "Trending up")
         }
     }
 

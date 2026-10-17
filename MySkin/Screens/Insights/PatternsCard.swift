@@ -37,7 +37,7 @@ struct PatternsCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            SectionHeader(title: "Patterns", subtitle: "What went with your itch, from your own diary", systemImage: "sparkle.magnifyingglass")
+            SectionHeader(title: String(localized: "Patterns"), subtitle: String(localized: "What went with your itch, from your own diary"), systemImage: "sparkle.magnifyingglass")
             content
         }
         .glassCard()
@@ -62,12 +62,12 @@ struct PatternsCard: View {
                 Text("No clear links yet. Keep logging triggers and food — patterns need a few repeats to show.")
                     .font(.rounded(.subheadline))
                     .foregroundStyle(Theme.inkSoft)
-                seeAll(report, title: "What was checked")
+                seeAll(report, title: String(localized: "What was checked"))
             } else {
                 ForEach(report.findings.prefix(3)) { finding in
                     PatternRow(finding: finding)
                 }
-                seeAll(report, title: report.findings.count > 3 ? "See all \(report.findings.count)" : "Details")
+                seeAll(report, title: report.findings.count > 3 ? String(localized: "See all \(report.findings.count)") : String(localized: "Details"))
             }
         } else {
             HStack(spacing: 8) {
@@ -81,7 +81,7 @@ struct PatternsCard: View {
 
     private func waiting(_ report: PatternReport) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Keep logging — \(report.checkInsUntilFirstAnalysis) more \(report.checkInsUntilFirstAnalysis == 1 ? "check-in" : "check-ins") to look for patterns.")
+            Text("Keep logging — \(report.checkInsUntilFirstAnalysis) more check-ins to look for patterns.")
                 .font(.rounded(.subheadline))
                 .foregroundStyle(Theme.ink)
             ProgressView(value: Double(report.checkInDays), total: Double(Patterns.Threshold.minCheckIns))
@@ -137,15 +137,20 @@ private struct PatternDirectionIcon: View {
             .foregroundStyle(direction == .worse ? Theme.intensitySevere : Theme.sageDeep)
             .frame(width: 32, height: 32)
             .background((direction == .worse ? Theme.intensityMild : Theme.sageSoft).opacity(0.6), in: .circle)
-            .accessibilityLabel(direction == .worse ? "Higher itch" : "Lower itch")
+            .accessibilityLabel(direction == .worse ? String(localized: "Higher itch") : String(localized: "Lower itch"))
     }
 }
 
 private enum PatternText {
     /// «Moderate link · 9 times · early sign»
     static func badge(_ finding: PatternFinding) -> String {
-        var parts = ["\(finding.strength.title) link", "\(finding.episodes) times"]
-        if finding.isEarly { parts.append("early sign") }
+        let strength = switch finding.strength {
+        case .weak: String(localized: "Weak link")
+        case .moderate: String(localized: "Moderate link")
+        case .strong: String(localized: "Strong link")
+        }
+        var parts = [strength, String(localized: "\(finding.episodes) times")]
+        if finding.isEarly { parts.append(String(localized: "early sign")) }
         return parts.joined(separator: " · ")
     }
 
@@ -171,7 +176,7 @@ struct PatternDetailView: View {
 
                 if !report.unclear.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
-                        SectionHeader(title: "No clear link yet", subtitle: "Checked, and itch looked about the same with or without")
+                        SectionHeader(title: String(localized: "No clear link yet"), subtitle: String(localized: "Checked, and itch looked about the same with or without"))
                         Text(report.unclear.map(\.title).formatted(.list(type: .and)))
                             .font(.rounded(.subheadline))
                             .foregroundStyle(Theme.ink)
@@ -181,12 +186,12 @@ struct PatternDetailView: View {
 
                 if !report.notEnoughData.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
-                        SectionHeader(title: "Not enough data yet", subtitle: "Needs at least \(Patterns.Threshold.minEpisodes) separate times, with days without it in between")
+                        SectionHeader(title: String(localized: "Not enough data yet"), subtitle: String(localized: "Needs at least \(Patterns.Threshold.minEpisodes) separate times, with days without it in between"))
                         ForEach(report.notEnoughData) { pending in
                             HStack {
                                 Text(pending.title)
                                 Spacer()
-                                Text(pending.episodes == 1 ? "once" : "\(pending.episodes) times")
+                                Text("\(pending.episodes) times")
                                     .foregroundStyle(Theme.inkSoft)
                             }
                             .font(.rounded(.subheadline))
@@ -222,8 +227,8 @@ struct PatternDetailView: View {
                 }
             }
             HStack(spacing: 10) {
-                number("\(Patterns.number(finding.meanItchExposed))", caption: "itch after \(Patterns.subject(finding.factor, title: finding.title))")
-                number("\(Patterns.number(finding.meanItchUnexposed))", caption: "itch on other days")
+                number(String(localized: "\(Patterns.number(finding.meanItchExposed))"), caption: String(localized: "itch after \(Patterns.subject(finding.factor, title: finding.title))"))
+                number(String(localized: "\(Patterns.number(finding.meanItchUnexposed))"), caption: String(localized: "itch on other days"))
             }
             Text("Days with flare signs: \(PatternText.percent(finding.flareShareExposed)) vs \(PatternText.percent(finding.flareShareUnexposed)).")
                 .font(.rounded(.footnote))

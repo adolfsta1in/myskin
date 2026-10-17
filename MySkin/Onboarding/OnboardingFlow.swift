@@ -275,7 +275,7 @@ struct ChoiceCard: View {
 
 /// Buttons for soft permission screens.
 struct PermissionButtons: View {
-    var allowTitle: String = "Allow"
+    var allowTitle: String = String(localized: "Allow")
     let onAllow: () -> Void
     let onNotNow: () -> Void
 

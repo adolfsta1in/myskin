@@ -13,9 +13,9 @@ nonisolated enum Sex: String, Codable, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .female: "Female"
-        case .male: "Male"
-        case .other: "Other"
+        case .female: String(localized: "Female")
+        case .male: String(localized: "Male")
+        case .other: String(localized: "Other")
         }
     }
 }
@@ -28,10 +28,10 @@ nonisolated enum ArthritisStatus: String, Codable, CaseIterable, Identifiable, S
 
     var title: String {
         switch self {
-        case .diagnosed: "Yes, a doctor diagnosed it"
-        case .suspected: "I think I might have it"
-        case .no: "No"
-        case .unsure: "I'm not sure"
+        case .diagnosed: String(localized: "Yes, a doctor diagnosed it")
+        case .suspected: String(localized: "I think I might have it")
+        case .no: String(localized: "No")
+        case .unsure: String(localized: "I'm not sure")
         }
     }
 }
@@ -45,14 +45,14 @@ nonisolated enum PsoriasisType: String, Codable, CaseIterable, Identifiable, Sen
 
     var title: String {
         switch self {
-        case .plaque: "Plaque"
-        case .guttate: "Guttate"
-        case .inverse: "Inverse (skin folds)"
-        case .pustular: "Pustular"
-        case .palmoplantar: "Palms & soles"
-        case .nail: "Nail"
-        case .scalp: "Scalp"
-        case .genital: "Genital"
+        case .plaque: String(localized: "Plaque")
+        case .guttate: String(localized: "Guttate")
+        case .inverse: String(localized: "Inverse (skin folds)")
+        case .pustular: String(localized: "Pustular")
+        case .palmoplantar: String(localized: "Palms & soles")
+        case .nail: String(localized: "Nail")
+        case .scalp: String(localized: "Scalp")
+        case .genital: String(localized: "Genital")
         }
     }
 
@@ -79,14 +79,14 @@ nonisolated enum Trigger: String, Codable, CaseIterable, Identifiable, Sendable 
 
     var title: String {
         switch self {
-        case .stress: "Stress"
-        case .alcohol: "Alcohol"
-        case .smoking: "Smoking"
-        case .infection: "Sick / sore throat"
-        case .skinInjury: "Skin injury"
-        case .newMedication: "New medication"
-        case .sunburn: "Sunburn"
-        case .coldDry: "Cold / dry air"
+        case .stress: String(localized: "Stress")
+        case .alcohol: String(localized: "Alcohol")
+        case .smoking: String(localized: "Smoking")
+        case .infection: String(localized: "Sick / sore throat")
+        case .skinInjury: String(localized: "Skin injury")
+        case .newMedication: String(localized: "New medication")
+        case .sunburn: String(localized: "Sunburn")
+        case .coldDry: String(localized: "Cold / dry air")
         }
     }
 
@@ -115,14 +115,14 @@ nonisolated enum Food: String, Codable, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .dairy: "Dairy"
-        case .gluten: "Gluten / wheat"
-        case .sugar: "Sugar & sweets"
-        case .redMeat: "Red meat"
-        case .processed: "Processed / fast food"
-        case .nightshades: "Nightshades (tomato, pepper)"
-        case .spicy: "Spicy food"
-        case .coffee: "Coffee"
+        case .dairy: String(localized: "Dairy")
+        case .gluten: String(localized: "Gluten / wheat")
+        case .sugar: String(localized: "Sugar & sweets")
+        case .redMeat: String(localized: "Red meat")
+        case .processed: String(localized: "Processed / fast food")
+        case .nightshades: String(localized: "Nightshades (tomato, pepper)")
+        case .spicy: String(localized: "Spicy food")
+        case .coffee: String(localized: "Coffee")
         }
     }
 
@@ -149,13 +149,13 @@ nonisolated enum TreatmentKind: String, Codable, CaseIterable, Identifiable, Sen
 
     var title: String {
         switch self {
-        case .cream: "Cream"
-        case .ointment: "Ointment"
-        case .shampoo: "Shampoo"
-        case .foam: "Foam"
-        case .pill: "Tablets"
-        case .biologic: "Biologic"
-        case .phototherapy: "Phototherapy"
+        case .cream: String(localized: "Cream")
+        case .ointment: String(localized: "Ointment")
+        case .shampoo: String(localized: "Shampoo")
+        case .foam: String(localized: "Foam")
+        case .pill: String(localized: "Tablets")
+        case .biologic: String(localized: "Biologic")
+        case .phototherapy: String(localized: "Phototherapy")
         }
     }
 
@@ -201,13 +201,13 @@ nonisolated enum SteroidClass: String, Codable, CaseIterable, Identifiable, Send
 
     var title: String {
         switch self {
-        case .class1: "Class I · super-potent"
-        case .class2: "Class II · high potency"
-        case .class3: "Class III · upper-mid potency"
-        case .class4: "Class IV · medium potency"
-        case .class5: "Class V · lower-mid potency"
-        case .class6: "Class VI · low potency"
-        case .class7: "Class VII · least potent"
+        case .class1: String(localized: "Class I · super-potent")
+        case .class2: String(localized: "Class II · high potency")
+        case .class3: String(localized: "Class III · upper-mid potency")
+        case .class4: String(localized: "Class IV · medium potency")
+        case .class5: String(localized: "Class V · lower-mid potency")
+        case .class6: String(localized: "Class VI · low potency")
+        case .class7: String(localized: "Class VII · least potent")
         }
     }
 
@@ -239,11 +239,11 @@ nonisolated enum ScheduleKind: String, Codable, CaseIterable, Identifiable, Send
 
     var title: String {
         switch self {
-        case .timesPerDay: "Times a day"
-        case .weekly: "Once a week"
-        case .everyNDays: "Every few days"
-        case .everyNWeeks: "Every few weeks"
-        case .asNeeded: "As needed"
+        case .timesPerDay: String(localized: "Times a day")
+        case .weekly: String(localized: "Once a week")
+        case .everyNDays: String(localized: "Every few days")
+        case .everyNWeeks: String(localized: "Every few weeks")
+        case .asNeeded: String(localized: "As needed")
         }
     }
 
@@ -274,10 +274,10 @@ nonisolated enum QuestionnaireKind: String, Codable, CaseIterable, Identifiable,
 
     var title: String {
         switch self {
-        case .skinImpact: "Skin impact"
-        case .jointCheck: "Joint check"
-        case .dlqi: "Skin impact (earlier version)"
-        case .pest: "Joint check (earlier version)"
+        case .skinImpact: String(localized: "Skin impact")
+        case .jointCheck: String(localized: "Joint check")
+        case .dlqi: String(localized: "Skin impact (earlier version)")
+        case .pest: String(localized: "Joint check (earlier version)")
         }
     }
 
@@ -298,8 +298,8 @@ nonisolated enum DoseStatus: String, Codable, CaseIterable, Identifiable, Sendab
 
     var title: String {
         switch self {
-        case .done: "Done"
-        case .skipped: "Skipped"
+        case .done: String(localized: "Done")
+        case .skipped: String(localized: "Skipped")
         }
     }
 
@@ -320,11 +320,11 @@ nonisolated enum Goal: String, Codable, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .triggers: "Spot possible patterns"
-        case .treatment: "Check my treatment"
-        case .doctor: "Prepare for my doctor"
-        case .sleep: "Itch less, sleep better"
-        case .journal: "Just keep a diary"
+        case .triggers: String(localized: "Spot possible patterns")
+        case .treatment: String(localized: "Check my treatment")
+        case .doctor: String(localized: "Prepare for my doctor")
+        case .sleep: String(localized: "Itch less, sleep better")
+        case .journal: String(localized: "Just keep a diary")
         }
     }
 
@@ -346,7 +346,7 @@ nonisolated enum AppMode: String, CaseIterable, Identifiable, Sendable {
     case calm, flare
 
     var id: String { rawValue }
-    var title: String { self == .calm ? "Calm" : "Flare" }
+    var title: String { self == .calm ? String(localized: "Calm") : String(localized: "Flare") }
 }
 
 // MARK: - Injection site
@@ -358,10 +358,10 @@ nonisolated enum InjectionSite: String, Codable, CaseIterable, Identifiable, Sen
 
     var title: String {
         switch self {
-        case .abdomenLeft: "Abdomen · left"
-        case .abdomenRight: "Abdomen · right"
-        case .thighLeft: "Thigh · left"
-        case .thighRight: "Thigh · right"
+        case .abdomenLeft: String(localized: "Abdomen · left")
+        case .abdomenRight: String(localized: "Abdomen · right")
+        case .thighLeft: String(localized: "Thigh · left")
+        case .thighRight: String(localized: "Thigh · right")
         }
     }
 }

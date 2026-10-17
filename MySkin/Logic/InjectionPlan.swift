@@ -38,11 +38,11 @@ enum InjectionPlan {
     /// «Today», «Tomorrow» or «In 5 days · Friday».
     static func countdownText(days: Int, from date: Date, calendar: Calendar = .current) -> String {
         switch days {
-        case 0: return "Next injection today"
-        case 1: return "Next injection tomorrow"
+        case 0: return String(localized: "Next injection today")
+        case 1: return String(localized: "Next injection tomorrow")
         default:
             let day = calendar.date(byAdding: .day, value: days, to: date) ?? date
-            return "Next injection in \(days) days · \(day.formatted(.dateTime.weekday(.wide)))"
+            return String(localized: "Next injection in \(days) days · \(day.formatted(.dateTime.weekday(.wide)))")
         }
     }
 }

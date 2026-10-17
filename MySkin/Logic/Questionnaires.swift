@@ -57,19 +57,19 @@ enum Questionnaires {
 /// Levels are plain words, not clinical bands.
 enum SkinImpact {
     private static let scale = [
-        QuestionOption(title: "Not at all", score: 0),
-        QuestionOption(title: "A little", score: 1),
-        QuestionOption(title: "Quite a bit", score: 2),
-        QuestionOption(title: "A lot", score: 3),
+        QuestionOption(title: String(localized: "Not at all"), score: 0),
+        QuestionOption(title: String(localized: "A little"), score: 1),
+        QuestionOption(title: String(localized: "Quite a bit"), score: 2),
+        QuestionOption(title: String(localized: "A lot"), score: 3),
     ]
 
     static let questions: [Question] = [
-        Question(id: 1, text: "In the past 7 days, how much did your skin get in the way of your sleep?", options: scale),
-        Question(id: 2, text: "In the past 7 days, how much did your skin affect your mood — feeling low, irritable or worried?", options: scale),
-        Question(id: 3, text: "In the past 7 days, how much did your skin get in the way of work, study or everyday tasks?", options: scale),
-        Question(id: 4, text: "In the past 7 days, how much did your skin hold you back from seeing people or going out?", options: scale),
-        Question(id: 5, text: "In the past 7 days, how much did your skin affect what you chose to wear?", options: scale),
-        Question(id: 6, text: "In the past 7 days, how much of a burden was looking after your skin — time, mess or routine?", options: scale),
+        Question(id: 1, text: String(localized: "In the past 7 days, how much did your skin get in the way of your sleep?"), options: scale),
+        Question(id: 2, text: String(localized: "In the past 7 days, how much did your skin affect your mood — feeling low, irritable or worried?"), options: scale),
+        Question(id: 3, text: String(localized: "In the past 7 days, how much did your skin get in the way of work, study or everyday tasks?"), options: scale),
+        Question(id: 4, text: String(localized: "In the past 7 days, how much did your skin hold you back from seeing people or going out?"), options: scale),
+        Question(id: 5, text: String(localized: "In the past 7 days, how much did your skin affect what you chose to wear?"), options: scale),
+        Question(id: 6, text: String(localized: "In the past 7 days, how much of a burden was looking after your skin — time, mess or routine?"), options: scale),
     ]
 
     static let maxScore = 18
@@ -81,10 +81,10 @@ enum SkinImpact {
 
         var title: String {
             switch self {
-            case .none: "No impact this week"
-            case .small: "Small impact"
-            case .moderate: "Moderate impact"
-            case .large: "Large impact"
+            case .none: String(localized: "No impact this week")
+            case .small: String(localized: "Small impact")
+            case .moderate: String(localized: "Moderate impact")
+            case .large: String(localized: "Large impact")
             }
         }
     }
@@ -102,9 +102,9 @@ enum SkinImpact {
 
     static func interpretation(for score: Int) -> String {
         switch level(for: score) {
-        case .none: "Your skin didn't get in the way of your week."
-        case .small, .moderate: "Your skin affected part of your week. You can mention it at your next visit."
-        case .large: "Your skin affected a lot of your week. It's worth discussing with your doctor — show them these answers."
+        case .none: String(localized: "Your skin didn't get in the way of your week.")
+        case .small, .moderate: String(localized: "Your skin affected part of your week. You can mention it at your next visit.")
+        case .large: String(localized: "Your skin affected a lot of your week. It's worth discussing with your doctor — show them these answers.")
         }
     }
 }
@@ -113,15 +113,15 @@ enum SkinImpact {
 
 /// Joint symptoms: 6 yes/no questions, 0–6. A reason to talk to a doctor, not a diagnosis.
 enum JointCheck {
-    private static let yesNo = [QuestionOption(title: "Yes", score: 1), QuestionOption(title: "No", score: 0)]
+    private static let yesNo = [QuestionOption(title: String(localized: "Yes"), score: 1), QuestionOption(title: String(localized: "No"), score: 0)]
 
     static let questions: [Question] = [
-        Question(id: 1, text: "In the past month, has any joint been painful for more than a few days?", options: yesNo),
-        Question(id: 2, text: "In the past month, has any joint looked or felt swollen?", options: yesNo),
-        Question(id: 3, text: "Do your joints feel stiff for more than 30 minutes after you get up?", options: yesNo),
-        Question(id: 4, text: "In the past month, have you had pain at the back of your heel or under your foot?", options: yesNo),
-        Question(id: 5, text: "In the past month, has a whole finger or toe been swollen and sore?", options: yesNo),
-        Question(id: 6, text: "Do you have back pain that wakes you at night and eases when you move?", options: yesNo),
+        Question(id: 1, text: String(localized: "In the past month, has any joint been painful for more than a few days?"), options: yesNo),
+        Question(id: 2, text: String(localized: "In the past month, has any joint looked or felt swollen?"), options: yesNo),
+        Question(id: 3, text: String(localized: "Do your joints feel stiff for more than 30 minutes after you get up?"), options: yesNo),
+        Question(id: 4, text: String(localized: "In the past month, have you had pain at the back of your heel or under your foot?"), options: yesNo),
+        Question(id: 5, text: String(localized: "In the past month, has a whole finger or toe been swollen and sore?"), options: yesNo),
+        Question(id: 6, text: String(localized: "Do you have back pain that wakes you at night and eases when you move?"), options: yesNo),
     ]
 
     static let maxScore = 6
@@ -132,17 +132,17 @@ enum JointCheck {
 
     static func headline(for score: Int) -> String {
         switch score {
-        case ...0: "No joint symptoms noted"
-        case ..<attentionThreshold: "One joint symptom noted"
-        default: "Discuss your joints with a doctor"
+        case ...0: String(localized: "No joint symptoms noted")
+        case ..<attentionThreshold: String(localized: "One joint symptom noted")
+        default: String(localized: "Discuss your joints with a doctor")
         }
     }
 
     static func interpretation(for score: Int) -> String {
         switch score {
-        case ...0: "Tell your doctor if joint pain, swelling or stiffness appears."
-        case ..<attentionThreshold: "Keep an eye on it and mention it at your next visit."
-        default: "You noted symptoms in your joints. Show these answers to your doctor or a rheumatologist — psoriasis can affect joints, and it's worth checking early."
+        case ...0: String(localized: "Tell your doctor if joint pain, swelling or stiffness appears.")
+        case ..<attentionThreshold: String(localized: "Keep an eye on it and mention it at your next visit.")
+        default: String(localized: "You noted symptoms in your joints. Show these answers to your doctor or a rheumatologist — psoriasis can affect joints, and it's worth checking early.")
         }
     }
 }
@@ -159,5 +159,5 @@ enum RetiredQuestionnaire {
         kind == .pest ? score >= 3 : score > 10
     }
 
-    static let interpretation = "From an earlier version of this questionnaire. Take the new one to keep tracking."
+    static let interpretation = String(localized: "From an earlier version of this questionnaire. Take the new one to keep tracking.")
 }

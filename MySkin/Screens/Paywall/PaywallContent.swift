@@ -76,7 +76,7 @@ struct PaywallContent: View {
                 .foregroundStyle(.white)
                 .fixedSize(horizontal: false, vertical: true)
             HStack(spacing: 14) {
-                ForEach(["No tracking", "Cancel anytime"], id: \.self) { item in
+                ForEach([String(localized: "No tracking"), String(localized: "Cancel anytime")], id: \.self) { item in
                     Label(item, systemImage: "checkmark")
                         .labelStyle(.titleAndIcon)
                 }
@@ -147,7 +147,7 @@ struct PaywallContent: View {
                 ForEach(options) { option in
                     PlanCard(
                         option: option,
-                        badge: option.plan == .yearly ? savings.map { "SAVE \($0)%" } : nil,
+                        badge: option.plan == .yearly ? savings.map { String(localized: "SAVE \($0)%") } : nil,
                         isSelected: option.plan == current?.plan
                     ) {
                         selected = option.plan
@@ -178,7 +178,7 @@ struct PaywallContent: View {
     private var footer: some View {
         VStack(spacing: 10) {
             priceSummary
-            PrimaryButton(title: current.map(PaywallOffer.buttonTitle) ?? "Continue", action: onContinue)
+            PrimaryButton(title: current.map(PaywallOffer.buttonTitle) ?? String(localized: "Continue"), action: onContinue)
                 .disabled(current == nil || isPurchasing)
                 .overlay {
                     if isPurchasing { ProgressView().tint(.white) }
@@ -288,12 +288,12 @@ private struct PlanCard: View {
     let isSelected: Bool
     let action: () -> Void
 
-    private var title: String { option.plan == .yearly ? "Yearly" : "Weekly" }
+    private var title: String { option.plan == .yearly ? String(localized: "Yearly") : String(localized: "Weekly") }
     private var period: String { option.plan == .yearly ? "/yr" : "/wk" }
     private var subtitle: String {
         switch option.plan {
-        case .yearly: "\(option.formatted(PaywallOffer.weeklyEquivalent(ofYearly: option.price))) a week"
-        case .weekly: "Billed weekly"
+        case .yearly: String(localized: "\(option.formatted(PaywallOffer.weeklyEquivalent(ofYearly: option.price))) a week")
+        case .weekly: String(localized: "Billed weekly")
         }
     }
 
@@ -315,7 +315,7 @@ private struct PlanCard: View {
                     .font(.rounded(.subheadline))
                     .foregroundStyle(Theme.inkSoft)
                 Spacer(minLength: 0)
-                Text(option.trialDays.map { "\($0)-day free trial" } ?? "No free trial")
+                Text(option.trialDays.map { String(localized: "\($0)-day free trial") } ?? String(localized: "No free trial"))
                     .font(.rounded(.caption, weight: .semibold))
                     .foregroundStyle(option.trialDays == nil ? Theme.inkSoft : Theme.sageDeep)
             }

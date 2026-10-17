@@ -66,11 +66,11 @@ struct ZoneAssessmentDraft: Equatable {
 enum SignScale {
     static func label(for value: Int) -> String {
         switch value {
-        case 1: "Slight"
-        case 2: "Moderate"
-        case 3: "Marked"
-        case 4: "Very marked"
-        default: "None"
+        case 1: String(localized: "Slight")
+        case 2: String(localized: "Moderate")
+        case 3: String(localized: "Marked")
+        case 4: String(localized: "Very marked")
+        default: String(localized: "None")
         }
     }
 }

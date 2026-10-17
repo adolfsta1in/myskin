@@ -63,7 +63,7 @@ struct QuestionnaireHistoryView: View {
                 }
             }
             if !kind.isRetired {
-                Button(results.isEmpty ? "Take it now" : "Take it again", systemImage: "square.and.pencil") {
+                Button(results.isEmpty ? String(localized: "Take it now") : String(localized: "Take it again"), systemImage: "square.and.pencil") {
                     taking = kind
                 }
                 .font(.rounded(.subheadline, weight: .semibold))

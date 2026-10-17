@@ -22,7 +22,7 @@ struct ZoneProgressView: View {
         _photos = Query(filter: #Predicate<Photo> { ids.contains($0.zoneID) }, sort: \Photo.createdAt)
     }
 
-    private var zoneName: String { BodyZone.named(id: zoneID)?.name ?? "Area" }
+    private var zoneName: String { BodyZone.named(id: zoneID)?.name ?? String(localized: "Area") }
 
     /// Treatments applied to this zone, by start date. Ids are compared after `canonicalID`:
     /// face photos live in `quick.face`, treatments save `front.head`.
@@ -89,7 +89,7 @@ struct ZoneProgressView: View {
         .onAppear(perform: resetSelection)
         .onChange(of: photos.count) { resetSelection() }
         .confirmationDialog(
-            "Delete this photo?",
+            String(localized: "Delete this photo?"),
             isPresented: Binding(get: { photoToDelete != nil }, set: { if !$0 { photoToDelete = nil } }),
             titleVisibility: .visible,
             presenting: photoToDelete
@@ -151,9 +151,9 @@ struct ZoneProgressView: View {
 
                 VStack {
                     HStack {
-                        dateBadge("Before", beforePhoto?.day)
+                        dateBadge(String(localized: "Before"), beforePhoto?.day)
                         Spacer()
-                        dateBadge("Now", afterPhoto?.day)
+                        dateBadge(String(localized: "Now"), afterPhoto?.day)
                     }
                     Spacer()
                 }
@@ -194,7 +194,7 @@ struct ZoneProgressView: View {
 
     private var photoStrip: some View {
         VStack(alignment: .leading, spacing: 10) {
-            SectionHeader(title: "All photos", subtitle: "Tap to set “before”. Touch and hold to set “now” or delete.")
+            SectionHeader(title: String(localized: "All photos"), subtitle: String(localized: "Tap to set “before”. Touch and hold to set “now” or delete."))
             ScrollView(.horizontal) {
                 HStack(spacing: 10) {
                     ForEach(Array(photos.enumerated()), id: \.element.persistentModelID) { index, photo in
@@ -236,7 +236,7 @@ struct ZoneProgressView: View {
         let span = max(end.timeIntervalSince(start), 1)
 
         return VStack(alignment: .leading, spacing: 12) {
-            SectionHeader(title: "Timeline", subtitle: markers.isEmpty ? "Photos of this area" : "Photos and treatment starts")
+            SectionHeader(title: String(localized: "Timeline"), subtitle: markers.isEmpty ? String(localized: "Photos of this area") : String(localized: "Photos and treatment starts"))
             GeometryReader { geo in
                 let width = geo.size.width
                 ZStack(alignment: .leading) {

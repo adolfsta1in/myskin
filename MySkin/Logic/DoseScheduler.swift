@@ -154,21 +154,21 @@ extension DoseScheduler {
         switch schedule.kind {
         case .timesPerDay:
             switch schedule.timesPerDay {
-            case ...1: return "Once a day"
-            case 2: return "Twice a day"
-            default: return "\(schedule.timesPerDay) times a day"
+            case ...1: return String(localized: "Once a day")
+            case 2: return String(localized: "Twice a day")
+            default: return String(localized: "\(schedule.timesPerDay) times a day")
             }
         case .weekly:
             let weekday = schedule.weekday ?? calendar.component(.weekday, from: schedule.startDate)
             let names = calendar.standaloneWeekdaySymbols
             let name = names.indices.contains(weekday - 1) ? names[weekday - 1] : ""
-            return name.isEmpty ? "Once a week" : "Weekly · \(name)"
+            return name.isEmpty ? String(localized: "Once a week") : String(localized: "Weekly · \(name)")
         case .everyNDays:
-            return schedule.interval <= 1 ? "Every day" : "Every \(schedule.interval) days"
+            return schedule.interval <= 1 ? String(localized: "Every day") : String(localized: "Every \(schedule.interval) days")
         case .everyNWeeks:
-            return schedule.interval <= 1 ? "Every week" : "Every \(schedule.interval) weeks"
+            return schedule.interval <= 1 ? String(localized: "Every week") : String(localized: "Every \(schedule.interval) weeks")
         case .asNeeded:
-            return "As needed"
+            return String(localized: "As needed")
         }
     }
 }

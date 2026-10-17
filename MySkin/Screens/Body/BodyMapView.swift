@@ -81,13 +81,13 @@ struct BodyMapView: View {
     }
 
     private func lastTappedDescription(_ levels: [String: Int]) -> String {
-        guard let lastTapped else { return "Front and back views are tracked separately" }
-        return "\(lastTapped.name) · \(IntensityLegend.label(for: levels[lastTapped.id] ?? 0))"
+        guard let lastTapped else { return String(localized: "Front and back views are tracked separately") }
+        return String(localized: "\(lastTapped.name) · \(IntensityLegend.label(for: levels[lastTapped.id] ?? 0))")
     }
 
     private func quickZones(_ levels: [String: Int]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionHeader(title: "Quick zones", subtitle: "Hard-to-draw areas")
+            SectionHeader(title: String(localized: "Quick zones"), subtitle: String(localized: "Hard-to-draw areas"))
             GlassEffectContainer(spacing: 10) {
             // Two columns don't fit the longest names at the largest text sizes.
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: dynamicTypeSize.isAccessibilitySize ? 1 : 2), spacing: 10) {
@@ -160,10 +160,11 @@ struct BodyMapView: View {
             }
 
             if let change = summary.bsaChange {
+                let amount = abs(change).formatted(.number.precision(.fractionLength(1)))
                 Label(
-                    change == 0
-                        ? "Same area as the previous assessment"
-                        : "\(abs(change), format: .number.precision(.fractionLength(1)))% \(change < 0 ? "less" : "more") vs previous assessment",
+                    change == 0 ? String(localized: "Same area as the previous assessment")
+                        : change < 0 ? String(localized: "\(amount)% less vs previous assessment")
+                        : String(localized: "\(amount)% more vs previous assessment"),
                     systemImage: change < 0 ? "arrow.down.right" : change > 0 ? "arrow.up.right" : "equal"
                 )
                 .font(.rounded(.subheadline, weight: .semibold))
@@ -191,8 +192,8 @@ struct BodyMapView: View {
     /// Special site or suspected arthritis (spec §2.2): a hint to talk to the doctor, not a diagnosis.
     private func elevatedNote(_ snapshot: SeveritySnapshot) -> some View {
         let names = snapshot.specialSiteIDs.compactMap { BodyZone.zone(id: $0)?.name }
-        let joints = profiles.first?.arthritisStatus == .diagnosed ? "Psoriatic arthritis" : "Your joint answers"
-        let reason = names.isEmpty ? joints : "Special area: \(names.formatted(.list(type: .and)))"
+        let joints = profiles.first?.arthritisStatus == .diagnosed ? String(localized: "Psoriatic arthritis") : String(localized: "Your joint answers")
+        let reason = names.isEmpty ? joints : String(localized: "Special area: \(names.formatted(.list(type: .and)))")
         return HStack(alignment: .firstTextBaseline, spacing: 8) {
             Image(systemName: "exclamationmark.circle")
                 .foregroundStyle(Theme.intensitySevere)

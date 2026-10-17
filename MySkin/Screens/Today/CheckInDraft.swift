@@ -40,10 +40,10 @@ struct CheckInDraft: Equatable, PickDraft {
 
     var itchDescription: String {
         switch itch {
-        case ..<1: "Barely there"
-        case ..<4: "Noticeable"
-        case ..<7: "Hard to ignore"
-        default: "Very intense"
+        case ..<1: String(localized: "Barely there")
+        case ..<4: String(localized: "Noticeable")
+        case ..<7: String(localized: "Hard to ignore")
+        default: String(localized: "Very intense")
         }
     }
 

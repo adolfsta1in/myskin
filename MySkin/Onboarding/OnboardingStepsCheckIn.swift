@@ -9,8 +9,8 @@ struct FirstCheckInStep: View {
     var body: some View {
         @Bindable var draft = draft
         OnboardingPage(
-            title: "Your first check-in",
-            subtitle: "This is your daily routine — about 20 seconds. It's saved as today's entry in your diary."
+            title: String(localized: "Your first check-in"),
+            subtitle: String(localized: "This is your daily routine — about 20 seconds. It's saved as today's entry in your diary.")
         ) {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 6) {

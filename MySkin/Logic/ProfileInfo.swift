@@ -23,12 +23,14 @@ enum ProfileInfo {
 
     /// «Good morning, Anna» — or without the name if there is none.
     static func greeting(hour: Int, name: String) -> String {
-        let base = switch hour {
-        case 5..<12: "Good morning"
-        case 12..<18: "Good afternoon"
-        default: "Good evening"
-        }
         let name = cleanName(name)
-        return name.isEmpty ? base : "\(base), \(name)"
+        return switch (hour, name.isEmpty) {
+        case (5..<12, true): String(localized: "Good morning")
+        case (5..<12, false): String(localized: "Good morning, \(name)")
+        case (12..<18, true): String(localized: "Good afternoon")
+        case (12..<18, false): String(localized: "Good afternoon, \(name)")
+        case (_, true): String(localized: "Good evening")
+        case (_, false): String(localized: "Good evening, \(name)")
+        }
     }
 }

@@ -102,11 +102,11 @@ private struct PaywallMessage: Identifiable {
     let text: String
     var id: String { title + text }
 
-    static let pending = PaywallMessage(title: "Waiting for approval",
-                                        text: "Your purchase needs approval. You'll get access as soon as it's approved.")
-    static let nothingToRestore = PaywallMessage(title: "No subscription found",
-                                                 text: "We couldn't find an active MySkin subscription for this Apple Account.")
-    static func failed(_ text: String) -> PaywallMessage { PaywallMessage(title: "Purchase didn't go through", text: text) }
+    static let pending = PaywallMessage(title: String(localized: "Waiting for approval"),
+                                        text: String(localized: "Your purchase needs approval. You'll get access as soon as it's approved."))
+    static let nothingToRestore = PaywallMessage(title: String(localized: "No subscription found"),
+                                                 text: String(localized: "We couldn't find an active MySkin subscription for this Apple Account."))
+    static func failed(_ text: String) -> PaywallMessage { PaywallMessage(title: String(localized: "Purchase didn't go through"), text: text) }
 }
 
 enum PaywallLinks {

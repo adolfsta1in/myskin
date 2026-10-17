@@ -11,10 +11,10 @@ struct TreatmentView: View {
 
     /// Sections in display order; topicals cover creams, ointments, foams and shampoos.
     private static let groups: [(title: String, systemImage: String, kinds: Set<TreatmentKind>)] = [
-        ("Creams & ointments", "hand.point.up.left", [.cream, .ointment, .foam, .shampoo]),
-        ("Tablets", "pills", [.pill]),
-        ("Biologics", "syringe", [.biologic]),
-        ("Phototherapy", "sun.max", [.phototherapy]),
+        (String(localized: "Creams & ointments"), "hand.point.up.left", [.cream, .ointment, .foam, .shampoo]),
+        (String(localized: "Tablets"), "pills", [.pill]),
+        (String(localized: "Biologics"), "syringe", [.biologic]),
+        (String(localized: "Phototherapy"), "sun.max", [.phototherapy]),
     ]
 
     var body: some View {
@@ -163,7 +163,7 @@ private struct TreatmentCard: View {
                 HStack(spacing: 14) {
                     FingerIllustration()
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("\(ftu, format: .number.precision(.fractionLength(0...1))) fingertip unit\(ftu == 1 ? "" : "s")")
+                        Text(ftu == 1 ? "1 fingertip unit" : "\(ftu.formatted(.number.precision(.fractionLength(0...1)))) fingertip units")
                             .font(.rounded(.headline, weight: .semibold))
                             .foregroundStyle(Theme.ink)
                         Text("A line from the fingertip to the first crease. One unit covers about two adult palms.")
@@ -194,13 +194,13 @@ private struct TreatmentCard: View {
     }
 
     private var dateLine: String {
-        let started = "Started \(treatment.startDate.formatted(.dateTime.month(.wide).day().year()))"
+        let started = String(localized: "Started \(treatment.startDate.formatted(.dateTime.month(.wide).day().year()))")
         guard let end = treatment.endDate else { return started }
-        let stopped = "stopped \(end.formatted(.dateTime.month(.wide).day().year()))"
+        let stopped = String(localized: "stopped \(end.formatted(.dateTime.month(.wide).day().year()))")
         if let reason = treatment.stopReason, !reason.isEmpty {
-            return "\(started) · \(stopped) · \(reason)"
+            return String(localized: "\(started) · \(stopped) · \(reason)")
         }
-        return "\(started) · \(stopped)"
+        return String(localized: "\(started) · \(stopped)")
     }
 }
 
@@ -249,7 +249,7 @@ private struct InjectionSitesCard: View {
         let last = InjectionPlan.lastSite(records)
         let next = InjectionPlan.suggestedSite(after: last)
         VStack(alignment: .leading, spacing: 14) {
-            SectionHeader(title: "Injection sites", subtitle: "Rotating helps your skin recover")
+            SectionHeader(title: String(localized: "Injection sites"), subtitle: String(localized: "Rotating helps your skin recover"))
             HStack(spacing: 18) {
                 // Mini torso diagram
                 ZStack {

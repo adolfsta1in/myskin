@@ -30,50 +30,50 @@ struct InsightsView: View {
                     NavigationLink {
                         DoctorReportView()
                     } label: {
-                        LinkCard(systemImage: "doc.text", title: "Report for your doctor", subtitle: "One page · ready in a tap", tint: Theme.accentSoft)
+                        LinkCard(systemImage: "doc.text", title: String(localized: "Report for your doctor"), subtitle: String(localized: "One page · ready in a tap"), tint: Theme.accentSoft)
                     }
                     .buttonStyle(.plain)
 
                     NavigationLink {
                         DiaryCalendarView()
                     } label: {
-                        LinkCard(systemImage: "calendar", title: "Diary calendar", subtitle: "What happened on each day, with photos")
+                        LinkCard(systemImage: "calendar", title: String(localized: "Diary calendar"), subtitle: String(localized: "What happened on each day, with photos"))
                     }
                     .buttonStyle(.plain)
 
                     NavigationLink {
                         QuestionnaireHistoryView()
                     } label: {
-                        LinkCard(systemImage: "list.clipboard", title: "Questionnaires", subtitle: "Skin impact and joint check · scores over time")
+                        LinkCard(systemImage: "list.clipboard", title: String(localized: "Questionnaires"), subtitle: String(localized: "Skin impact and joint check · scores over time"))
                     }
                     .buttonStyle(.plain)
 
                     PatternsCard()
 
                     TrendCard(
-                        title: "Itch",
-                        subtitle: "Weekly average, 0–10",
+                        title: String(localized: "Itch"),
+                        subtitle: String(localized: "Weekly average, 0–10"),
                         data: itch,
                         scale: .itch,
                         format: { $0.formatted(.number.precision(.fractionLength(1))) },
-                        pointDate: { "week of \($0.formatted(date: .abbreviated, time: .omitted))" },
-                        emptyText: "Check in daily and your itch trend will appear here."
+                        pointDate: { String(localized: "week of \($0.formatted(date: .abbreviated, time: .omitted))") },
+                        emptyText: String(localized: "Check in daily and your itch trend will appear here.")
                     )
                     TrendCard(
-                        title: "Affected area",
-                        subtitle: "Share of body surface, from the body map",
+                        title: String(localized: "Affected area"),
+                        subtitle: String(localized: "Share of body surface, from the body map"),
                         data: bsa,
                         scale: .bsa,
                         format: { "\($0.formatted(.number.precision(.fractionLength(0...1)))) %" },
-                        emptyText: "Assess your skin on the Body tab to see how the affected area changes."
+                        emptyText: String(localized: "Assess your skin on the Body tab to see how the affected area changes.")
                     )
                     TrendCard(
-                        title: "Skin impact",
-                        subtitle: "How much your skin got in the way, 0–18",
+                        title: String(localized: "Skin impact"),
+                        subtitle: String(localized: "How much your skin got in the way, 0–18"),
                         data: skinImpact,
                         scale: .skinImpact,
                         format: { "\(Int($0))" },
-                        emptyText: "Take the skin impact check monthly to see its trend here."
+                        emptyText: String(localized: "Take the skin impact check monthly to see its trend here.")
                     )
 
                     Text("Trends aren't a diagnosis. They're a starting point to talk through with your doctor.")
@@ -126,7 +126,7 @@ private struct TrendCard: View {
     let scale: ScoreScale
     let format: (Double) -> String
     /// How a point's date reads; weekly series show the week, not a single day.
-    var pointDate: (Date) -> String = { "on \($0.formatted(date: .abbreviated, time: .omitted))" }
+    var pointDate: (Date) -> String = { String(localized: "on \($0.formatted(date: .abbreviated, time: .omitted))") }
     let emptyText: String
 
     var body: some View {

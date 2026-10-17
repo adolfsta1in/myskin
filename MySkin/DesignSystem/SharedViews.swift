@@ -104,10 +104,10 @@ struct BodySilhouette: View {
 struct IntensityLegend: View {
     static func label(for level: Int) -> String {
         switch level {
-        case 1: "Mild"
-        case 2: "Moderate"
-        case 3: "Severe"
-        default: "Clear"
+        case 1: String(localized: "Mild")
+        case 2: String(localized: "Moderate")
+        case 3: String(localized: "Severe")
+        default: String(localized: "Clear")
         }
     }
 
@@ -192,19 +192,19 @@ enum ScoreScale {
     var bands: [Band] {
         switch self {
         case .bsa: [
-            Band(range: 0...3, label: "Mild", color: Theme.intensityCalm),
-            Band(range: 3...10, label: "Moderate", color: Theme.intensityMild),
-            Band(range: 10...100, label: "Severe", color: Theme.intensityModerate),
+            Band(range: 0...3, label: String(localized: "Mild"), color: Theme.intensityCalm),
+            Band(range: 3...10, label: String(localized: "Moderate"), color: Theme.intensityMild),
+            Band(range: 10...100, label: String(localized: "Severe"), color: Theme.intensityModerate),
         ]
         case .skinImpact: [
-            Band(range: 0...4, label: "Small", color: Theme.intensityCalm),
-            Band(range: 4...10, label: "Moderate", color: Theme.intensityMild),
-            Band(range: 10...18, label: "Large", color: Theme.intensityModerate),
+            Band(range: 0...4, label: String(localized: "Small"), color: Theme.intensityCalm),
+            Band(range: 4...10, label: String(localized: "Moderate"), color: Theme.intensityMild),
+            Band(range: 10...18, label: String(localized: "Large"), color: Theme.intensityModerate),
         ]
         case .itch: [
-            Band(range: 0...3, label: "Low", color: Theme.intensityCalm),
-            Band(range: 3...7, label: "Medium", color: Theme.intensityMild),
-            Band(range: 7...10, label: "High", color: Theme.intensityModerate),
+            Band(range: 0...3, label: String(localized: "Low"), color: Theme.intensityCalm),
+            Band(range: 3...7, label: String(localized: "Medium"), color: Theme.intensityMild),
+            Band(range: 7...10, label: String(localized: "High"), color: Theme.intensityModerate),
         ]
         }
     }

@@ -13,9 +13,9 @@ nonisolated struct PhotoStore: Sendable {
 
         var errorDescription: String? {
             switch self {
-            case .unreadableImage: "The image couldn't be read."
-            case .encodingFailed: "The image couldn't be saved."
-            case .invalidFileName: "The photo file name is invalid."
+            case .unreadableImage: String(localized: "The image couldn't be read.")
+            case .encodingFailed: String(localized: "The image couldn't be saved.")
+            case .invalidFileName: String(localized: "The photo file name is invalid.")
             }
         }
     }

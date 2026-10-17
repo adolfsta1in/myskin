@@ -16,10 +16,15 @@ struct DoctorReportView: View {
     @State private var isSharing = false
 
     enum ReportPeriod: String, CaseIterable, Identifiable {
-        case oneMonth = "Last month"
-        case threeMonths = "Last 3 months"
-        case sixMonths = "Last 6 months"
+        case oneMonth, threeMonths, sixMonths
         var id: String { rawValue }
+        var title: String {
+            switch self {
+            case .oneMonth: String(localized: "Last month")
+            case .threeMonths: String(localized: "Last 3 months")
+            case .sixMonths: String(localized: "Last 6 months")
+            }
+        }
         var days: Int {
             switch self {
             case .oneMonth: 30
@@ -65,10 +70,10 @@ struct DoctorReportView: View {
                 HStack(spacing: 12) {
                     Menu {
                         Picker("Period", selection: $period) {
-                            ForEach(ReportPeriod.allCases) { Text($0.rawValue).tag($0) }
+                            ForEach(ReportPeriod.allCases) { Text($0.title).tag($0) }
                         }
                     } label: {
-                        Label(period.rawValue, systemImage: "calendar")
+                        Label(period.title, systemImage: "calendar")
                             .font(.rounded(.headline, weight: .medium))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 6)
@@ -143,29 +148,34 @@ struct ReportPaper: View {
             severity
 
             if weeklyItch.count > 1 {
-                label("Itch · weekly average")
+                label(String(localized: "Itch · weekly average"))
                 ScoreTrendChart(data: weeklyItch, scale: .itch, height: 110)
             }
 
-            label("Questionnaires")
+            label(String(localized: "Questionnaires"))
             VStack(alignment: .leading, spacing: 4) {
                 line(report.skinImpactLatest.map { score in
-                    let change = report.skinImpactFirst.map { "\($0) → " } ?? ""
-                    return "Skin impact: \(change)\(score) of \(SkinImpact.maxScore) · \(SkinImpact.level(for: score).title.lowercased())"
-                } ?? "Skin impact: not taken in this period")
+                    let level = SkinImpact.level(for: score).title.inSentence
+                    if let first = report.skinImpactFirst {
+                        return String(localized: "Skin impact: \(first) → \(score) of \(SkinImpact.maxScore) · \(level)")
+                    }
+                    return String(localized: "Skin impact: \(score) of \(SkinImpact.maxScore) · \(level)")
+                } ?? String(localized: "Skin impact: not taken in this period"))
                 line(report.jointLatest.map { joint in
-                    let noted = Questionnaires.needsAttention(joint.kind, score: joint.score) ? " · joint symptoms noted" : ""
-                    return "\(joint.kind.title): \(joint.score) of \(Questionnaires.maxScore(joint.kind))\(noted)"
-                } ?? "Joint check: not taken")
-                line("Patient-reported questionnaires written for MySkin; not validated clinical scores.")
+                    let maxScore = Questionnaires.maxScore(joint.kind)
+                    return Questionnaires.needsAttention(joint.kind, score: joint.score)
+                        ? String(localized: "\(joint.kind.title): \(joint.score) of \(maxScore) · joint symptoms noted")
+                        : String(localized: "\(joint.kind.title): \(joint.score) of \(maxScore)")
+                } ?? String(localized: "Joint check: not taken"))
+                line(String(localized: "Patient-reported questionnaires written for MySkin; not validated clinical scores."))
                 if let arthritis = ArthritisRules.reportText(report.patient.arthritis) {
                     line(arthritis)
                 }
             }
 
-            label("Treatment")
+            label(String(localized: "Treatment"))
             if report.treatments.isEmpty {
-                line("No treatments logged in this period.")
+                line(String(localized: "No treatments logged in this period."))
             } else {
                 VStack(alignment: .leading, spacing: 6) {
                     ForEach(report.treatments) { treatment in
@@ -181,12 +191,12 @@ struct ReportPaper: View {
             }
 
             if !report.triggers.isEmpty {
-                label("Logged triggers")
-                line(report.triggers.prefix(5).map { "\($0.trigger.title) · \($0.days) \($0.days == 1 ? "day" : "days")" }.joined(separator: ", "))
+                label(String(localized: "Logged triggers"))
+                line(report.triggers.prefix(5).map { String(localized: "\($0.trigger.title) · \($0.days) days") }.joined(separator: ", "))
             }
 
             if !report.photos.isEmpty {
-                label("Before / now")
+                label(String(localized: "Before / now"))
                 HStack(alignment: .top, spacing: 8) {
                     ForEach(report.photos) { pair in
                         VStack(spacing: 4) {
@@ -216,7 +226,7 @@ struct ReportPaper: View {
 
     /// «Age 34 · Female», or nil if neither was given.
     private var patientLine: String? {
-        let parts = [report.patient.age.map { "Age \($0)" }, report.patient.sex?.title].compactMap(\.self)
+        let parts = [report.patient.age.map { String(localized: "Age \($0)") }, report.patient.sex?.title].compactMap(\.self)
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 
@@ -246,9 +256,9 @@ struct ReportPaper: View {
 
     private var stats: some View {
         HStack(spacing: 8) {
-            stat("Body area (est.)", change(report.severityBefore?.bsa, report.severityNow?.bsa) { "\($0.formatted(.number.precision(.fractionLength(0...1))))%" })
-            stat("Self-rated index", change(report.severityBefore?.severityIndex, report.severityNow?.severityIndex) { $0.formatted(.number.precision(.fractionLength(1))) })
-            stat("Avg itch", change(report.itchBefore, report.itchNow) { $0.formatted(.number.precision(.fractionLength(1))) })
+            stat(String(localized: "Body area (est.)"), change(report.severityBefore?.bsa, report.severityNow?.bsa) { String(localized: "\($0.formatted(.number.precision(.fractionLength(0...1))))%") })
+            stat(String(localized: "Self-rated index"), change(report.severityBefore?.severityIndex, report.severityNow?.severityIndex) { $0.formatted(.number.precision(.fractionLength(1))) })
+            stat(String(localized: "Avg itch"), change(report.itchBefore, report.itchNow) { $0.formatted(.number.precision(.fractionLength(1))) })
         }
     }
 
@@ -256,24 +266,29 @@ struct ReportPaper: View {
     private var severity: some View {
         VStack(alignment: .leading, spacing: 4) {
             if let now = report.severityNow {
-                line("Self-estimated category: \(now.category.title)\(now.isElevated ? " · raised by special sites or joint symptoms" : "")")
+                line(now.isElevated
+                     ? String(localized: "Self-estimated category: \(now.category.title) · raised by special sites or joint symptoms")
+                     : String(localized: "Self-estimated category: \(now.category.title)"))
                 if !now.specialSiteIDs.isEmpty {
-                    line("Special sites: \(now.specialSiteIDs.compactMap { BodyZone.named(id: $0)?.name }.formatted(.list(type: .and)))")
+                    let sites = now.specialSiteIDs.compactMap { BodyZone.named(id: $0)?.name }.formatted(.list(type: .and))
+                    line(String(localized: "Special sites: \(sites)"))
                 }
             } else {
-                line("No body map assessments yet.")
+                line(String(localized: "No body map assessments yet."))
             }
-            line("Check-ins: \(report.checkInDays) \(report.checkInDays == 1 ? "day" : "days") · with flare signs: \(report.flareDays)")
+            line(String(localized: "Check-ins: \(report.checkInDays) days · with flare signs: \(report.flareDays)"))
         }
     }
 
     private func treatmentDetail(_ treatment: DoctorReport.TreatmentLine) -> String {
-        var parts = [treatment.kind.title, treatment.schedule, "since \(treatment.startDate.formatted(date: .abbreviated, time: .omitted))"]
+        var parts = [treatment.kind.title, treatment.schedule,
+                     String(localized: "since \(treatment.startDate.formatted(date: .abbreviated, time: .omitted))")]
         if let end = treatment.endDate {
-            parts.append("stopped \(end.formatted(date: .abbreviated, time: .omitted))\(treatment.stopReason.map { " (\($0))" } ?? "")")
+            let date = end.formatted(date: .abbreviated, time: .omitted)
+            parts.append(treatment.stopReason.map { String(localized: "stopped \(date) (\($0))") } ?? String(localized: "stopped \(date)"))
         }
         if let adherence = treatment.adherence {
-            parts.append("\(adherence.formatted(.percent.precision(.fractionLength(0)))) of planned doses marked done")
+            parts.append(String(localized: "\(adherence.formatted(.percent.precision(.fractionLength(0)))) of planned doses marked done"))
         }
         return parts.joined(separator: " · ")
     }

@@ -178,9 +178,9 @@ nonisolated enum PatternStrength: Int, Comparable, Sendable {
 
     var title: String {
         switch self {
-        case .weak: "Weak"
-        case .moderate: "Moderate"
-        case .strong: "Strong"
+        case .weak: String(localized: "pattern.weak", defaultValue: "Weak", comment: "Strength of a pattern")
+        case .moderate: String(localized: "pattern.moderate", defaultValue: "Moderate", comment: "Strength of a pattern")
+        case .strong: String(localized: "pattern.strong", defaultValue: "Strong", comment: "Strength of a pattern")
         }
     }
 }
@@ -214,22 +214,43 @@ nonisolated struct PatternFinding: Hashable, Sendable, Identifiable {
     var id: String { factor.id }
 
     var summary: String {
-        "Itch was \(direction == .worse ? "higher" : "lower") \(Patterns.lagPhrase(lag)) \(Patterns.subject(factor, title: title))"
+        let subject = Patterns.subject(factor, title: title)
+        let low = lag.lowerBound, high = lag.upperBound
+        return switch (direction, low, high) {
+        case (.worse, 0, 0): String(localized: "Itch was higher on days with \(subject)")
+        case (.worse, 0, 1): String(localized: "Itch was higher on the same or next day after \(subject)")
+        case (.worse, 1, 1): String(localized: "Itch was higher the day after \(subject)")
+        case (.worse, _, _): String(localized: "Itch was higher \(low)–\(high) days after \(subject)")
+        case (.better, 0, 0): String(localized: "Itch was lower on days with \(subject)")
+        case (.better, 0, 1): String(localized: "Itch was lower on the same or next day after \(subject)")
+        case (.better, 1, 1): String(localized: "Itch was lower the day after \(subject)")
+        case (.better, _, _): String(localized: "Itch was lower \(low)–\(high) days after \(subject)")
+        }
     }
 
     var explanation: String {
         let one = Patterns.number(meanItchExposed)
         let other = Patterns.number(meanItchUnexposed)
-        var text = "\(Patterns.lagPhrase(lag).capitalizingFirst) \(Patterns.subject(factor, title: title)), itch averaged \(one)/10, vs \(other)/10 on other days (\(episodes) times)."
+        let subject = Patterns.subject(factor, title: title)
+        let low = lag.lowerBound, high = lag.upperBound
+        let first = switch (low, high) {
+        case (0, 0): String(localized: "On days with \(subject), itch averaged \(one)/10, vs \(other)/10 on other days (\(episodes) times).")
+        case (0, 1): String(localized: "On the same or next day after \(subject), itch averaged \(one)/10, vs \(other)/10 on other days (\(episodes) times).")
+        case (1, 1): String(localized: "The day after \(subject), itch averaged \(one)/10, vs \(other)/10 on other days (\(episodes) times).")
+        default: String(localized: "\(low)–\(high) days after \(subject), itch averaged \(one)/10, vs \(other)/10 on other days (\(episodes) times).")
+        }
+        var sentences = [first]
         if factor.mayBeResultOfItch {
-            text += " \(title) can also be a result of itch."
+            sentences.append(String(localized: "\(title) can also be a result of itch."))
         }
         if !oftenLoggedWith.isEmpty {
-            text += " Often logged together with \(oftenLoggedWith.formatted(.list(type: .and)))"
-            text += hardToTellApart ? " — hard to tell which one goes with itch." : "."
+            let others = oftenLoggedWith.formatted(.list(type: .and))
+            sentences.append(hardToTellApart
+                ? String(localized: "Often logged together with \(others) — hard to tell which one goes with itch.")
+                : String(localized: "Often logged together with \(others)."))
         }
-        text += " This is a pattern in your diary, not proof of cause. Discuss it with your doctor before changing your diet or treatment."
-        return text
+        sentences.append(String(localized: "This is a pattern in your diary, not proof of cause. Discuss it with your doctor before changing your diet or treatment."))
+        return sentences.joined(separator: " ")
     }
 }
 
@@ -639,13 +660,13 @@ nonisolated enum Patterns {
         case .food(let food): food.title
         case .customTag(let tag): names[factor.id] ?? tag
         case .customFood(let food): names[factor.id] ?? food
-        case .dryAir: "Dry air"
-        case .humidAir: "Humid air"
-        case .highUV: "Strong sun (UV 6+)"
-        case .cold: "Cold (below 5 °C)"
-        case .poorSleep: "Poor sleep"
-        case .lowMood: "Low mood"
-        case .missedDoses: "Missed doses"
+        case .dryAir: String(localized: "Dry air")
+        case .humidAir: String(localized: "Humid air")
+        case .highUV: String(localized: "Strong sun (UV 6+)")
+        case .cold: String(localized: "Cold (below 5 °C)")
+        case .poorSleep: String(localized: "Poor sleep")
+        case .lowMood: String(localized: "Low mood")
+        case .missedDoses: String(localized: "Missed doses")
         }
     }
 
@@ -653,17 +674,8 @@ nonisolated enum Patterns {
     static func subject(_ factor: PatternFactor, title: String) -> String {
         switch factor {
         case .customTag, .customFood: "«\(title)»"
-        case .missedDoses: "missed doses"
-        default: title.lowercased()
-        }
-    }
-
-    static func lagPhrase(_ lag: ClosedRange<Int>) -> String {
-        switch (lag.lowerBound, lag.upperBound) {
-        case (0, 0): "on days with"
-        case (0, 1): "on the same or next day after"
-        case (1, 1): "the day after"
-        case let (low, high): "\(low)–\(high) days after"
+        case .missedDoses: String(localized: "missed doses", comment: "Mid-sentence: Itch was higher the day after missed doses")
+        default: title.inSentence
         }
     }
 
@@ -720,6 +732,3 @@ nonisolated enum Patterns {
     }
 }
 
-private extension String {
-    nonisolated var capitalizingFirst: String { prefix(1).uppercased() + String(dropFirst()) }
-}

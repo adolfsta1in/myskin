@@ -25,7 +25,7 @@ enum NotificationService {
 
     /// Outside `ReminderPlan.idPrefix` on purpose: `sync` must not remove it.
     static let trialReminderID = "trial.ending"
-    static let trialReminderBody = "Your free trial ends in \(PaywallOffer.reminderDaysBeforeEnd) days."
+    static let trialReminderBody = String(localized: "Your free trial ends in \(PaywallOffer.reminderDaysBeforeEnd) days.")
 
     /// One-off reminder promised on the paywall timeline. Silently skipped without permission.
     static func scheduleTrialReminder(at date: Date) async {

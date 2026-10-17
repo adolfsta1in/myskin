@@ -89,9 +89,9 @@ struct DiaryCalendarView: View {
             }
 
             HStack(spacing: 14) {
-                legend(Theme.sageDeep, "Check-in")
-                legend(Theme.intensityModerate, "Flare sign")
-                legend(Theme.accent, "Photo")
+                legend(Theme.sageDeep, String(localized: "Check-in"))
+                legend(Theme.intensityModerate, String(localized: "Flare sign"))
+                legend(Theme.accent, String(localized: "Photo"))
             }
             .font(.rounded(.caption))
             .foregroundStyle(Theme.inkSoft)
@@ -139,11 +139,11 @@ struct DiaryCalendarView: View {
 
     private func accessibilityValue(_ mark: DayMark) -> String {
         var parts: [String] = []
-        if mark.hasCheckIn { parts.append(mark.hasFlareSign ? "check-in with flare signs" : "check-in") }
-        if mark.hasPhoto { parts.append("photos") }
-        if mark.hasZoneAssessment { parts.append("body map") }
-        if mark.dosesDone > 0 { parts.append("\(mark.dosesDone) doses") }
-        return parts.isEmpty ? "Nothing logged" : parts.formatted(.list(type: .and))
+        if mark.hasCheckIn { parts.append(mark.hasFlareSign ? String(localized: "check-in with flare signs") : String(localized: "check-in")) }
+        if mark.hasPhoto { parts.append(String(localized: "photos")) }
+        if mark.hasZoneAssessment { parts.append(String(localized: "body map")) }
+        if mark.dosesDone > 0 { parts.append(String(localized: "\(mark.dosesDone) doses")) }
+        return parts.isEmpty ? String(localized: "Nothing logged") : parts.formatted(.list(type: .and))
     }
 
     private func shiftMonth(_ value: Int) {
@@ -192,9 +192,9 @@ private struct MonthCharts: View {
                     .foregroundStyle(Theme.inkSoft)
             } else {
                 HStack(spacing: 10) {
-                    stat("Days logged", "\(series.daysLogged)")
-                    stat("Average itch", series.averageItch.map { $0.formatted(.number.precision(.fractionLength(1))) } ?? "–")
-                    stat("Highest", series.highestItch.map { "\(Int($0.value)) · \($0.date.formatted(.dateTime.day().month(.abbreviated)))" } ?? "–")
+                    stat(String(localized: "Days logged"), "\(series.daysLogged)")
+                    stat(String(localized: "Average itch"), series.averageItch.map { $0.formatted(.number.precision(.fractionLength(1))) } ?? "–")
+                    stat(String(localized: "Highest"), series.highestItch.map { "\(Int($0.value)) · \($0.date.formatted(.dateTime.day().month(.abbreviated)))" } ?? "–")
                 }
 
                 Chart {
@@ -249,9 +249,9 @@ private struct MonthCharts: View {
                 .accessibilityLabel("Itch, pain and sleep this month")
 
                 HStack(spacing: 14) {
-                    legend(Theme.intensityModerate, "Itch", isLine: false)
-                    if !series.pain.isEmpty { legend(Theme.intensitySevere, "Pain", isLine: true) }
-                    if !series.sleep.isEmpty { legend(Theme.accent, "Sleep", isLine: true) }
+                    legend(Theme.intensityModerate, String(localized: "Itch"), isLine: false)
+                    if !series.pain.isEmpty { legend(Theme.intensitySevere, String(localized: "Pain"), isLine: true) }
+                    if !series.sleep.isEmpty { legend(Theme.accent, String(localized: "Sleep"), isLine: true) }
                     Spacer()
                     Text("Tap a day")
                 }
@@ -410,22 +410,22 @@ private struct DayDetail: View {
 
     private func checkInSection(_ checkIn: DailyCheckIn) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            label("Check-in")
-            row("Itch", "\(checkIn.itch)/10")
-            if let pain = checkIn.pain { row("Burning or pain", "\(pain)/10") }
-            if let sleep = checkIn.sleep { row("Sleep", "\(sleep)/10") }
-            if let mood = checkIn.mood { row("Mood", "\(mood)/5") }
-            if checkIn.newSpots { row("New or spreading spots", "Yes") }
+            label(String(localized: "Check-in"))
+            row(String(localized: "Itch"), String(localized: "\(checkIn.itch)/10"))
+            if let pain = checkIn.pain { row(String(localized: "Burning or pain"), String(localized: "\(pain)/10")) }
+            if let sleep = checkIn.sleep { row(String(localized: "Sleep"), String(localized: "\(sleep)/10")) }
+            if let mood = checkIn.mood { row(String(localized: "Mood"), String(localized: "\(mood)/5")) }
+            if checkIn.newSpots { row(String(localized: "New or spreading spots"), String(localized: "Yes")) }
             let tags = checkIn.triggers.map(\.title) + checkIn.customTags
-            if !tags.isEmpty { row("Possible triggers", tags.joined(separator: ", ")) }
+            if !tags.isEmpty { row(String(localized: "Possible triggers"), tags.joined(separator: String(localized: ", "))) }
             if checkIn.foodIDs != nil {
                 let foods = checkIn.foods.map(\.title) + checkIn.customFoods
-                row("Food", foods.isEmpty ? "None of these" : foods.joined(separator: ", "))
+                row(String(localized: "Food"), foods.isEmpty ? String(localized: "None of these") : foods.joined(separator: String(localized: ", ")))
             }
-            if let humidity = checkIn.humidity { row("Humidity", "\(Int(humidity.rounded())) %") }
-            if let uv = checkIn.uvIndex { row("UV index", uv.formatted(.number.precision(.fractionLength(0...1)))) }
+            if let humidity = checkIn.humidity { row(String(localized: "Humidity"), String(localized: "\(Int(humidity.rounded())) %")) }
+            if let uv = checkIn.uvIndex { row(String(localized: "UV index"), uv.formatted(.number.precision(.fractionLength(0...1)))) }
             if let temperature = checkIn.temperature {
-                row("Temperature", Measurement(value: temperature, unit: UnitTemperature.celsius).formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(0)))))
+                row(String(localized: "Temperature"), Measurement(value: temperature, unit: UnitTemperature.celsius).formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(0)))))
             }
             if !checkIn.note.isEmpty {
                 Text(checkIn.note)
@@ -438,7 +438,7 @@ private struct DayDetail: View {
 
     private var zonesSection: some View {
         VStack(alignment: .leading, spacing: 6) {
-            label("Body map")
+            label(String(localized: "Body map"))
             ForEach(assessments.sorted { $0.zoneID < $1.zoneID }) { assessment in
                 let level = SeverityCalculator.level(for: assessment.score)
                 row(BodyZone.named(id: assessment.zoneID)?.name ?? assessment.zoneID, IntensityLegend.label(for: level))
@@ -448,16 +448,16 @@ private struct DayDetail: View {
 
     private var dosesSection: some View {
         VStack(alignment: .leading, spacing: 6) {
-            label("Treatment")
+            label(String(localized: "Treatment"))
             ForEach(doses) { dose in
-                row(dose.treatment?.name ?? "Treatment", dose.timestamp.formatted(date: .omitted, time: .shortened))
+                row(dose.treatment?.name ?? String(localized: "Treatment"), dose.timestamp.formatted(date: .omitted, time: .shortened))
             }
         }
     }
 
     private var photosSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            label("Photos")
+            label(String(localized: "Photos"))
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 90), spacing: 8)], spacing: 8) {
                 ForEach(photos) { photo in
                     NavigationLink {

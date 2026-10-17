@@ -88,7 +88,7 @@ struct TreatmentDraft: Hashable {
         guard isTopical, let steroidClass, steroidClass.number <= 2 else { return nil }
         let sensitive = zoneIDs.filter(Self.sensitiveZoneIDs.contains).compactMap { BodyZone.named(id: $0)?.name }
         guard !sensitive.isEmpty else { return nil }
-        return "Strong steroids on \(sensitive.formatted(.list(type: .and))) can thin the skin. Check with your doctor that this is intended."
+        return String(localized: "Strong steroids on \(sensitive.formatted(.list(type: .and))) can thin the skin. Check with your doctor that this is intended.")
     }
 
     static let sensitiveZoneIDs: Set<String> = ["front.head", "quick.face", "quick.folds", "quick.genitals"]

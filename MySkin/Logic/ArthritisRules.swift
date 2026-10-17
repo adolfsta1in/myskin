@@ -19,10 +19,10 @@ enum ArthritisRules {
     /// Line for the doctor's report; nil when the user didn't answer.
     static func reportText(_ status: ArthritisStatus?) -> String? {
         switch status {
-        case .diagnosed: "Psoriatic arthritis: diagnosed"
-        case .suspected: "Psoriatic arthritis: suspected by the patient"
-        case .no: "Psoriatic arthritis: none known"
-        case .unsure: "Psoriatic arthritis: not sure"
+        case .diagnosed: String(localized: "Psoriatic arthritis: diagnosed")
+        case .suspected: String(localized: "Psoriatic arthritis: suspected by the patient")
+        case .no: String(localized: "Psoriatic arthritis: none known")
+        case .unsure: String(localized: "Psoriatic arthritis: not sure")
         case nil: nil
         }
     }

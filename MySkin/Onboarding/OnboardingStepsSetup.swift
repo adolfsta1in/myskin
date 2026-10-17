@@ -10,9 +10,9 @@ struct FirstBodyMapStep: View {
     var body: some View {
         let bsa = draft.snapshot.bsa
         OnboardingPage(
-            title: "Where is your skin affected?",
-            subtitle: "Tap areas on the body. Tap again for more: mild, moderate, severe.",
-            why: "Your own estimate of how much skin is involved helps you and your doctor see change over time."
+            title: String(localized: "Where is your skin affected?"),
+            subtitle: String(localized: "Tap areas on the body. Tap again for more: mild, moderate, severe."),
+            why: String(localized: "Your own estimate of how much skin is involved helps you and your doctor see change over time.")
         ) {
             VStack(spacing: 14) {
                 Picker("Side", selection: $side) {
@@ -30,7 +30,7 @@ struct FirstBodyMapStep: View {
                     ForEach(BodyZone.quickZones) { zone in
                         let level = draft.zoneLevels[zone.id] ?? 0
                         TagChip(
-                            title: level == 0 ? zone.name : "\(zone.name) · \(IntensityLegend.label(for: level))",
+                            title: level == 0 ? zone.name : String(localized: "\(zone.name) · \(IntensityLegend.label(for: level))"),
                             isSelected: level > 0
                         ) {
                             draft.cycleLevel(for: zone.id)
@@ -85,9 +85,9 @@ struct TreatmentsStep: View {
     var body: some View {
         @Bindable var draft = draft
         OnboardingPage(
-            title: "What are you using right now?",
-            subtitle: "Pick from the list, search, or type your own. We fill in a typical schedule — change it in Treatment to what your doctor prescribed.",
-            why: "Knowing when a treatment started lets you see whether it's making a difference."
+            title: String(localized: "What are you using right now?"),
+            subtitle: String(localized: "Pick from the list, search, or type your own. We fill in a typical schedule — change it in Treatment to what your doctor prescribed."),
+            why: String(localized: "Knowing when a treatment started lets you see whether it's making a difference.")
         ) {
             VStack(alignment: .leading, spacing: 18) {
                 HStack(spacing: 10) {
@@ -111,7 +111,7 @@ struct TreatmentsStep: View {
                                 query = ""
                             }
                         }
-                        resultRow("Add “\(trimmedQuery)”", detail: "Your own medication", action: addCustom)
+                        resultRow(String(localized: "Add “\(trimmedQuery)”"), detail: String(localized: "Your own medication"), action: addCustom)
                     }
                     .glassCard(padding: 14)
                 }
@@ -179,7 +179,7 @@ struct TreatmentsStep: View {
                     .contentShape(.rect)
                 }
                 .buttonStyle(.plain)
-                .accessibilityHint(isOpen ? "Hides the medications" : "Shows the medications")
+                .accessibilityHint(isOpen ? String(localized: "Hides the medications") : String(localized: "Shows the medications"))
 
                 if isOpen {
                     GlassEffectContainer(spacing: 8) {
@@ -238,8 +238,8 @@ struct NotificationsStep: View {
     var body: some View {
         @Bindable var settings = settings
         OnboardingPage(
-            title: "Gentle reminders, only if you want them",
-            why: "You choose what we remind you about — and you can change it anytime."
+            title: String(localized: "Gentle reminders, only if you want them"),
+            why: String(localized: "You choose what we remind you about — and you can change it anytime.")
         ) {
             VStack(spacing: 16) {
                 // Notification preview
@@ -263,11 +263,11 @@ struct NotificationsStep: View {
 
                 VStack(spacing: 14) {
                     Toggle(isOn: $settings.doseReminders) {
-                        toggleLabel("Treatment reminders", "Creams, tablets and injections")
+                        toggleLabel(String(localized: "Treatment reminders"), String(localized: "Creams, tablets and injections"))
                     }
                     Divider()
                     Toggle(isOn: $settings.checkInReminder) {
-                        toggleLabel("Daily check-in", "A 10-second note about your skin")
+                        toggleLabel(String(localized: "Daily check-in"), String(localized: "A 10-second note about your skin"))
                     }
                     if settings.checkInReminder {
                         DatePicker("Time", selection: $settings.checkInTime, displayedComponents: .hourAndMinute)
@@ -280,7 +280,7 @@ struct NotificationsStep: View {
                 .animation(.smooth, value: settings.checkInReminder)
             }
         } footer: {
-            PermissionButtons(allowTitle: "Turn on", onAllow: turnOn, onNotNow: notNow)
+            PermissionButtons(allowTitle: String(localized: "Turn on"), onAllow: turnOn, onNotNow: notNow)
                 .disabled(isAsking)
             Text("Reminders never mention your condition or medicines.")
                 .font(.rounded(.footnote))
@@ -327,18 +327,18 @@ struct PrivacyStep: View {
 
     var body: some View {
         OnboardingPage(
-            title: "Your skin, your privacy",
-            why: "Skin photos are personal. We keep them away from your camera roll."
+            title: String(localized: "Your skin, your privacy"),
+            why: String(localized: "Skin photos are personal. We keep them away from your camera roll.")
         ) {
             VStack(spacing: 16) {
                 LockToggle()
                     .glassCard()
 
                 VStack(alignment: .leading, spacing: 14) {
-                    privacyRow("photo.badge.checkmark", "Photos never go to your shared photo library or device backups")
-                    privacyRow("iphone", "Your diary is stored in the app on this iPhone and included in your iPhone backup")
-                    privacyRow("person.crop.circle.badge.xmark", "No account needed")
-                    privacyRow("square.and.arrow.up", "Your diary isn't sent anywhere — you choose what to share. Weather, if you turn it on, uses your approximate location")
+                    privacyRow("photo.badge.checkmark", String(localized: "Photos never go to your shared photo library or device backups"))
+                    privacyRow("iphone", String(localized: "Your diary is stored in the app on this iPhone and included in your iPhone backup"))
+                    privacyRow("person.crop.circle.badge.xmark", String(localized: "No account needed"))
+                    privacyRow("square.and.arrow.up", String(localized: "Your diary isn't sent anywhere — you choose what to share. Weather, if you turn it on, uses your approximate location"))
                 }
                 .glassCard()
 
@@ -401,7 +401,7 @@ struct LockToggle: View {
         }
         isAuthenticating = true
         Task {
-            if await BiometricAuth.authenticate(reason: "Turn on the lock for your skin diary") {
+            if await BiometricAuth.authenticate(reason: String(localized: "Turn on the lock for your skin diary")) {
                 settings.faceIDEnabled = true
             }
             isAuthenticating = false
@@ -417,33 +417,33 @@ struct PlanReadyStep: View {
     let next: () -> Void
 
     private var forms: String {
-        draft.orderedTypes.isEmpty ? "Not specified — you can add it later" : draft.orderedTypes.map(\.title).formatted(.list(type: .and))
+        draft.orderedTypes.isEmpty ? String(localized: "Not specified — you can add it later") : draft.orderedTypes.map(\.title).formatted(.list(type: .and))
     }
 
     private var focus: String {
-        guard !draft.goals.isEmpty else { return "None chosen" }
+        guard !draft.goals.isEmpty else { return String(localized: "None chosen") }
         return Goal.allCases.filter { draft.goals.contains($0) }.map(\.title).joined(separator: ", ")
     }
 
     private var startingPoint: String {
         let snapshot = draft.snapshot
-        guard !draft.zoneLevels.isEmpty else { return "No areas marked yet — use the Body tab anytime" }
-        return "≈ \(snapshot.bsa.formatted(.number.precision(.fractionLength(0...1))))% body area · \(snapshot.category.title.lowercased())"
+        guard !draft.zoneLevels.isEmpty else { return String(localized: "No areas marked yet — use the Body tab anytime") }
+        return String(localized: "≈ \(snapshot.bsa.formatted(.number.precision(.fractionLength(0...1))))% body area · \(snapshot.category.title.inSentence)")
     }
 
     var body: some View {
-        OnboardingPage(title: "Your plan is ready") {
+        OnboardingPage(title: String(localized: "Your plan is ready")) {
             VStack(spacing: 14) {
                 VStack(alignment: .leading, spacing: 14) {
-                    planRow("circle.hexagongrid", "Your psoriasis", forms)
-                    planRow("waveform.path.ecg", "We'll track", "Itch daily · body map when it changes")
-                    planRow("target", "Your focus", focus)
-                    planRow("bell", "First reminder", settings.checkInReminder
-                            ? "Tomorrow at \(settings.checkInTime.formatted(date: .omitted, time: .shortened)) · daily check-in"
-                            : "None — you can add one anytime")
-                    planRow("flag.checkered", "Starting point", startingPoint)
+                    planRow("circle.hexagongrid", String(localized: "Your psoriasis"), forms)
+                    planRow("waveform.path.ecg", String(localized: "We'll track"), String(localized: "Itch daily · body map when it changes"))
+                    planRow("target", String(localized: "Your focus"), focus)
+                    planRow("bell", String(localized: "First reminder"), settings.checkInReminder
+                            ? String(localized: "Tomorrow at \(settings.checkInTime.formatted(date: .omitted, time: .shortened)) · daily check-in")
+                            : String(localized: "None — you can add one anytime"))
+                    planRow("flag.checkered", String(localized: "Starting point"), startingPoint)
                     if draft.hasFirstCheckIn {
-                        planRow("checkmark.circle", "First entry", "Itch \(draft.firstCheckIn.itch)/10 · saved for today")
+                        planRow("checkmark.circle", String(localized: "First entry"), String(localized: "Itch \(draft.firstCheckIn.itch)/10 · saved for today"))
                     }
                 }
                 .glassCard()

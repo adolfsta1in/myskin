@@ -152,16 +152,16 @@ struct CurrentSubscription: Equatable {
 
     /// e.g. «Yearly · free trial», «Weekly».
     var title: String {
-        let name = plan == .yearly ? "Yearly" : "Weekly"
-        return isTrial ? "\(name) · free trial" : name
+        let name = plan == .yearly ? String(localized: "Yearly") : String(localized: "Weekly")
+        return isTrial ? String(localized: "\(name) · free trial") : name
     }
 
     /// e.g. «Renews on Oct 24, 2026», «Ends on Oct 24, 2026».
     var detail: String? {
-        if hasBillingIssue { return "There's a problem with your payment. Update it in Settings › Apple Account to keep access." }
+        if hasBillingIssue { return String(localized: "There's a problem with your payment. Update it in Settings › Apple Account to keep access.") }
         guard let periodEnd else { return nil }
         let date = periodEnd.formatted(date: .abbreviated, time: .omitted)
-        if isTrial { return willRenew ? "Trial ends on \(date), then your subscription starts" : "Trial ends on \(date) and won't renew" }
-        return willRenew ? "Renews on \(date)" : "Ends on \(date) and won't renew"
+        if isTrial { return willRenew ? String(localized: "Trial ends on \(date), then your subscription starts") : String(localized: "Trial ends on \(date) and won't renew") }
+        return willRenew ? String(localized: "Renews on \(date)") : String(localized: "Ends on \(date) and won't renew")
     }
 }

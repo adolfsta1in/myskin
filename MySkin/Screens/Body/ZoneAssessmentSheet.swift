@@ -74,7 +74,7 @@ struct ZoneAssessmentSheet: View {
 
     private var areaCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            SectionHeader(title: "How much skin is affected?", subtitle: "Your palm with fingers is about 1 % of your body.")
+            SectionHeader(title: String(localized: "How much skin is affected?"), subtitle: String(localized: "Your palm with fingers is about 1 % of your body."))
             HStack(alignment: .firstTextBaseline) {
                 Text("\(draft.palms, format: .number.precision(.fractionLength(0...1))) \(draft.palms == 1 ? "palm" : "palms")")
                     .font(.rounded(.title2, weight: .bold))
@@ -104,14 +104,14 @@ struct ZoneAssessmentSheet: View {
 
     private var signsCard: some View {
         VStack(alignment: .leading, spacing: 16) {
-            SectionHeader(title: "How does it look?", subtitle: "Rate the worst patch in this area.")
+            SectionHeader(title: String(localized: "How does it look?"), subtitle: String(localized: "Rate the worst patch in this area."))
             SignRow(
-                title: "Redness",
-                hint: "On darker skin, look for purple, grey or dark brown instead of red.",
+                title: String(localized: "Redness"),
+                hint: String(localized: "On darker skin, look for purple, grey or dark brown instead of red."),
                 value: $draft.erythema
             )
-            SignRow(title: "Thickness", hint: "How raised the patch feels above the skin.", value: $draft.induration)
-            SignRow(title: "Scaling", hint: "Flakes or silvery scale on the surface.", value: $draft.scale)
+            SignRow(title: String(localized: "Thickness"), hint: String(localized: "How raised the patch feels above the skin."), value: $draft.induration)
+            SignRow(title: String(localized: "Scaling"), hint: String(localized: "Flakes or silvery scale on the surface."), value: $draft.scale)
         }
         .glassCard()
     }
@@ -134,10 +134,10 @@ struct ZoneAssessmentSheet: View {
     private var photosCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             SectionHeader(
-                title: "Photos",
+                title: String(localized: "Photos"),
                 subtitle: photos.isEmpty
-                    ? "A photo now makes it easier to see change later."
-                    : "\(photos.count) \(photos.count == 1 ? "photo" : "photos") of this area"
+                    ? String(localized: "A photo now makes it easier to see change later.")
+                    : String(localized: "\(photos.count) photos of this area")
             )
             HStack(spacing: 10) {
                 ForEach(PhotoSource.available) { option in

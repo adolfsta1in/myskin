@@ -71,15 +71,15 @@ enum FlareReason: Hashable, Sendable {
     var explanation: String {
         switch self {
         case .highItch(let itch):
-            "Itch was \(itch)/10."
+            String(localized: "Itch was \(itch)/10.")
         case .itchSpike(let itch, let average):
-            "Itch was \(itch)/10, well above your recent average of \(average.formatted(.number.precision(.fractionLength(1))))."
+            String(localized: "Itch was \(itch)/10, well above your recent average of \(average.formatted(.number.precision(.fractionLength(1)))).")
         case .bsaIncrease(let from, let to):
-            "Affected area grew from \(from.formatted(.number.precision(.fractionLength(1)))) % to \(to.formatted(.number.precision(.fractionLength(1)))) %."
+            String(localized: "Affected area grew from \(from.formatted(.number.precision(.fractionLength(1)))) % to \(to.formatted(.number.precision(.fractionLength(1)))) %.")
         case .newZones(let ids):
-            "New area marked: \(ids.compactMap { BodyZone.zone(id: $0)?.name }.formatted(.list(type: .and)))."
+            String(localized: "New area marked: \(ids.compactMap { BodyZone.zone(id: $0)?.name }.formatted(.list(type: .and))).")
         case .newSpots:
-            "You noted new or spreading spots."
+            String(localized: "You noted new or spreading spots.")
         }
     }
 }

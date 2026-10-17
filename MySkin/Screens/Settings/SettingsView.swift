@@ -21,6 +21,7 @@ struct SettingsView: View {
                 aboutYouSection
                 profileSection
                 remindersSection
+                LanguageSection()
                 Section {
                     LockToggle()
                 } header: {
@@ -133,7 +134,7 @@ struct SettingsView: View {
 
     private var typesSummary: String {
         let types = profile?.psoriasisTypes ?? []
-        return types.isEmpty ? "Not set" : PsoriasisType.allCases.filter(types.contains).map(\.title).joined(separator: ", ")
+        return types.isEmpty ? String(localized: "Not set") : PsoriasisType.allCases.filter(types.contains).map(\.title).joined(separator: String(localized: ", "))
     }
 
     /// Edits the profile, creating it if onboarding left none.
@@ -204,10 +205,10 @@ struct SettingsView: View {
             Text("Safety information is based on the American Academy of Dermatology psoriasis guidelines and NICE guideline CG153 (Psoriasis: assessment and management). Medication schedules are typical examples — use what your doctor prescribed.")
                 .font(.rounded(.footnote))
                 .foregroundStyle(Theme.inkSoft)
-            aboutLink("Privacy Policy", systemImage: "hand.raised", AppLinks.privacy)
-            aboutLink("Terms & Medical Disclaimer", systemImage: "doc.text", AppLinks.terms)
-            aboutLink("Help & FAQ", systemImage: "questionmark.circle", AppLinks.support)
-            aboutLink("Contact support", systemImage: "envelope", AppLinks.contactSupport)
+            aboutLink(String(localized: "Privacy Policy"), systemImage: "hand.raised", AppLinks.privacy)
+            aboutLink(String(localized: "Terms & Medical Disclaimer"), systemImage: "doc.text", AppLinks.terms)
+            aboutLink(String(localized: "Help & FAQ"), systemImage: "questionmark.circle", AppLinks.support)
+            aboutLink(String(localized: "Contact support"), systemImage: "envelope", AppLinks.contactSupport)
             if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String {
                 LabeledContent("Version", value: version)
             }
@@ -222,6 +223,35 @@ struct SettingsView: View {
                     .font(.rounded(.body))
             }
             .tint(Theme.accent)
+        }
+    }
+}
+
+/// The app's own language. iOS applies it at the next launch, so the user is asked to reopen MySkin.
+private struct LanguageSection: View {
+    @State private var chosen = AppLanguage.chosen()
+    @State private var isAskingToReopen = false
+
+    var body: some View {
+        Section {
+            Picker("Language", selection: $chosen) {
+                ForEach(AppLanguage.allCases) { language in
+                    Text(verbatim: language.nativeName).tag(language)
+                }
+            }
+            .onChange(of: chosen) { _, language in
+                AppLanguage.choose(language)
+                isAskingToReopen = true
+            }
+        } header: {
+            Text("Language")
+        } footer: {
+            Text("A new language shows after you close MySkin and open it again.")
+        }
+        .alert("Reopen MySkin", isPresented: $isAskingToReopen) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("The new language shows after you close MySkin in the app switcher and open it again.")
         }
     }
 }
@@ -276,7 +306,7 @@ private struct SubscriptionSection: View {
             defer { isRestoring = false }
             do {
                 try await subscriptions.restore()
-                restoreMessage = subscriptions.isSubscribed ? "Your subscription is active." : "No subscription found for this Apple Account."
+                restoreMessage = subscriptions.isSubscribed ? String(localized: "Your subscription is active.") : String(localized: "No subscription found for this Apple Account.")
             } catch {
                 restoreMessage = error.localizedDescription
             }

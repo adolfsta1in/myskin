@@ -11,7 +11,8 @@
             "value" : "MySkin"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "CFBundleName" : {
       "comment" : "Bundle name",
@@ -23,7 +24,8 @@
             "value" : "MySkin"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "NSCameraUsageDescription" : {
       "comment" : "Privacy - Camera Usage Description",
