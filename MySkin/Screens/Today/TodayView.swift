@@ -839,6 +839,8 @@ private struct WeatherCard: View {
             Button("Try again") { Task { await weather.refresh(isManual: true) } }
                 .font(.rounded(.subheadline, weight: .semibold))
                 .tint(Theme.accent)
+        case .limitReached:
+            prompt(systemImage: "cloud.fill", title: "Weather", text: "The weather has been checked many times today. It will be back tomorrow.")
         case .loaded(let reading):
             loaded(reading)
         }

@@ -87,6 +87,8 @@ final class WeatherModel {
         case loading
         case loaded(WeatherReading)
         case failed
+        /// Today's `WeatherRequestPolicy.maxPerDay` requests are used up; «Try again» can't help until tomorrow.
+        case limitReached
     }
 
     private(set) var state: State
@@ -123,17 +125,29 @@ final class WeatherModel {
     func refresh(askPermission: Bool = false, isManual: Bool = false) async {
         if LocationProvider.isDenied { state = .denied; return }
         if LocationProvider.status == .notDetermined && !askPermission { state = .needsPermission; return }
+        #if DEBUG
+        // Test runs launch the app as their host: no WeatherKit calls from there.
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil { return }
+        // Runs from Xcode would use up the daily cap within an hour of work; Release keeps it.
+        let daily: WeatherRequestPolicy.DailyCount? = nil
+        #else
+        let daily = dailyCount
+        #endif
         guard !isFetching, WeatherRequestPolicy.mayRequest(
             now: .now,
             lastSuccess: reading == nil ? nil : updatedAt,
             lastFailure: failedAt,
             isManual: isManual || askPermission,
-            daily: dailyCount
+            daily: daily
         ) else {
             // Nothing new to show and no request allowed: don't spin forever.
-            let today = dailyCount?.current(on: .now) ?? 0
-            Self.log.notice("Weather request not sent: \(today, privacy: .public) of \(WeatherRequestPolicy.maxPerDay, privacy: .public) today")
-            if state == .loading { state = .failed }
+            let today = daily?.current(on: .now) ?? 0
+            if today >= WeatherRequestPolicy.maxPerDay {
+                Self.log.notice("Weather request not sent: daily limit of \(WeatherRequestPolicy.maxPerDay, privacy: .public) reached")
+                if reading == nil { state = .limitReached }
+            } else if state == .loading {
+                state = .failed
+            }
             return
         }
         isFetching = true
