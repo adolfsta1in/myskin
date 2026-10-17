@@ -2,6 +2,7 @@ import CoreLocation
 import Foundation
 import MapKit
 import Observation
+import OSLog
 import UIKit
 import WeatherKit
 
@@ -89,6 +90,7 @@ final class WeatherModel {
     }
 
     private(set) var state: State
+    private static let log = Logger(subsystem: "app.myskin.ios", category: "weather")
     private(set) var updatedAt: Date?
     /// City (or area) name for the card, from Apple's reverse geocoder; nil if unknown.
     private(set) var placeName: String?
@@ -152,6 +154,9 @@ final class WeatherModel {
         } catch LocationProvider.LocationError.denied {
             state = LocationProvider.status == .notDetermined ? .needsPermission : .denied
         } catch {
+            // Domain and code only: the description can carry the request URL with coordinates.
+            let nsError = error as NSError
+            Self.log.error("Weather failed: \(nsError.domain, privacy: .public) \(nsError.code, privacy: .public)")
             state = .failed
             failedAt = .now
         }
