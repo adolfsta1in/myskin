@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 
 enum OnboardingStep: Int, CaseIterable, Identifiable {
-    case welcome, disclaimer, aboutYou, psoriasisProfile, joints, skinNow, goals, insight, bodyMap, treatments, firstCheckIn, notifications, privacy, plan
+    case welcome, disclaimer, aboutYou, psoriasisProfile, skinNow, goals, insight, bodyMap, joints, treatments, firstCheckIn, notifications, privacy, plan
 
     var id: Int { rawValue }
 
@@ -21,11 +21,11 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
         case .disclaimer: "disclaimer"
         case .aboutYou: "aboutYou"
         case .psoriasisProfile: "psoriasisProfile"
-        case .joints: "joints"
         case .skinNow: "skinNow"
         case .goals: "goals"
         case .insight: "insight"
         case .bodyMap: "bodyMap"
+        case .joints: "joints"
         case .treatments: "treatments"
         case .firstCheckIn: "firstCheckIn"
         case .notifications: "notifications"
@@ -41,11 +41,11 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
         case .disclaimer: "O2 · Disclaimer"
         case .aboutYou: "O3 · About you"
         case .psoriasisProfile: "O4 · Your psoriasis"
-        case .joints: "O5 · Joints"
-        case .skinNow: "O6 · Skin now"
-        case .goals: "O7 · Goals"
-        case .insight: "O8 · Insight"
-        case .bodyMap: "O9 · Body map"
+        case .skinNow: "O5 · Skin now"
+        case .goals: "O6 · Goals"
+        case .insight: "O7 · Insight"
+        case .bodyMap: "O8 · Body map"
+        case .joints: "O9 · Joints"
         case .treatments: "O10 · Treatments"
         case .firstCheckIn: "O10b · First check-in"
         case .notifications: "O11 · Notifications"
@@ -108,11 +108,11 @@ struct OnboardingFlow: View {
         case .disclaimer: DisclaimerStep(next: advance)
         case .aboutYou: AboutYouStep(next: advance)
         case .psoriasisProfile: PsoriasisProfileStep(next: advance)
-        case .joints: JointsStep(next: advance)
         case .skinNow: SkinNowStep(next: advance)
         case .goals: GoalsStep(next: advance)
         case .insight: DelayInsightStep(next: advance)
         case .bodyMap: FirstBodyMapStep(next: advance)
+        case .joints: JointsStep(next: advance)
         case .treatments: TreatmentsStep(next: advance)
         case .firstCheckIn: FirstCheckInStep(next: advance)
         case .notifications: NotificationsStep(next: advance)

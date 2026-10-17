@@ -630,6 +630,9 @@ MySkinTests/      Swift Testing
 - **Сделано (2026-10-18, по просьбе пользователя, вариант A):** приветствие — не список из трёх функций, а одно обещание с результатом. Сверху иллюстрация `WelcomeHero` (заменена: силуэт с бляшками + отчёт с падающим графиком; Higgsfield, Nano Banana 2 по образцу старой, фон вырезан), заголовок «Your psoriasis, on the record.», подзаголовок «A quick daily check-in, a body map and photos — turned into a clear report for your doctor.», «Get started» и прежняя строка о хранении. `WelcomeStep` — своя вёрстка (картинка над заголовком), подвал как у `OnboardingPage`. `OnboardingTopBar.showsProgress` — на приветствии прогресс-бар скрыт. Переводы de/pt-BR/es-419; четыре старые строки удалены из каталога. `usageName` шага не менялся.
 - **Готово, когда:** сборка, тесты 372/372 на iPhone A; превью en и de. На телефоне не смотрели — онбординг виден только на чистой установке.
 
+### Шаг 63.2. Вопрос про артрит — после карты тела ✅
+- **Сделано (2026-10-18, по просьбе пользователя):** `OnboardingStep.joints` перенесён после `bodyMap` (Welcome → Disclaimer → About you → Your psoriasis → Skin now → Goals → Insight → Body map → **Joints** → Treatments → …). `usageName` не менялись; порядок обновлён в `UsageStatsTests` и в `queries/funnel.sql` сайта (`~/Desktop/myskinsite`, там не закоммичено). Тесты 372/372 на iPhone A.
+
 ---
 
 ## Сводка по этапам

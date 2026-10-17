@@ -18,8 +18,8 @@ struct UsageEventTests {
 
     @Test func stepNamesAreStableAndUnique() {
         let names = OnboardingStep.allCases.map(\.usageName)
-        #expect(names == ["welcome", "disclaimer", "aboutYou", "psoriasisProfile", "joints", "skinNow", "goals",
-                          "insight", "bodyMap", "treatments", "firstCheckIn", "notifications", "privacy", "plan"])
+        #expect(names == ["welcome", "disclaimer", "aboutYou", "psoriasisProfile", "skinNow", "goals",
+                          "insight", "bodyMap", "joints", "treatments", "firstCheckIn", "notifications", "privacy", "plan"])
     }
 
     @Test func onceKeysSeparateDetails() {
