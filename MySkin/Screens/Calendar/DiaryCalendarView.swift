@@ -63,18 +63,27 @@ struct DiaryCalendarView: View {
             .font(.rounded(.body, weight: .semibold))
             .tint(Theme.accent)
 
-            let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
-            LazyVGrid(columns: columns, spacing: 6) {
-                ForEach(Array(DiaryCalendar.weekdaySymbols().enumerated()), id: \.offset) { _, symbol in
-                    Text(symbol)
-                        .font(.rounded(.caption, weight: .semibold))
-                        .foregroundStyle(Theme.inkSoft)
+            // A plain `Grid`: `LazyVGrid` measured the rows late and the card came out shorter than its content.
+            let days = DiaryCalendar.monthGrid(containing: month)
+            let weeks = stride(from: 0, to: days.count, by: 7).map { Array(days[$0..<min($0 + 7, days.count)]) }
+            Grid(horizontalSpacing: 4, verticalSpacing: 6) {
+                GridRow {
+                    ForEach(Array(DiaryCalendar.weekdaySymbols().enumerated()), id: \.offset) { _, symbol in
+                        Text(symbol)
+                            .font(.rounded(.caption, weight: .semibold))
+                            .foregroundStyle(Theme.inkSoft)
+                            .frame(maxWidth: .infinity)
+                    }
                 }
-                ForEach(Array(DiaryCalendar.monthGrid(containing: month).enumerated()), id: \.offset) { _, date in
-                    if let date {
-                        dayCell(date, mark: marks[calendar.startOfDay(for: date)] ?? DayMark())
-                    } else {
-                        Color.clear.frame(height: 44)
+                ForEach(Array(weeks.enumerated()), id: \.offset) { _, week in
+                    GridRow {
+                        ForEach(Array(week.enumerated()), id: \.offset) { _, date in
+                            if let date {
+                                dayCell(date, mark: marks[calendar.startOfDay(for: date)] ?? DayMark())
+                            } else {
+                                Color.clear.frame(maxWidth: .infinity, minHeight: 44)
+                            }
+                        }
                     }
                 }
             }
