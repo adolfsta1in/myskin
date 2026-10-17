@@ -1,3 +1,4 @@
+import DeclaredAgeRange
 import SwiftData
 import SwiftUI
 
@@ -78,11 +79,17 @@ struct RootView: View {
     /// nil in previews and the canvas: no paywall there.
     @Environment(Subscriptions.self) private var subscriptions: Subscriptions?
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.requestAgeRange) private var requestAgeRange
+    @State private var ageAssurance = AgeAssurance()
 
     var body: some View {
         Group {
             if let remoteConfig, remoteConfig.requiresUpdate {
                 UpdateRequiredView(updateURL: remoteConfig.config.updateURL)
+                    .transition(.opacity)
+            } else if ageAssurance.isBlocked {
+                // Age assurance laws (Texas and others): MySkin is 16+.
+                AgeRestrictedView()
                     .transition(.opacity)
             } else if !settings.hasCompletedOnboarding {
                 OnboardingFlow()
@@ -125,6 +132,8 @@ struct RootView: View {
             if !enabled { lock.isLocked = false }
         }
         // Remote config: on launch and on returning to the app (`RemoteConfigPolicy` limits how often).
+        // Only where the law requires it, and once per launch; asks Apple, stores nothing.
+        .task { await ageAssurance.check(using: requestAgeRange) }
         .task(id: scenePhase) {
             guard scenePhase == .active else { return }
             // A period can end while the app sits in the background; renewals come via `Transaction.updates`.
