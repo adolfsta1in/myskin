@@ -13,6 +13,8 @@ struct PaywallContent: View {
     var onRestore: () -> Void = {}
     var onRetry: () -> Void = {}
     var onClose: (() -> Void)?
+    /// Shown when there's a diary from before: the data stays the user's even without a subscription.
+    var onExport: (() -> Void)?
     /// Debug builds pass a closure: shows «Skip paywall (debug build)».
     var onDebugSkip: (() -> Void)?
 
@@ -194,6 +196,11 @@ struct PaywallContent: View {
                 .font(.rounded(.caption2))
                 .foregroundStyle(Theme.inkSoft)
                 .multilineTextAlignment(.center)
+            if let onExport {
+                Button("Your diary is still on this iPhone · Export it", action: onExport)
+                    .font(.rounded(.caption, weight: .medium))
+                    .foregroundStyle(Theme.accent)
+            }
         }
         .padding(.horizontal, Theme.screenPadding)
         .padding(.top, 14)

@@ -28,21 +28,30 @@ struct PaywallOfferTests {
         #expect(PaywallOffer.weeklyEquivalent(ofYearly: Decimal(string: "59.99")!) == Decimal(string: "1.15")!)
     }
 
-    @Test func trialTimelineHasReminderTwoDaysBeforeEnd() {
-        let steps = PaywallOffer.trialTimeline(trialDays: 7, canRemind: true)
-        #expect(steps.map(\.title) == ["Today", "Day 5", "Day 7"])
-        #expect(steps[1].detail.contains("remind"))
-        let noPermission = PaywallOffer.trialTimeline(trialDays: 7, canRemind: false)
-        #expect(!noPermission[1].detail.contains("We'll"))
-        #expect(PaywallOffer.trialTimeline(trialDays: 3, canRemind: true).map(\.title) == ["Today", "Day 3"])
+    private var utc: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC") ?? .gmt
+        return calendar
     }
 
-    @Test func reminderDateIsDayFive() throws {
-        let calendar = Calendar(identifier: .gregorian)
-        let start = try #require(calendar.date(from: DateComponents(year: 2026, month: 10, day: 1, hour: 9)))
-        let date = try #require(PaywallOffer.reminderDate(trialStart: start, trialDays: 7, calendar: calendar))
-        #expect(calendar.component(.day, from: date) == 5)
-        #expect(PaywallOffer.reminderDate(trialStart: start, trialDays: 3, calendar: calendar) == nil)
+    @Test func trialTimelineShowsRealDates() throws {
+        let start = try #require(utc.date(from: DateComponents(year: 2026, month: 10, day: 17, hour: 9)))
+        let english = Locale(identifier: "en_US")
+        let steps = PaywallOffer.trialTimeline(trialDays: 7, canRemind: true, start: start, calendar: utc, locale: english)
+        // A 7-day trial from Oct 17 ends and bills on Oct 24; the reminder comes 2 days before.
+        #expect(steps.map(\.title) == ["Today", "Oct 22", "Oct 24"])
+        #expect(steps[1].detail.contains("remind"))
+        let noPermission = PaywallOffer.trialTimeline(trialDays: 7, canRemind: false, start: start, calendar: utc, locale: english)
+        #expect(!noPermission[1].detail.contains("We'll"))
+        #expect(PaywallOffer.trialTimeline(trialDays: 2, canRemind: true, start: start, calendar: utc, locale: english).map(\.title) == ["Today", "Oct 19"])
+    }
+
+    @Test func reminderComesExactlyTwoDaysBeforeTheEnd() throws {
+        let start = try #require(utc.date(from: DateComponents(year: 2026, month: 10, day: 1, hour: 9)))
+        let date = try #require(PaywallOffer.reminderDate(trialStart: start, trialDays: 7, calendar: utc))
+        let end = try #require(utc.date(byAdding: .day, value: 7, to: start))
+        #expect(end.timeIntervalSince(date) == 2 * 24 * 3600)
+        #expect(PaywallOffer.reminderDate(trialStart: start, trialDays: 2, calendar: utc) == nil)
     }
 
     @Test func texts() {

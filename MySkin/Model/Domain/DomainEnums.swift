@@ -320,7 +320,7 @@ nonisolated enum Goal: String, Codable, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .triggers: "Find my triggers"
+        case .triggers: "Spot possible patterns"
         case .treatment: "Check my treatment"
         case .doctor: "Prepare for my doctor"
         case .sleep: "Itch less, sleep better"

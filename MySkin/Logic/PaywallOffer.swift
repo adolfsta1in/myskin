@@ -73,38 +73,52 @@ nonisolated enum PaywallOffer {
         return rounded
     }
 
-    /// Day (counted from 1 = today) the trial-ending reminder arrives; nil for trials too short for it.
-    static func reminderDay(trialDays: Int) -> Int? {
-        let day = trialDays - reminderDaysBeforeEnd
-        return day > 1 ? day : nil
+    /// Days after the trial start when the reminder goes out — exactly `reminderDaysBeforeEnd`
+    /// before the trial ends. Nil for trials too short for it.
+    static func reminderOffsetDays(trialDays: Int) -> Int? {
+        let offset = trialDays - reminderDaysBeforeEnd
+        return offset >= 1 ? offset : nil
     }
 
     /// When to send the reminder for a trial that started at `start`.
     static func reminderDate(trialStart start: Date, trialDays: Int, calendar: Calendar = .current) -> Date? {
-        guard let day = reminderDay(trialDays: trialDays) else { return nil }
-        return calendar.date(byAdding: .day, value: day - 1, to: start)
+        guard let offset = reminderOffsetDays(trialDays: trialDays) else { return nil }
+        return calendar.date(byAdding: .day, value: offset, to: start)
     }
 
-    /// Timeline for a free trial. The reminder row promises a notification only if we can send one.
-    static func trialTimeline(trialDays: Int, canRemind: Bool) -> [TrialStep] {
+    /// Timeline for a free trial starting `start`, with real dates: a 7-day trial started
+    /// on Oct 17 ends (and bills) on Oct 24. The reminder row promises a notification only if we can send one.
+    static func trialTimeline(
+        trialDays: Int,
+        canRemind: Bool,
+        start: Date = .now,
+        calendar: Calendar = .current,
+        locale: Locale = .current
+    ) -> [TrialStep] {
+        func title(_ offset: Int) -> String {
+            let date = calendar.date(byAdding: .day, value: offset, to: start) ?? start
+            var style = Date.FormatStyle(timeZone: calendar.timeZone).month(.abbreviated).day()
+            style.locale = locale
+            return date.formatted(style)
+        }
         var steps = [TrialStep(
             icon: .unlock,
             title: "Today",
             detail: "Check-ins, body map and photos — know your patterns over time and share a report with your doctor."
         )]
-        if let day = reminderDay(trialDays: trialDays) {
+        if let offset = reminderOffsetDays(trialDays: trialDays) {
             steps.append(TrialStep(
                 icon: .reminder,
-                title: "Day \(day)",
+                title: title(offset),
                 detail: canRemind
-                    ? "We'll remind you that your trial ends soon."
+                    ? "We'll remind you that your trial ends in \(reminderDaysBeforeEnd) days."
                     : "Your trial ends in \(reminderDaysBeforeEnd) days. Cancel anytime in Settings."
             ))
         }
         steps.append(TrialStep(
             icon: .renewal,
-            title: "Day \(trialDays)",
-            detail: "Your subscription starts. Cancel before then to avoid being charged."
+            title: title(trialDays),
+            detail: "Your subscription starts. Cancel at least a day before to avoid being charged."
         ))
         return steps
     }

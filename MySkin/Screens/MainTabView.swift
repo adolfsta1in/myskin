@@ -94,6 +94,9 @@ struct RootView: View {
                 // Hard paywall: no close button. Safety information stays reachable from it.
                 PaywallView()
                     .transition(.opacity)
+                    // No access, no diary reminders: a lapsed subscriber shouldn't be nudged into a locked app.
+                    // `ReminderSync` plans them again once the tabs are back.
+                    .task { await NotificationService.removeAll() }
             } else if lock.isLocked {
                 PrivacyLockView()
                     .transition(.opacity)
@@ -123,7 +126,10 @@ struct RootView: View {
         }
         // Remote config: on launch and on returning to the app (`RemoteConfigPolicy` limits how often).
         .task(id: scenePhase) {
-            if scenePhase == .active { await remoteConfig?.refresh() }
+            guard scenePhase == .active else { return }
+            // A period can end while the app sits in the background; renewals come via `Transaction.updates`.
+            await subscriptions?.refreshEntitlements()
+            await remoteConfig?.refresh()
         }
     }
 }

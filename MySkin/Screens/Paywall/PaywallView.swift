@@ -1,4 +1,5 @@
 import StoreKit
+import SwiftData
 import SwiftUI
 
 /// Subscription paywall: trial timeline, yearly / weekly plans (yearly preselected), purchase via StoreKit.
@@ -9,6 +10,11 @@ struct PaywallView: View {
 
     @Environment(Subscriptions.self) private var subscriptions
     @Environment(\.purchase) private var purchase
+    @Environment(\.modelContext) private var modelContext
+    /// Two check-ins mean a diary from before (onboarding saves at most one): a lapsed subscriber
+    /// can still take their data with them.
+    @Query(PaywallView.diaryProbeDescriptor) private var diaryProbe: [DailyCheckIn]
+    @State private var isExporting = false
     @State private var selected = PaywallPlan.preselected
     @State private var isPurchasing = false
     @State private var canRemind = false
@@ -25,8 +31,12 @@ struct PaywallView: View {
             onRestore: restore,
             onRetry: { Task { await subscriptions.loadProducts() } },
             onClose: onClose,
+            onExport: diaryProbe.count >= 2 ? { isExporting = true } : nil,
             onDebugSkip: debugSkip
         )
+        .healthDataShare(isPresented: $isExporting) {
+            try DataExport.writeCSV(from: modelContext)
+        }
         .task {
             canRemind = await NotificationPermission.isAllowed()
             if subscriptions.loadState != .loaded { await subscriptions.loadProducts() }
@@ -34,6 +44,12 @@ struct PaywallView: View {
         .alert(item: $message) { message in
             Alert(title: Text(message.title), message: Text(message.text), dismissButton: .default(Text("OK")))
         }
+    }
+
+    private static var diaryProbeDescriptor: FetchDescriptor<DailyCheckIn> {
+        var descriptor = FetchDescriptor<DailyCheckIn>()
+        descriptor.fetchLimit = 2
+        return descriptor
     }
 
     private func buy() {

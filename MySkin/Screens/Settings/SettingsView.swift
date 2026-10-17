@@ -1,3 +1,4 @@
+import StoreKit
 import SwiftData
 import SwiftUI
 import UIKit
@@ -27,6 +28,7 @@ struct SettingsView: View {
                 } footer: {
                     Text("When on, MySkin locks each time you leave the app and hides its content in the app switcher.")
                 }
+                SubscriptionSection()
                 DataSection(isDeleting: $isDeleting)
                 #if DEBUG
                 DeveloperSection()
@@ -220,6 +222,64 @@ struct SettingsView: View {
                     .font(.rounded(.body))
             }
             .tint(Theme.accent)
+        }
+    }
+}
+
+/// Plan and renewal date, with Apple's own sheets to change or cancel, redeem a code, or restore.
+private struct SubscriptionSection: View {
+    /// nil in previews.
+    @Environment(Subscriptions.self) private var subscriptions: Subscriptions?
+    @State private var isManaging = false
+    @State private var isRedeeming = false
+    @State private var isRestoring = false
+    @State private var restoreMessage: String?
+
+    var body: some View {
+        if let subscriptions {
+            Section {
+                if let current = subscriptions.current {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("MySkin Premium · \(current.title)")
+                            .foregroundStyle(Theme.ink)
+                        if let detail = current.detail {
+                            Text(detail)
+                                .font(.rounded(.footnote))
+                                .foregroundStyle(current.hasBillingIssue ? Theme.flare : Theme.inkSoft)
+                        }
+                    }
+                }
+                Button("Manage subscription", systemImage: "creditcard") { isManaging = true }
+                Button("Redeem a code", systemImage: "giftcard") { isRedeeming = true }
+                Button("Restore purchases", systemImage: "arrow.clockwise") { restore(subscriptions) }
+                    .disabled(isRestoring)
+            } header: {
+                Text("Subscription")
+            } footer: {
+                Text("Change plan or cancel in your Apple Account. Cancel at least a day before renewal to avoid being charged.")
+            }
+            .manageSubscriptionsSheet(isPresented: $isManaging)
+            .offerCodeRedemption(isPresented: $isRedeeming) { _ in
+                Task { await subscriptions.refreshEntitlements() }
+            }
+            .alert("Restore purchases", isPresented: Binding(get: { restoreMessage != nil }, set: { if !$0 { restoreMessage = nil } })) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(restoreMessage ?? "")
+            }
+        }
+    }
+
+    private func restore(_ subscriptions: Subscriptions) {
+        isRestoring = true
+        Task {
+            defer { isRestoring = false }
+            do {
+                try await subscriptions.restore()
+                restoreMessage = subscriptions.isSubscribed ? "Your subscription is active." : "No subscription found for this Apple Account."
+            } catch {
+                restoreMessage = error.localizedDescription
+            }
         }
     }
 }
