@@ -156,6 +156,8 @@ struct RootView: View {
             // A period can end while the app sits in the background; renewals come via `Transaction.updates`.
             await subscriptions?.refreshEntitlements()
             await remoteConfig?.refresh()
+            // Usage counts that couldn't go out earlier (offline).
+            await UsageStats.shared.flush()
         }
     }
 }

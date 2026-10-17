@@ -14,6 +14,26 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
         }
     }
 
+    /// Name in anonymous usage counts (`UsageEvent`). Never rename: past counts are grouped by it.
+    var usageName: String {
+        switch self {
+        case .welcome: "welcome"
+        case .disclaimer: "disclaimer"
+        case .aboutYou: "aboutYou"
+        case .psoriasisProfile: "psoriasisProfile"
+        case .joints: "joints"
+        case .skinNow: "skinNow"
+        case .goals: "goals"
+        case .insight: "insight"
+        case .bodyMap: "bodyMap"
+        case .treatments: "treatments"
+        case .firstCheckIn: "firstCheckIn"
+        case .notifications: "notifications"
+        case .privacy: "privacy"
+        case .plan: "plan"
+        }
+    }
+
     /// Label used on the design canvas.
     var label: String {
         switch self {
@@ -56,7 +76,7 @@ struct OnboardingFlow: View {
                     canGoBack: step != .welcome,
                     showSkip: step.isOptional,
                     onBack: goBack,
-                    onSkip: advance
+                    onSkip: skip
                 )
                 content
                     .id(step)
@@ -68,6 +88,10 @@ struct OnboardingFlow: View {
         }
         .environment(draft)
         .fontDesign(.rounded)
+        // Which steps people reach: once per install, no answers.
+        .onChange(of: step, initial: true) { _, step in
+            UsageStats.shared.record(.onboardingStep(step.usageName))
+        }
         .alert("Couldn't save your answers", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -106,10 +130,16 @@ struct OnboardingFlow: View {
         }
     }
 
+    private func skip() {
+        UsageStats.shared.record(.onboardingSkipped(step.usageName))
+        advance()
+    }
+
     /// Saves the answers, then leaves onboarding.
     private func finish() {
         do {
             try draft.save(in: modelContext)
+            UsageStats.shared.record(.onboardingCompleted)
             withAnimation(.smooth(duration: 0.35)) {
                 settings.hasCompletedOnboarding = true
             }

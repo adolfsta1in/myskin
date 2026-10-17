@@ -12,6 +12,7 @@ final class AppSettings {
         static let checkInReminder = "checkInReminder"
         static let checkInMinutes = "checkInMinutes"
         static let doseReminders = "doseReminders"
+        static let shareUsageStats = "shareUsageStats"
     }
 
     @ObservationIgnored private let defaults: UserDefaults
@@ -38,6 +39,11 @@ final class AppSettings {
         didSet { defaults.set(doseReminders, forKey: Key.doseReminders) }
     }
 
+    /// Anonymous usage counts (`UsageStats`). On by default: they carry no id and nothing from the diary.
+    var shareUsageStats: Bool {
+        didSet { defaults.set(shareUsageStats, forKey: Key.shareUsageStats) }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         defaults.register(defaults: [
@@ -46,17 +52,19 @@ final class AppSettings {
             Key.checkInReminder: true,
             Key.checkInMinutes: 20 * 60,
             Key.doseReminders: true,
+            Key.shareUsageStats: true,
         ])
         hasCompletedOnboarding = defaults.bool(forKey: Key.hasCompletedOnboarding)
         faceIDEnabled = defaults.bool(forKey: Key.faceIDEnabled)
         checkInReminder = defaults.bool(forKey: Key.checkInReminder)
         checkInMinutes = defaults.integer(forKey: Key.checkInMinutes)
         doseReminders = defaults.bool(forKey: Key.doseReminders)
+        shareUsageStats = defaults.bool(forKey: Key.shareUsageStats)
     }
 
     /// Back to a fresh install: onboarding again, lock off, default reminders.
     func resetAll() {
-        for key in [Key.hasCompletedOnboarding, Key.faceIDEnabled, Key.checkInReminder, Key.checkInMinutes, Key.doseReminders] {
+        for key in [Key.hasCompletedOnboarding, Key.faceIDEnabled, Key.checkInReminder, Key.checkInMinutes, Key.doseReminders, Key.shareUsageStats] {
             defaults.removeObject(forKey: key)
         }
         hasCompletedOnboarding = defaults.bool(forKey: Key.hasCompletedOnboarding)
@@ -64,6 +72,7 @@ final class AppSettings {
         checkInReminder = defaults.bool(forKey: Key.checkInReminder)
         checkInMinutes = defaults.integer(forKey: Key.checkInMinutes)
         doseReminders = defaults.bool(forKey: Key.doseReminders)
+        shareUsageStats = defaults.bool(forKey: Key.shareUsageStats)
     }
 
     /// Today's date at `checkInMinutes` — for `DatePicker` and display.

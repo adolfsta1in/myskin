@@ -117,6 +117,7 @@ enum DataReset {
         // A diary once set aside by the recovery screen.
         try? FileManager.default.removeItem(at: AppModelContainer.setAsideDirectoryURL)
         ExportFolder.clear()
+        UsageStats.shared.reset()
         settings.resetAll()
     }
 

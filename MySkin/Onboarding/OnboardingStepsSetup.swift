@@ -339,6 +339,7 @@ struct PrivacyStep: View {
                     privacyRow("iphone", String(localized: "Your diary is stored in the app on this iPhone and included in your iPhone backup"))
                     privacyRow("person.crop.circle.badge.xmark", String(localized: "No account needed"))
                     privacyRow("square.and.arrow.up", String(localized: "Your diary isn't sent anywhere — you choose what to share. Weather, if you turn it on, uses your approximate location"))
+                    privacyRow("chart.bar", String(localized: "Anonymous counts of which setup screens were opened help us improve MySkin — never your answers. You can turn them off in Settings"))
                 }
                 .glassCard()
 

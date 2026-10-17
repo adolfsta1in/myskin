@@ -1,6 +1,6 @@
 import Foundation
 
-/// Our website (myskin.cc): legal pages, support and the remote config file.
+/// Our website (myskin.cc): legal pages, support, the remote config file and usage counts.
 /// Every address the app opens or fetches lives here.
 nonisolated enum AppLinks {
     static let website = page("")
@@ -10,6 +10,8 @@ nonisolated enum AppLinks {
     static let healthDataPrivacy = page("health-data-privacy/")
     /// Static JSON read by `RemoteConfigStore` (C14).
     static let remoteConfig = page("config.json")
+    /// Anonymous usage counts sent by `UsageStats` (step 63).
+    static let usageStats = page("v1/usage")
 
     static let supportEmail = "support@myskin.cc"
     /// Opens Mail with the support address and a subject — nothing about the diary.

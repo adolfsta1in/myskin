@@ -622,6 +622,10 @@ MySkinTests/      Swift Testing
 ### Шаг 62.6. Сайт myskin.cc
 - Privacy, Terms & Medical Disclaimer, FAQ, страница о медданных на de/pt-BR/es (`/de/…`, `/pt-br/…`, `/es/…`, `hreflang`); английская версия — основная, переводы без юриста.
 
+### Шаг 63. Анонимная воронка онбординга и пейвола ✅
+- **Сделано (2026-10-17, по просьбе пользователя):** `Logic/UsageEvent.swift` — события `onboarding_step`/`onboarding_skip` (шаг — `OnboardingStep.usageName`, не переименовывать), `onboarding_done`, `paywall_shown`, `purchase_tap` (план), `subscribed` (план, `_trial`); в запросе только событие, деталь, версия, язык, `build` (release/debug). `Services/UsageStats.swift` — каждое событие раз за установку (`usageSentEvents`), очередь при отсутствии сети (`usagePendingEvents`, до 50, отправка пачками по 20 при активной сцене), ephemeral `URLSession`; в тестах и превью не отправляет. `AppSettings.shareUsageStats` (по умолчанию вкл.) — Settings › «Share anonymous usage stats», выключение сбрасывает очередь; «Delete all data» забывает отправленное. Онбординг (Privacy) — строка про анонимные счётчики. `PrivacyInfo.xcprivacy` — Product Interaction, not linked, no tracking, Analytics. Сервер (`~/Desktop/myskinsite`): `src/worker.js` (`run_worker_first = ["/v1/*"]`, проверка по фиксированным спискам, +1 к дневному счётчику; IP и время не хранятся, логов нет), D1 `myskin-usage` (WEUR), `migrations/0001_daily_counts.sql`, `queries/funnel.sql`; Privacy Policy, лендинг и страница о медданных обновлены. Новые шаги/события — сначала в списки Worker, потом в приложение. Тесты 372/372 на iPhone A; Worker проверен локально (`wrangler dev`).
+- **Не сделано:** миграция боевой D1 и деплой сайта — ждут подтверждения пользователя; в App Store Connect › App Privacy указать «Product Interaction · Analytics · not linked». Release-сборка и отправка с телефона не проверялись.
+
 ---
 
 ## Сводка по этапам

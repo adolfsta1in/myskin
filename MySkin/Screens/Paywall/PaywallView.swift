@@ -38,6 +38,7 @@ struct PaywallView: View {
             try DataExport.writeCSV(from: modelContext)
         }
         .task {
+            UsageStats.shared.record(.paywallShown)
             canRemind = await NotificationPermission.isAllowed()
             if subscriptions.loadState != .loaded { await subscriptions.loadProducts() }
         }
@@ -54,7 +55,9 @@ struct PaywallView: View {
 
     private func buy() {
         guard let product = subscriptions.product(for: selected), !isPurchasing else { return }
-        let trialDays = subscriptions.options.first { $0.plan == selected }?.trialDays
+        let plan = selected
+        let trialDays = subscriptions.options.first { $0.plan == plan }?.trialDays
+        UsageStats.shared.record(.purchaseTapped(plan))
         isPurchasing = true
         Task {
             defer { isPurchasing = false }
@@ -63,6 +66,7 @@ struct PaywallView: View {
                 if case .pending = result {
                     message = .pending
                 } else if await subscriptions.complete(result) {
+                    UsageStats.shared.record(.subscribed(plan, trial: trialDays != nil))
                     if let trialDays, let date = PaywallOffer.reminderDate(trialStart: .now, trialDays: trialDays) {
                         await NotificationService.scheduleTrialReminder(at: date)
                     }

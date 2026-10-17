@@ -29,6 +29,7 @@ struct SettingsView: View {
                 } footer: {
                     Text("When on, MySkin locks each time you leave the app and hides its content in the app switcher.")
                 }
+                UsageStatsSection()
                 SubscriptionSection()
                 DataSection(isDeleting: $isDeleting)
                 #if DEBUG
@@ -252,6 +253,23 @@ private struct LanguageSection: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text("The new language shows after you close MySkin in the app switcher and open it again.")
+        }
+    }
+}
+
+/// Anonymous usage counts (`UsageStats`): switching off also drops what hasn't been sent.
+private struct UsageStatsSection: View {
+    @Environment(AppSettings.self) private var settings
+
+    var body: some View {
+        @Bindable var settings = settings
+        Section {
+            Toggle("Share anonymous usage stats", isOn: $settings.shareUsageStats)
+                .onChange(of: settings.shareUsageStats) { _, isOn in
+                    if !isOn { UsageStats.shared.discardPending() }
+                }
+        } footer: {
+            Text("Counts of which setup and subscription screens were opened, without any ID. Your diary entries, answers and photos are never sent.")
         }
     }
 }
