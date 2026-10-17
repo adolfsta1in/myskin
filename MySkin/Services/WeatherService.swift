@@ -131,6 +131,8 @@ final class WeatherModel {
             daily: dailyCount
         ) else {
             // Nothing new to show and no request allowed: don't spin forever.
+            let today = dailyCount?.current(on: .now) ?? 0
+            Self.log.notice("Weather request not sent: \(today, privacy: .public) of \(WeatherRequestPolicy.maxPerDay, privacy: .public) today")
             if state == .loading { state = .failed }
             return
         }

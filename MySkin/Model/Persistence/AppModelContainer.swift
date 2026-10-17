@@ -19,6 +19,12 @@ enum AppModelContainer {
         )
         let container = try ModelContainer(for: schema, migrationPlan: MySkinMigrationPlan.self, configurations: configuration)
         try protectContents(of: directory, fileManager: fileManager)
+        // Not fatal: reads still map retired ids through `BodyZone.canonicalID`.
+        do {
+            try RetiredZoneRepair.run(in: container.mainContext)
+        } catch {
+            print("Could not rewrite retired zone ids: \(error)")
+        }
         return container
     }
 
