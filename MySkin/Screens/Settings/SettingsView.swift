@@ -283,6 +283,12 @@ private struct SubscriptionSection: View {
                 Button("Redeem a code", systemImage: "giftcard") { isRedeeming = true }
                 Button("Restore purchases", systemImage: "arrow.clockwise") { restore(subscriptions) }
                     .disabled(isRestoring)
+                #if DEBUG
+                Button("Show paywall (debug build)", systemImage: "rectangle.on.rectangle") {
+                    subscriptions.showPaywallForDebug()
+                }
+                .foregroundStyle(Theme.flare)
+                #endif
             } header: {
                 Text("Subscription")
             } footer: {

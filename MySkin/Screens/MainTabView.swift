@@ -73,6 +73,11 @@ private struct ReminderSync: ViewModifier {
 /// Decides between onboarding, privacy lock and the main app.
 /// Content is covered whenever the app is not active (app switcher, Control Center).
 struct RootView: View {
+    #if DEBUG
+    private static let isTakingScreenshots = ScreenshotMode.isOn
+    #else
+    private static let isTakingScreenshots = false
+    #endif
     @Environment(AppLock.self) private var lock
     @Environment(AppSettings.self) private var settings
     @Environment(RemoteConfigStore.self) private var remoteConfig: RemoteConfigStore?
@@ -98,7 +103,7 @@ struct RootView: View {
                 // Before the paywall: it offers a full diary export.
                 PrivacyLockView()
                     .transition(.opacity)
-            } else if let subscriptions, !subscriptions.hasCheckedEntitlements {
+            } else if let subscriptions, !subscriptions.hasCheckedEntitlements, !subscriptions.hasAccess {
                 // A moment on launch while StoreKit reads the (cached) entitlements.
                 WarmBackground()
             } else if let subscriptions, !subscriptions.hasAccess {
@@ -109,12 +114,23 @@ struct RootView: View {
                     // `ReminderSync` plans them again once the tabs are back.
                     .task { await NotificationService.removeAll() }
             } else {
+                #if DEBUG
+                if ScreenshotMode.showsPaywall {
+                    PaywallContent(options: PreviewData.paywallOptions, selected: .constant(.yearly))
+                } else if ScreenshotMode.showsReport {
+                    NavigationStack { DoctorReportView() }
+                } else {
+                    MainTabView(selection: ScreenshotMode.tab)
+                        .transition(.opacity)
+                }
+                #else
                 MainTabView()
                     .transition(.opacity)
+                #endif
             }
         }
         .overlay {
-            if scenePhase != .active && settings.hasCompletedOnboarding {
+            if scenePhase != .active && settings.hasCompletedOnboarding && !Self.isTakingScreenshots {
                 PrivacyCover()
             }
         }

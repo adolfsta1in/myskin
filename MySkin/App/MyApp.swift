@@ -26,6 +26,15 @@ import UserNotifications
             UNUserNotificationCenter.current().delegate = NotificationPresenter.shared
             return
         }
+        if ScreenshotMode.isOn {
+            _settings = State(initialValue: PreviewData.settings)
+            _lock = State(initialValue: AppLock(settings: PreviewData.settings))
+            _modelContainer = State(initialValue: ScreenshotMode.container)
+            let subscriptions = Subscriptions()
+            subscriptions.debugBypass = true
+            _subscriptions = State(initialValue: subscriptions)
+            return
+        }
         #endif
         let settings = AppSettings()
         _settings = State(initialValue: settings)

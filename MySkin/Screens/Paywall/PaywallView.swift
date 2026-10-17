@@ -76,7 +76,7 @@ struct PaywallView: View {
 
     private var debugSkip: (() -> Void)? {
         #if DEBUG
-        return { subscriptions.debugBypass = true }
+        return { subscriptions.skipPaywallForDebug() }
         #else
         return nil
         #endif

@@ -409,6 +409,9 @@ private struct CheckInCard: View {
                 draft.symptoms = symptoms
                 showsDetails = existing.pain != nil || existing.sleep != nil || existing.mood != nil || !existing.note.isEmpty
                 isExpanded = false
+                #if DEBUG
+                if ScreenshotMode.expandsCheckIn { isExpanded = true }
+                #endif
             }
         }
         // Not reported until the draft changes, so a stored check-in isn't hidden by the empty draft at launch.

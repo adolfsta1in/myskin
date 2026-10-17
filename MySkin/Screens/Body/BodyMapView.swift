@@ -5,7 +5,11 @@ struct BodyMapView: View {
     @Query private var assessments: [ZoneAssessment]
     @Query(sort: \QuestionnaireResult.date, order: .reverse) private var questionnaires: [QuestionnaireResult]
     @Query(sort: \Profile.createdAt) private var profiles: [Profile]
+    #if DEBUG
+    @State private var side: BodySide = ScreenshotMode.bodySide
+    #else
     @State private var side: BodySide = .front
+    #endif
     @State private var lastTapped: BodyZone?
     @State private var editingZone: BodyZone?
     @State private var tapCount = 0

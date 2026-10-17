@@ -19,13 +19,33 @@ final class Subscriptions {
     private(set) var current: CurrentSubscription?
 
     #if DEBUG
-    /// Debug builds only: skip the paywall for this session (testing on a phone with a real diary).
-    var debugBypass = false
+    /// Debug builds only: skip the paywall (testing on a phone with a real diary).
+    var debugBypass = UserDefaults.standard.bool(forKey: Subscriptions.debugSkipKey)
+
+    /// Kept across launches: iOS often ends the app in the background, and the paywall
+    /// came back on the next launch. Reinstalling the app shows the paywall again.
+    static let debugSkipKey = "debugSkipPaywall"
+
+    /// Debug builds only: show the paywall even with a subscription or a skip (this session).
+    var debugForcesPaywall = false
+
+    func skipPaywallForDebug() {
+        debugForcesPaywall = false
+        debugBypass = true
+        UserDefaults.standard.set(true, forKey: Self.debugSkipKey)
+    }
+
+    func showPaywallForDebug() {
+        debugBypass = false
+        UserDefaults.standard.removeObject(forKey: Self.debugSkipKey)
+        debugForcesPaywall = true
+    }
     #endif
 
     /// Whether the app may open past the paywall.
     var hasAccess: Bool {
         #if DEBUG
+        if debugForcesPaywall { return false }
         if debugBypass { return true }
         #endif
         return isSubscribed
@@ -81,6 +101,9 @@ final class Subscriptions {
         switch result {
         case .success(.verified(let transaction)):
             await transaction.finish()
+            #if DEBUG
+            debugForcesPaywall = false
+            #endif
             await refreshEntitlements()
             return isSubscribed
         case .success(.unverified), .pending, .userCancelled:
@@ -93,6 +116,9 @@ final class Subscriptions {
     /// "Restore purchases": syncs with the App Store (may ask the user to sign in).
     func restore() async throws {
         try await AppStore.sync()
+        #if DEBUG
+        debugForcesPaywall = false
+        #endif
         await refreshEntitlements()
     }
 
