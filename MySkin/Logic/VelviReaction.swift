@@ -66,6 +66,11 @@ enum VelviReaction {
         level >= 0.5 ? .caring : .happy
     }
 
+    /// While the itch slider moves on the first check-in: sympathy from a strong itch on, never joy.
+    static func firstCheckIn(itch: Int) -> VelviMood {
+        itch >= toughItch ? .caring : .happy
+    }
+
     /// Velvi on each onboarding step; `nil` hides it where the step needs the whole screen.
     static func onboarding(_ step: OnboardingStep) -> (cue: VelviCue, presence: VelviPresence)? {
         switch step {
@@ -76,7 +81,7 @@ enum VelviReaction {
         case .goals: (VelviCue(mood: .happy), .companion)
         case .insight: (VelviCue(mood: .thinking), .companion)
         case .bodyMap, .treatments: nil
-        case .firstCheckIn: (VelviCue(mood: .caring), .companion)
+        case .firstCheckIn: (VelviCue(mood: firstCheckIn(itch: 0)), .companion)
         case .notifications: (VelviCue(mood: .happy, prop: .bell), .companion)
         case .privacy: (VelviCue(mood: .calm, prop: .lock), .companion)
         case .plan: (VelviCue(mood: .proud, prop: .report), .hero)

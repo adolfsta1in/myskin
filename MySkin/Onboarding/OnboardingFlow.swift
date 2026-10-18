@@ -62,6 +62,11 @@ struct OnboardingFlow: View {
     @State private var isForward = true
     @State private var draft = OnboardingDraft()
     @State private var saveError: String?
+    /// Velvi's one-off state: a mood that overrides the step's, a line in a bubble, the reaction to play.
+    @State private var velviMood: VelviMood?
+    @State private var velviLine: VelviLine?
+    @State private var velviMotion: VelviMotion = .hop
+    @State private var velviTrigger = 0
 
     init(startAt step: OnboardingStep = .welcome) {
         _step = State(initialValue: step)
@@ -80,6 +85,7 @@ struct OnboardingFlow: View {
                     onBack: goBack,
                     onSkip: skip
                 )
+                velvi
                 content
                     .id(step)
                     .transition(.asymmetric(
@@ -93,6 +99,22 @@ struct OnboardingFlow: View {
         // Which steps people reach: once per install, no answers.
         .onChange(of: step, initial: true) { _, step in
             UsageStats.shared.record(.onboardingStep(step.usageName))
+        }
+        .onChange(of: step) { old, new in velviEnter(new, from: old) }
+        // Velvi nods at each answer.
+        .onChange(of: draft.hasAcceptedDisclaimer) { _, accepted in if accepted { velviReact(.nod) } }
+        .onChange(of: draft.sex) { velviReact(.nod) }
+        .onChange(of: draft.psoriasisTypes) { velviReact(.nod) }
+        .onChange(of: draft.goals) { velviReact(.nod) }
+        .onChange(of: draft.arthritis) { velviReact(.nod) }
+        .task(id: velviLine) {
+            guard velviLine != nil else { return }
+            try? await Task.sleep(for: .seconds(4))
+            guard !Task.isCancelled else { return }
+            withAnimation(.smooth) {
+                velviLine = nil
+                velviMood = nil
+            }
         }
         .alert("Couldn't save your answers", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
             Button("OK", role: .cancel) {}
@@ -118,6 +140,64 @@ struct OnboardingFlow: View {
         case .notifications: NotificationsStep(next: advance)
         case .privacy: PrivacyStep(next: advance)
         case .plan: PlanReadyStep(next: advance)
+        }
+    }
+
+    // MARK: Velvi
+
+    /// One Velvi for the whole flow, outside the step's `.id`, so it stays on screen between steps:
+    /// large in the middle on welcome and plan, a small companion above the title elsewhere.
+    @ViewBuilder
+    private var velvi: some View {
+        let entry = VelviReaction.onboarding(step)
+        let isHero = entry?.presence == .hero
+        HStack(alignment: .center, spacing: 4) {
+            if let entry {
+                VelviMascot(
+                    mood: velviMood ?? liveMood ?? entry.cue.mood,
+                    prop: entry.cue.prop,
+                    size: isHero ? (step == .welcome ? 220 : 150) : 64,
+                    motion: velviMotion,
+                    trigger: velviTrigger
+                )
+                .transition(.scale(scale: 0.3, anchor: .bottomLeading).combined(with: .opacity))
+                if let velviLine, !isHero {
+                    VelviBubble(velviLine.text)
+                        .transition(.scale(scale: 0.6, anchor: .leading).combined(with: .opacity))
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: isHero ? .center : .leading)
+        .padding(.horizontal, 20)
+        .padding(.top, entry == nil ? 0 : 4)
+    }
+
+    /// Steps where Velvi follows a slider as it moves.
+    private var liveMood: VelviMood? {
+        switch step {
+        case .skinNow: VelviReaction.skinNow(draft.skinNow)
+        case .firstCheckIn: VelviReaction.firstCheckIn(itch: draft.firstCheckIn.itch)
+        default: nil
+        }
+    }
+
+    private func velviReact(_ motion: VelviMotion) {
+        velviMotion = motion
+        velviTrigger += 1
+    }
+
+    private func velviEnter(_ step: OnboardingStep, from previous: OnboardingStep) {
+        velviMood = nil
+        velviLine = nil
+        // Right after «Save my first entry»: Velvi answers the entry on the next screen.
+        if step == .notifications, previous == .firstCheckIn, draft.hasFirstCheckIn {
+            let entry = draft.firstCheckIn
+            let cue = VelviReaction.afterCheckIn(itch: entry.itch, mode: entry.newSpots ? .flare : .calm)
+            velviMood = cue.mood
+            velviLine = cue.line
+            velviReact(cue.motion)
+        } else if let cue = VelviReaction.onboarding(step)?.cue {
+            velviReact(cue.motion)
         }
     }
 
@@ -327,6 +407,12 @@ struct PermissionButtons: View {
 #if DEBUG
 #Preview {
     OnboardingFlow()
+        .modelContainer(PreviewData.emptyContainer())
+        .previewSetup()
+}
+
+#Preview("Velvi as companion") {
+    OnboardingFlow(startAt: .goals)
         .modelContainer(PreviewData.emptyContainer())
         .previewSetup()
 }

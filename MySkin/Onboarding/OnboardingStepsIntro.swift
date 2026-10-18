@@ -3,18 +3,13 @@ import SwiftUI
 // MARK: - O1 Welcome
 
 /// First screen: one promise — your own entries become a report for your doctor.
-/// The picture shows that result (body map, falling chart, report), so it comes first.
+/// Velvi holding the report stands above it (drawn by `OnboardingFlow`, so it stays on through the flow).
 struct WelcomeStep: View {
     let next: () -> Void
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Image("WelcomeHero")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity, maxHeight: 320)
-                    .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Your psoriasis, on the record.")
                         .font(.rounded(.largeTitle, weight: .bold))

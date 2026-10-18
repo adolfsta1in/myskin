@@ -67,6 +67,14 @@ struct VelviReactionTests {
         #expect(VelviReaction.skinNow(1) == .caring)
     }
 
+    @Test func firstCheckInSliderNeverCelebrates() {
+        for itch in 0...10 {
+            #expect(!celebrating.contains(VelviReaction.firstCheckIn(itch: itch)))
+        }
+        #expect(VelviReaction.firstCheckIn(itch: 6) == .happy)
+        #expect(VelviReaction.firstCheckIn(itch: 7) == .caring)
+    }
+
     // MARK: - Onboarding
 
     @Test func everyOnboardingStepIsDecided() {

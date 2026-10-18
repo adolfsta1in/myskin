@@ -646,8 +646,9 @@ MySkinTests/      Swift Testing
 - **Сделано (2026-10-18):** `Logic/VelviReaction.swift` — `VelviCue` (настроение, предмет, движение, реплика), `VelviLine` (стабильные случаи: `checkInLogged`, `checkInSaved`, `checkInTough`; тексты на 4 языках), `VelviPresence` (hero/companion). `afterCheckIn(itch:mode:)`: Flare или зуд ≥ 7 → caring + «That sounds tough. It's in your diary.», зуд ≤ 3 → joyful/hop, иначе happy/nod; `greeting(mode:hasCheckedInToday:hour:)`: Flare → caring, ночь (22–5) → sleepy, иначе curious/happy с взмахом; `questionnaireResult(needsAttention:)`; `skinNow(_:)` (≥ 0.5 → caring); `onboarding(_:)` — конфигурация на каждый шаг, карта тела и лечение — без маскота. `MySkinTests/VelviReactionTests.swift`. Аргументы `@Test(arguments:)` вычисляются вне MainActor — литералы, а не `VelviReaction.toughItch`.
 - **Готово, когда:** тесты 397/397 на iPhone A.
 
-### Шаг 64.2. Онбординг
-Один Velvi над содержимым шагов (вне `.id(step)`), прыгает и меняет настроение при смене шага; крупный на Welcome (вместо `WelcomeHero`) и Plan; скрыт на карте тела и лечении.
+### Шаг 64.2. Онбординг ✅
+- **Сделано (2026-10-18):** один `VelviMascot` в `OnboardingFlow` между верхней панелью и содержимым (вне `.id(step)`) — между шагами не пропадает: на Welcome крупный (220) по центру с отчётом и машет, при переходе плавно уменьшается в спутника 64 pt над заголовком; на Plan — 150, proud с отчётом; на карте тела и лечении скрыт. При смене шага — движение из `VelviReaction.onboarding`; кивок на каждый ответ (`onChange` черновика: дисклеймер, пол, формы, цели, суставы — шаги не менялись); SkinNow и первый чек-ин — настроение следует за ползунком (`skinNow`, новое `firstCheckIn(itch:)`: от 7 — caring). После «Save my first entry» на шаге Notifications — реакция `afterCheckIn` (new spots считаются Flare) и облачко на 4 с. Картинка `WelcomeHero` удалена (ассет тоже). Превью «Velvi as companion».
+- **Готово, когда:** тесты 398/398 на iPhone A; превью Welcome и Goals. Проход онбординга на телефоне — за пользователем (Settings › Developer › Show onboarding).
 
 ### Шаг 64.3. Пейвол
 Velvi в градиентной шапке со звездой; выбор плана — кивок, покупка — радость.
