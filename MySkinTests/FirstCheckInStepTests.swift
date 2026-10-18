@@ -7,7 +7,14 @@ struct FirstCheckInStepTests {
     @Test func checkInComesRightAfterTreatments() {
         let steps = OnboardingStep.allCases
         #expect(steps.firstIndex(of: .firstCheckIn) == (steps.firstIndex(of: .treatments) ?? 0) + 1)
-        #expect(steps.last == .plan)
+        #expect(steps.last == .commitment)
+    }
+
+    /// The promise is the last thing before the paywall, right after the plan.
+    @Test func commitmentComesRightAfterThePlan() {
+        let steps = OnboardingStep.allCases
+        #expect(steps.firstIndex(of: .commitment) == (steps.firstIndex(of: .plan) ?? 0) + 1)
+        #expect(OnboardingStep.commitment.isOptional)
     }
 
     @Test func firstCheckInIsSavedAsToday() throws {

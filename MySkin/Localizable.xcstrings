@@ -2145,6 +2145,28 @@
         }
       }
     },
+    "A quick check-in every day — about 20 seconds" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeden Tag ein kurzer Check-in – etwa 20 Sekunden"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un registro rápido cada día: unos 20 segundos"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um registro rápido todo dia — cerca de 20 segundos"
+          }
+        }
+      }
+    },
     "A quick daily check-in, a body map and photos — turned into a clear report for your doctor." : {
       "localizations" : {
         "de" : {
@@ -3657,6 +3679,28 @@
         }
       }
     },
+    "Bringing my report to my next doctor's visit" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meinen Bericht zum nächsten Arzttermin mitzunehmen"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Llevar mi informe a mi próxima consulta médica"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Levar meu relatório à próxima consulta médica"
+          }
+        }
+      }
+    },
     "Brodalumab (Siliq, Kyntheum)" : {
       "localizations" : {
         "de" : {
@@ -4715,6 +4759,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Confortável"
+          }
+        }
+      }
+    },
+    "Committed" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versprochen"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prometido"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Combinado"
           }
         }
       }
@@ -7737,6 +7803,50 @@
         }
       }
     },
+    "Hold the button to make the promise." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Halte den Button gedrückt, um es dir zu versprechen."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantén presionado el botón para hacer la promesa."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segure o botão para fazer a promessa."
+          }
+        }
+      }
+    },
+    "Hold to commit" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gedrückt halten"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantén para prometer"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segure para prometer"
+          }
+        }
+      }
+    },
     "How does it look?" : {
       "localizations" : {
         "de" : {
@@ -8041,6 +8151,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hidrocortisona 1% creme"
+          }
+        }
+      }
+    },
+    "I commit to:" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ich verspreche mir:"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Me comprometo a:"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eu me comprometo a:"
           }
         }
       }
@@ -10119,6 +10251,50 @@
         }
       }
     },
+    "Make it a habit" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mach es zur Gewohnheit"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hazlo un hábito"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faça disso um hábito"
+          }
+        }
+      }
+    },
+    "Make it a habit, %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mach es zur Gewohnheit, %@"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hazlo un hábito, %@"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faça disso um hábito, %@"
+          }
+        }
+      }
+    },
     "Male" : {
       "localizations" : {
         "de" : {
@@ -11929,6 +12105,28 @@
         }
       }
     },
+    "Noting what could matter: triggers, food, sleep" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Festzuhalten, was zählen könnte: Auslöser, Essen, Schlaf"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anotar lo que podría importar: desencadenantes, comida, sueño"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anotar o que pode importar: gatilhos, alimentação, sono"
+          }
+        }
+      }
+    },
     "Now" : {
       "localizations" : {
         "de" : {
@@ -13245,6 +13443,28 @@
         }
       }
     },
+    "Proud of you. Let's do this together." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ich bin stolz auf dich. Wir schaffen das zusammen."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estoy orgulloso de ti. Hagámoslo juntos."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tenho orgulho de você. Vamos juntos nessa."
+          }
+        }
+      }
+    },
     "Psoriasis" : {
       "localizations" : {
         "de" : {
@@ -13263,6 +13483,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Psoríase"
+          }
+        }
+      }
+    },
+    "Psoriasis changes slowly. A few seconds a day is what makes the changes visible — to you and your doctor." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Psoriasis verändert sich langsam. Ein paar Sekunden am Tag machen die Veränderungen sichtbar – für dich und deinen Arzt oder deine Ärztin."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La psoriasis cambia despacio. Unos segundos al día hacen visibles los cambios, para ti y para tu médico."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A psoríase muda devagar. Alguns segundos por dia tornam as mudanças visíveis — para você e para seu médico."
           }
         }
       }
@@ -16058,6 +16300,7 @@
       }
     },
     "Start" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

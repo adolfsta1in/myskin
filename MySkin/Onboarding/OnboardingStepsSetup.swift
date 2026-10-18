@@ -456,7 +456,7 @@ struct PlanReadyStep: View {
                 }
             }
         } footer: {
-            PrimaryButton(title: "Start", action: next)
+            PrimaryButton(title: "Continue", action: next)
         }
     }
 

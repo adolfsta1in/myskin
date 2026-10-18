@@ -2,14 +2,14 @@ import SwiftData
 import SwiftUI
 
 enum OnboardingStep: Int, CaseIterable, Identifiable {
-    case welcome, disclaimer, aboutYou, psoriasisProfile, skinNow, goals, insight, bodyMap, joints, treatments, firstCheckIn, notifications, privacy, plan
+    case welcome, disclaimer, aboutYou, psoriasisProfile, skinNow, goals, insight, bodyMap, joints, treatments, firstCheckIn, notifications, privacy, plan, commitment
 
     var id: Int { rawValue }
 
     /// Optional steps show a "Skip" button. The disclaimer can never be skipped.
     var isOptional: Bool {
         switch self {
-        case .aboutYou, .psoriasisProfile, .joints, .skinNow, .goals, .bodyMap, .treatments, .firstCheckIn, .notifications, .privacy: true
+        case .aboutYou, .psoriasisProfile, .joints, .skinNow, .goals, .bodyMap, .treatments, .firstCheckIn, .notifications, .privacy, .commitment: true
         default: false
         }
     }
@@ -31,6 +31,7 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
         case .notifications: "notifications"
         case .privacy: "privacy"
         case .plan: "plan"
+        case .commitment: "commitment"
         }
     }
 
@@ -51,6 +52,7 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
         case .notifications: "O11 · Notifications"
         case .privacy: "O12 · Privacy"
         case .plan: "O13 · Plan ready"
+        case .commitment: "O14 · Commitment"
         }
     }
 }
@@ -85,8 +87,8 @@ struct OnboardingFlow: View {
                     onBack: goBack,
                     onSkip: skip
                 )
-                velvi
                 content
+                    .environment(\.onboardingVelvi, velvi)
                     .id(step)
                     .transition(.asymmetric(
                         insertion: .move(edge: isForward ? .trailing : .leading).combined(with: .opacity),
@@ -140,36 +142,20 @@ struct OnboardingFlow: View {
         case .notifications: NotificationsStep(next: advance)
         case .privacy: PrivacyStep(next: advance)
         case .plan: PlanReadyStep(next: advance)
+        case .commitment: CommitmentStep(onCommitted: commit)
         }
     }
 
     // MARK: Velvi
 
-    /// One Velvi for the whole flow, outside the step's `.id`, so it stays on screen between steps:
-    /// large in the middle on welcome and plan, a small companion above the title elsewhere.
-    @ViewBuilder
-    private var velvi: some View {
-        let entry = VelviReaction.onboarding(step)
-        let isHero = entry?.presence == .hero
-        HStack(alignment: .center, spacing: 4) {
-            if let entry {
-                VelviMascot(
-                    mood: velviMood ?? liveMood ?? entry.cue.mood,
-                    prop: entry.cue.prop,
-                    size: isHero ? (step == .welcome ? 220 : 150) : 64,
-                    motion: velviMotion,
-                    trigger: velviTrigger
-                )
-                .transition(.scale(scale: 0.3, anchor: .bottomLeading).combined(with: .opacity))
-                if let velviLine, !isHero {
-                    VelviBubble(velviLine.text)
-                        .transition(.scale(scale: 0.6, anchor: .leading).combined(with: .opacity))
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: isHero ? .center : .leading)
-        .padding(.horizontal, 20)
-        .padding(.top, entry == nil ? 0 : 4)
+    /// What the page draws for Velvi: next to the title, or large above it on welcome and plan.
+    private var velvi: OnboardingVelvi? {
+        guard let entry = VelviReaction.onboarding(step) else { return nil }
+        var cue = entry.cue
+        cue.mood = velviMood ?? liveMood ?? cue.mood
+        cue.motion = velviMotion
+        cue.line = velviLine
+        return OnboardingVelvi(cue: cue, presence: entry.presence, trigger: velviTrigger)
     }
 
     /// Steps where Velvi follows a slider as it moves.
@@ -184,6 +170,18 @@ struct OnboardingFlow: View {
     private func velviReact(_ motion: VelviMotion) {
         velviMotion = motion
         velviTrigger += 1
+    }
+
+    /// «Hold to commit»: Velvi celebrates, then onboarding ends and the paywall comes.
+    private func commit() {
+        let cue = VelviReaction.committed
+        velviMood = cue.mood
+        velviLine = cue.line
+        velviReact(cue.motion)
+        Task {
+            try? await Task.sleep(for: .seconds(1.6))
+            advance()
+        }
     }
 
     private func velviEnter(_ step: OnboardingStep, from previous: OnboardingStep) {
@@ -304,14 +302,39 @@ struct OnboardingPage<Content: View, Footer: View>: View {
     @ViewBuilder var content: Content
     @ViewBuilder var footer: Footer
 
+    @Environment(\.onboardingVelvi) private var velvi
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    /// Velvi beside the title; above it when the text is very large and needs the width.
+    private var titleLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8))
+            : AnyLayout(HStackLayout(alignment: .center, spacing: 12))
+    }
+
     var body: some View {
         ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(title)
-                            .font(.rounded(.largeTitle, weight: .bold))
-                            .foregroundStyle(Theme.ink)
-                            .fixedSize(horizontal: false, vertical: true)
+                        if let velvi, velvi.presence == .hero {
+                            OnboardingVelviView(velvi: velvi, size: 150)
+                                .frame(maxWidth: .infinity)
+                        }
+                        titleLayout {
+                            Text(title)
+                                .font(.rounded(.largeTitle, weight: .bold))
+                                .foregroundStyle(Theme.ink)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            if let velvi, velvi.presence == .companion {
+                                OnboardingVelviView(velvi: velvi, size: 64)
+                            }
+                        }
+                        if let line = velvi?.cue.line {
+                            VelviBubble(line.text, tail: .topTrailing)
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                                .transition(.scale(scale: 0.6, anchor: .topTrailing).combined(with: .opacity))
+                        }
                         if let subtitle {
                             Text(subtitle)
                                 .font(.rounded(.body))
@@ -325,6 +348,7 @@ struct OnboardingPage<Content: View, Footer: View>: View {
                     }
                     content
                 }
+                .animation(.spring(duration: 0.4, bounce: 0.3), value: velvi?.cue.line)
                 .padding(.horizontal, 24)
                 .padding(.top, 16)
                 .padding(.bottom, 24)
@@ -340,6 +364,29 @@ struct OnboardingPage<Content: View, Footer: View>: View {
             .padding(.top, 12)
             .padding(.bottom, 8)
         }
+    }
+}
+
+// MARK: - Velvi
+
+/// Velvi as the onboarding page should draw it; set by `OnboardingFlow` for the current step.
+struct OnboardingVelvi: Equatable {
+    var cue: VelviCue
+    var presence: VelviPresence
+    /// Changes when Velvi should play `cue.motion` (an answer, a saved entry).
+    var trigger: Int
+}
+
+extension EnvironmentValues {
+    @Entry var onboardingVelvi: OnboardingVelvi?
+}
+
+struct OnboardingVelviView: View {
+    let velvi: OnboardingVelvi
+    let size: CGFloat
+
+    var body: some View {
+        VelviMascot(mood: velvi.cue.mood, prop: velvi.cue.prop, size: size, motion: velvi.cue.motion, trigger: velvi.trigger)
     }
 }
 
@@ -413,6 +460,12 @@ struct PermissionButtons: View {
 
 #Preview("Velvi as companion") {
     OnboardingFlow(startAt: .goals)
+        .modelContainer(PreviewData.emptyContainer())
+        .previewSetup()
+}
+
+#Preview("Commitment") {
+    OnboardingFlow(startAt: .commitment)
         .modelContainer(PreviewData.emptyContainer())
         .previewSetup()
 }

@@ -22,12 +22,14 @@ enum VelviLine: CaseIterable, Equatable {
     case checkInLogged
     case checkInSaved
     case checkInTough
+    case committed
 
     var text: String {
         switch self {
         case .checkInLogged: String(localized: "Logged. See you tomorrow.")
         case .checkInSaved: String(localized: "Saved. Thanks for checking in.")
         case .checkInTough: String(localized: "That sounds tough. It's in your diary.")
+        case .committed: String(localized: "Proud of you. Let's do this together.")
         }
     }
 }
@@ -35,6 +37,9 @@ enum VelviLine: CaseIterable, Equatable {
 /// Picks Velvi's mood and reaction for each moment. Pure rules, so the tone can be tested:
 /// on a hard day (Flare, strong itch, a result worth discussing) Velvi is caring, never celebrating.
 enum VelviReaction {
+    /// After «Hold to commit» on the last onboarding step.
+    static let committed = VelviCue(mood: .joyful, motion: .hop, line: .committed)
+
     /// Itch from which a check-in counts as a hard day.
     static let toughItch = 7
     /// Itch up to which a check-in counts as an easy day.
@@ -85,6 +90,7 @@ enum VelviReaction {
         case .notifications: (VelviCue(mood: .happy, prop: .bell), .companion)
         case .privacy: (VelviCue(mood: .calm, prop: .lock), .companion)
         case .plan: (VelviCue(mood: .proud, prop: .report), .hero)
+        case .commitment: (VelviCue(mood: .happy, prop: .heart), .companion)
         }
     }
 }

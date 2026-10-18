@@ -9,6 +9,8 @@ struct VelviBubble: View {
         case bottom
         /// Mascot above the bubble, near its leading edge.
         case top
+        /// Mascot above the bubble, near its trailing edge.
+        case topTrailing
     }
 
     let text: Text
@@ -43,7 +45,7 @@ struct VelviBubble: View {
         switch tail {
         case .leading: .leading
         case .bottom: .bottom
-        case .top: .top
+        case .top, .topTrailing: .top
         }
     }
 }
@@ -62,7 +64,7 @@ nonisolated private struct BubbleShape: Shape {
             body.size.width -= tailSize
         case .bottom:
             body.size.height -= tailSize
-        case .top:
+        case .top, .topTrailing:
             body.origin.y += tailSize
             body.size.height -= tailSize
         }
@@ -70,8 +72,8 @@ nonisolated private struct BubbleShape: Shape {
         let t = tailSize
         var p = Path()
         p.move(to: CGPoint(x: body.minX + r, y: body.minY))
-        if tail == .top {
-            let x = body.minX + min(32, body.width / 2)
+        if tail == .top || tail == .topTrailing {
+            let x = tail == .top ? body.minX + min(32, body.width / 2) : body.maxX - min(32, body.width / 2)
             p.addLine(to: CGPoint(x: x - t, y: body.minY))
             p.addQuadCurve(to: CGPoint(x: x - t * 0.4, y: rect.minY), control: CGPoint(x: x - t * 0.5, y: body.minY - t * 0.3))
             p.addLine(to: CGPoint(x: x + t * 0.6, y: body.minY))

@@ -3,13 +3,18 @@ import SwiftUI
 // MARK: - O1 Welcome
 
 /// First screen: one promise — your own entries become a report for your doctor.
-/// Velvi holding the report stands above it (drawn by `OnboardingFlow`, so it stays on through the flow).
+/// Velvi holding the report stands above it.
 struct WelcomeStep: View {
     let next: () -> Void
+    @Environment(\.onboardingVelvi) private var velvi
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
+                if let velvi {
+                    OnboardingVelviView(velvi: velvi, size: 220)
+                        .frame(maxWidth: .infinity)
+                }
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Your psoriasis, on the record.")
                         .font(.rounded(.largeTitle, weight: .bold))
