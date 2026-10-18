@@ -1,17 +1,26 @@
 import Observation
+import RevenueCat
 import StoreKit
 
-/// StoreKit 2: paywall products, purchases and whether the user has an active subscription.
-/// Apple does the billing and receipts; nothing is sent anywhere else.
+/// Paywall products, purchases and access through RevenueCat (StoreKit 2 underneath).
+/// RevenueCat gets the App Store transactions and an anonymous app user id — no diary data.
 @Observable
 final class Subscriptions {
-    /// `unavailable`: the App Store answered but has none of our products (not set up in
-    /// App Store Connect, or a run without the local `.storekit` file). `failed`: the request threw.
+    /// `unavailable`: RevenueCat answered but the current offering has none of our products
+    /// (not set up in App Store Connect / the RevenueCat dashboard). `failed`: the request threw.
     enum LoadState: Equatable { case idle, loading, loaded, unavailable, failed }
+
+    /// How a purchase ended, for the paywall.
+    enum PurchaseOutcome { case subscribed, pending, cancelled }
+
+    /// Public Apple SDK key from the RevenueCat dashboard (Project › API keys); it's meant to ship in the app.
+    static let apiKey = "appl_zDqmbQdsEHQZPKSzvUkVJYUCKeH"
+    /// Entitlement in the RevenueCat dashboard that both plans unlock — don't rename.
+    static let entitlementID = "premium"
 
     private(set) var options: [PaywallOption] = []
     private(set) var loadState: LoadState = .idle
-    /// Active (or in-trial) subscription, verified by StoreKit.
+    /// Active (or in-trial, or in a billing grace period) subscription, per RevenueCat.
     private(set) var isSubscribed = false
     /// False until entitlements were checked once — don't show a paywall before that.
     private(set) var hasCheckedEntitlements = false
@@ -51,16 +60,16 @@ final class Subscriptions {
         return isSubscribed
     }
 
-    @ObservationIgnored private var products: [PaywallPlan: Product] = [:]
+    @ObservationIgnored private var packages: [PaywallPlan: Package] = [:]
     @ObservationIgnored private var updatesTask: Task<Void, Never>?
 
-    /// Listens for renewals, refunds and purchases made elsewhere; checks current entitlements.
+    /// Configures RevenueCat once and follows customer info: renewals, refunds, purchases made elsewhere.
     func start() {
         guard updatesTask == nil else { return }
+        Self.configureIfNeeded()
         updatesTask = Task { [weak self] in
-            for await result in Transaction.updates {
-                if case .verified(let transaction) = result { await transaction.finish() }
-                await self?.refreshEntitlements()
+            for await info in Purchases.shared.customerInfoStream {
+                self?.apply(info)
             }
         }
         Task { await refreshEntitlements() }
@@ -68,14 +77,16 @@ final class Subscriptions {
 
     func loadProducts() async {
         guard loadState != .loading else { return }
+        Self.configureIfNeeded()
         loadState = .loading
         do {
-            let loaded = try await Product.products(for: PaywallPlan.allCases.map(\.productID))
-            var byPlan: [PaywallPlan: Product] = [:]
+            let offering = try await Purchases.shared.offerings().current
+            var byPlan: [PaywallPlan: Package] = [:]
             var result: [PaywallOption] = []
-            for product in loaded {
-                guard let plan = PaywallPlan(productID: product.id) else { continue }
-                byPlan[plan] = product
+            for package in offering?.availablePackages ?? [] {
+                guard let plan = PaywallPlan(productID: package.storeProduct.productIdentifier),
+                      let product = package.storeProduct.sk2Product else { continue }
+                byPlan[plan] = package
                 result.append(PaywallOption(
                     plan: plan,
                     displayPrice: product.displayPrice,
@@ -84,7 +95,7 @@ final class Subscriptions {
                     trialDays: await Self.eligibleTrialDays(product)
                 ))
             }
-            products = byPlan
+            packages = byPlan
             options = result.sorted { lhs, rhs in
                 PaywallPlan.allCases.firstIndex(of: lhs.plan) ?? 0 < PaywallPlan.allCases.firstIndex(of: rhs.plan) ?? 0
             }
@@ -94,59 +105,76 @@ final class Subscriptions {
         }
     }
 
-    func product(for plan: PaywallPlan) -> Product? { products[plan] }
+    func canPurchase(_ plan: PaywallPlan) -> Bool { packages[plan] != nil }
 
-    /// Handles the result of `PurchaseAction`. True if the subscription is now active.
-    func complete(_ result: Product.PurchaseResult) async -> Bool {
-        switch result {
-        case .success(.verified(let transaction)):
-            await transaction.finish()
+    /// Buys the plan through RevenueCat (Apple's purchase sheet). Throws if the purchase failed.
+    func purchase(_ plan: PaywallPlan) async throws -> PurchaseOutcome {
+        guard let package = packages[plan] else { return .cancelled }
+        do {
+            let result = try await Purchases.shared.purchase(package: package)
+            if result.userCancelled { return .cancelled }
             #if DEBUG
             debugForcesPaywall = false
             #endif
-            await refreshEntitlements()
-            return isSubscribed
-        case .success(.unverified), .pending, .userCancelled:
-            return false
-        @unknown default:
-            return false
+            apply(result.customerInfo)
+            return isSubscribed ? .subscribed : .pending
+        } catch ErrorCode.paymentPendingError {
+            return .pending
+        } catch ErrorCode.purchaseCancelledError {
+            return .cancelled
         }
     }
 
     /// "Restore purchases": syncs with the App Store (may ask the user to sign in).
     func restore() async throws {
-        try await AppStore.sync()
+        Self.configureIfNeeded()
+        let info = try await Purchases.shared.restorePurchases()
         #if DEBUG
         debugForcesPaywall = false
         #endif
-        await refreshEntitlements()
+        apply(info)
     }
 
     func refreshEntitlements() async {
-        var found: CurrentSubscription?
-        for await result in Transaction.currentEntitlements {
-            guard case .verified(let transaction) = result,
-                  let plan = PaywallPlan(productID: transaction.productID),
-                  transaction.revocationDate == nil else { continue }
-            let status = await transaction.subscriptionStatus
-            if let expiration = transaction.expirationDate, expiration < .now {
-                // In a billing grace period the last period has ended, but Apple is still
-                // collecting payment and the subscriber keeps full access.
-                guard status?.state == .inGracePeriod else { continue }
+        Self.configureIfNeeded()
+        do {
+            apply(try await Purchases.shared.customerInfo(fetchPolicy: .fetchCurrent))
+        } catch {
+            // Offline: RevenueCat's cached info is still the best answer.
+            if let cached = try? await Purchases.shared.customerInfo(fetchPolicy: .fromCacheOnly) {
+                apply(cached)
+            } else {
+                hasCheckedEntitlements = true
             }
-            var renewal: Product.SubscriptionInfo.RenewalInfo?
-            if case .verified(let info) = status?.renewalInfo { renewal = info }
-            found = CurrentSubscription(
-                plan: plan,
-                periodEnd: renewal?.gracePeriodExpirationDate ?? transaction.expirationDate,
-                willRenew: renewal?.willAutoRenew ?? true,
-                isTrial: transaction.offer?.paymentMode == .freeTrial,
-                hasBillingIssue: status?.state == .inGracePeriod
-            )
         }
-        current = found
-        isSubscribed = found != nil
+    }
+
+    private func apply(_ info: CustomerInfo) {
+        let entitlement = info.entitlements.active[Self.entitlementID]
+        current = entitlement.flatMap { entitlement in
+            PaywallPlan(productID: entitlement.productIdentifier).map { plan in
+                CurrentSubscription(
+                    plan: plan,
+                    periodEnd: entitlement.expirationDate,
+                    willRenew: entitlement.willRenew,
+                    isTrial: entitlement.periodType == .trial,
+                    // In a billing grace period Apple is still collecting payment and access continues.
+                    hasBillingIssue: entitlement.billingIssueDetectedAt != nil
+                )
+            }
+        }
+        isSubscribed = entitlement != nil
         hasCheckedEntitlements = true
+    }
+
+    private static func configureIfNeeded() {
+        guard !Purchases.isConfigured else { return }
+        #if DEBUG
+        Purchases.logLevel = .debug
+        #else
+        Purchases.logLevel = .warn
+        #endif
+        Purchases.configure(withAPIKey: apiKey)
     }
 
     /// Free-trial days from the introductory offer, if this Apple account can still get it.

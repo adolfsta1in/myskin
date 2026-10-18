@@ -1,15 +1,13 @@
-import StoreKit
 import SwiftData
 import SwiftUI
 
-/// Subscription paywall: trial timeline, yearly / weekly plans (yearly preselected), purchase via StoreKit.
+/// Subscription paywall: trial timeline, yearly / weekly plans (yearly preselected), purchase via RevenueCat.
 /// `onClose == nil` hides the close button (hard paywall).
 struct PaywallView: View {
     var onClose: (() -> Void)?
     var onSubscribed: () -> Void = {}
 
     @Environment(Subscriptions.self) private var subscriptions
-    @Environment(\.purchase) private var purchase
     @Environment(\.modelContext) private var modelContext
     /// Two check-ins mean a diary from before (onboarding saves at most one): a lapsed subscriber
     /// can still take their data with them.
@@ -54,7 +52,7 @@ struct PaywallView: View {
     }
 
     private func buy() {
-        guard let product = subscriptions.product(for: selected), !isPurchasing else { return }
+        guard subscriptions.canPurchase(selected), !isPurchasing else { return }
         let plan = selected
         let trialDays = subscriptions.options.first { $0.plan == plan }?.trialDays
         UsageStats.shared.record(.purchaseTapped(plan))
@@ -62,10 +60,12 @@ struct PaywallView: View {
         Task {
             defer { isPurchasing = false }
             do {
-                let result = try await purchase(product)
-                if case .pending = result {
+                switch try await subscriptions.purchase(plan) {
+                case .pending:
                     message = .pending
-                } else if await subscriptions.complete(result) {
+                case .cancelled:
+                    break
+                case .subscribed:
                     UsageStats.shared.record(.subscribed(plan, trial: trialDays != nil))
                     if let trialDays, let date = PaywallOffer.reminderDate(trialStart: .now, trialDays: trialDays) {
                         await NotificationService.scheduleTrialReminder(at: date)
