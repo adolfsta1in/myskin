@@ -27,7 +27,7 @@ struct PaywallView: View {
             selected: $selected,
             onContinue: buy,
             onRestore: restore,
-            onRetry: { Task { await subscriptions.loadProducts() } },
+            onRetry: { Task { await loadProducts() } },
             onClose: onClose,
             onExport: diaryProbe.count >= 2 ? { isExporting = true } : nil,
             onDebugSkip: debugSkip
@@ -38,7 +38,11 @@ struct PaywallView: View {
         .task {
             UsageStats.shared.record(.paywallShown)
             canRemind = await NotificationPermission.isAllowed()
-            if subscriptions.loadState != .loaded { await subscriptions.loadProducts() }
+            if subscriptions.loadState != .loaded { await loadProducts() }
+        }
+        // Moving off the preselected plan (or back to it): which plans people weigh.
+        .onChange(of: selected) { _, plan in
+            UsageStats.shared.record(.planSelected(plan))
         }
         .alert(item: $message) { message in
             Alert(title: Text(message.title), message: Text(message.text), dismissButton: .default(Text("OK")))
@@ -49,6 +53,15 @@ struct PaywallView: View {
         var descriptor = FetchDescriptor<DailyCheckIn>()
         descriptor.fetchLimit = 2
         return descriptor
+    }
+
+    private func loadProducts() async {
+        await subscriptions.loadProducts()
+        switch subscriptions.loadState {
+        case .unavailable: UsageStats.shared.record(.paywallUnavailable(.unavailable))
+        case .failed: UsageStats.shared.record(.paywallUnavailable(.failed))
+        case .idle, .loading, .loaded: break
+        }
     }
 
     private func buy() {
@@ -62,9 +75,10 @@ struct PaywallView: View {
             do {
                 switch try await subscriptions.purchase(plan) {
                 case .pending:
+                    UsageStats.shared.record(.purchasePending(plan))
                     message = .pending
                 case .cancelled:
-                    break
+                    UsageStats.shared.record(.purchaseCancelled(plan))
                 case .subscribed:
                     UsageStats.shared.record(.subscribed(plan, trial: trialDays != nil))
                     if let trialDays, let date = PaywallOffer.reminderDate(trialStart: .now, trialDays: trialDays) {
@@ -73,6 +87,7 @@ struct PaywallView: View {
                     onSubscribed()
                 }
             } catch {
+                UsageStats.shared.record(.purchaseFailed(plan))
                 message = .failed(error.localizedDescription)
             }
         }
@@ -93,8 +108,10 @@ struct PaywallView: View {
             defer { isPurchasing = false }
             do {
                 try await subscriptions.restore()
+                UsageStats.shared.record(.restored(subscriptions.isSubscribed ? .found : .nothing))
                 if subscriptions.isSubscribed { onSubscribed() } else { message = .nothingToRestore }
             } catch {
+                UsageStats.shared.record(.restored(.failed))
                 message = .failed(error.localizedDescription)
             }
         }

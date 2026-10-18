@@ -224,6 +224,7 @@ struct OnboardingFlow: View {
         do {
             try draft.save(in: modelContext)
             UsageStats.shared.record(.onboardingCompleted)
+            UsageStats.shared.markOnboardingCompleted()
             withAnimation(.smooth(duration: 0.35)) {
                 settings.hasCompletedOnboarding = true
             }

@@ -2855,24 +2855,24 @@
         }
       }
     },
-    "Anonymous counts of which setup screens were opened help us improve Velvi — never your answers. You can turn them off in Settings" : {
+    "Anonymous counts of which setup screens were opened and whether you come back help us improve Velvi — never your answers. You can turn them off in Settings" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Anonyme Zählungen, welche Einrichtungsbildschirme geöffnet wurden, helfen uns, Velvi zu verbessern – nie deine Antworten. Du kannst sie in den Einstellungen ausschalten"
+            "value" : "Anonyme Zählungen, welche Einrichtungsbildschirme geöffnet wurden und ob du wiederkommst, helfen uns, Velvi zu verbessern – nie deine Antworten. Du kannst sie in den Einstellungen ausschalten"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conteos anónimos de qué pantallas de configuración se abrieron nos ayudan a mejorar Velvi, nunca tus respuestas. Puedes desactivarlos en Ajustes"
+            "value" : "Conteos anónimos de qué pantallas de configuración se abrieron y de si vuelves nos ayudan a mejorar Velvi, nunca tus respuestas. Puedes desactivarlos en Ajustes"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contagens anônimas de quais telas de configuração foram abertas nos ajudam a melhorar o Velvi — nunca suas respostas. Você pode desativá-las nos Ajustes"
+            "value" : "Contagens anônimas de quais telas de configuração foram abertas e se você volta nos ajudam a melhorar o Velvi — nunca suas respostas. Você pode desativá-las nos Ajustes"
           }
         }
       }
@@ -5093,24 +5093,24 @@
         }
       }
     },
-    "Counts of which setup and subscription screens were opened, without any ID. Your diary entries, answers and photos are never sent." : {
+    "Counts of which setup and subscription screens were opened and whether Velvi is opened again 1, 7 and 30 days after setup, without any ID. Your diary entries, answers and photos are never sent." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zählt, welche Einrichtungs- und Abo-Bildschirme geöffnet wurden – ohne jede ID. Deine Tagebucheinträge, Antworten und Fotos werden nie gesendet."
+            "value" : "Zählt, welche Einrichtungs- und Abo-Bildschirme geöffnet wurden und ob Velvi 1, 7 und 30 Tage nach der Einrichtung wieder geöffnet wird – ohne jede ID. Deine Tagebucheinträge, Antworten und Fotos werden nie gesendet."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conteos de qué pantallas de configuración y de suscripción se abrieron, sin ningún ID. Tus registros del diario, respuestas y fotos nunca se envían."
+            "value" : "Conteos de qué pantallas de configuración y de suscripción se abrieron y de si Velvi se vuelve a abrir 1, 7 y 30 días después de la configuración, sin ningún ID. Tus registros del diario, respuestas y fotos nunca se envían."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contagens de quais telas de configuração e de assinatura foram abertas, sem nenhum ID. Seus registros do diário, respostas e fotos nunca são enviados."
+            "value" : "Contagens de quais telas de configuração e de assinatura foram abertas e se o Velvi é aberto de novo 1, 7 e 30 dias após a configuração, sem nenhum ID. Seus registros do diário, respostas e fotos nunca são enviados."
           }
         }
       }

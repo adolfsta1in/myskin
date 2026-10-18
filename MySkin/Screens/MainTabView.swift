@@ -156,7 +156,8 @@ struct RootView: View {
             // A period can end while the app sits in the background; renewals come via `Transaction.updates`.
             await subscriptions?.refreshEntitlements()
             await remoteConfig?.refresh()
-            // Usage counts that couldn't go out earlier (offline).
+            // «Opened again after setup» milestones, then counts that couldn't go out earlier (offline).
+            if settings.hasCompletedOnboarding { UsageStats.shared.recordReturns() }
             await UsageStats.shared.flush()
         }
     }

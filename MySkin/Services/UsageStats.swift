@@ -9,6 +9,8 @@ final class UsageStats {
     enum Key {
         static let sent = "usageSentEvents"
         static let pending = "usagePendingEvents"
+        /// Day setup was finished, for «opened again» milestones. Stays on the device.
+        static let onboardingCompletedAt = "usageOnboardingCompletedAt"
     }
 
     private let endpoint: URL?
@@ -40,7 +42,20 @@ final class UsageStats {
         Task { await flush() }
     }
 
-    /// Sends what's waiting; on any failure keeps it for the next try (app becomes active).
+    /// Remembers when setup was finished (once), for `recordReturns`.
+    func markOnboardingCompleted(at date: Date = .now) {
+        guard defaults.object(forKey: Key.onboardingCompletedAt) == nil else { return }
+        defaults.set(date, forKey: Key.onboardingCompletedAt)
+    }
+
+    /// The app is open: counts the «opened again» milestones reached since setup.
+    func recordReturns(now: Date = .now) {
+        guard let completedAt = defaults.object(forKey: Key.onboardingCompletedAt) as? Date else { return }
+        for event in UsagePolicy.returns(completedAt: completedAt, now: now) { record(event) }
+    }
+
+    /// Sends what's waiting; on a network or server error keeps it for the next try (app becomes active).
+    /// A batch the server turned down is dropped, so one unknown event can't hold up the rest.
     /// A call during a send waits for that send.
     func flush() async {
         if let flushTask { return await flushTask.value }
@@ -58,8 +73,14 @@ final class UsageStats {
         }
         while true {
             let batch = Array(pending.prefix(UsagePolicy.maxBatch))
-            guard !batch.isEmpty, let body = try? UsagePolicy.body(for: batch),
-                  (try? await send(endpoint, body)) != nil else { return }
+            guard !batch.isEmpty, let body = try? UsagePolicy.body(for: batch) else { return }
+            do {
+                try await send(endpoint, body)
+            } catch UsageSendError.rejected {
+                // Dropped below with the sent ones: the server won't take it later either.
+            } catch {
+                return
+            }
             // Anything queued while sending stays.
             save(Array(pending.dropFirst(batch.count)))
         }
@@ -74,6 +95,7 @@ final class UsageStats {
     func reset() {
         defaults.removeObject(forKey: Key.sent)
         defaults.removeObject(forKey: Key.pending)
+        defaults.removeObject(forKey: Key.onboardingCompletedAt)
     }
 
     private func save(_ records: [UsageRecord]) {
@@ -118,8 +140,13 @@ final class UsageStats {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = body
         let (_, response) = try await session.data(for: request)
-        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
-            throw URLError(.badServerResponse)
-        }
+        guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
+        if UsagePolicy.isRejected(statusCode: http.statusCode) { throw UsageSendError.rejected }
+        guard (200..<300).contains(http.statusCode) else { throw URLError(.badServerResponse) }
     }
+}
+
+nonisolated enum UsageSendError: Error {
+    /// 4xx: the server won't accept this batch.
+    case rejected
 }

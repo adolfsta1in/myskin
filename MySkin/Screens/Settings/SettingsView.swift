@@ -269,7 +269,7 @@ private struct UsageStatsSection: View {
                     if !isOn { UsageStats.shared.discardPending() }
                 }
         } footer: {
-            Text("Counts of which setup and subscription screens were opened, without any ID. Your diary entries, answers and photos are never sent.")
+            Text("Counts of which setup and subscription screens were opened and whether Velvi is opened again 1, 7 and 30 days after setup, without any ID. Your diary entries, answers and photos are never sent.")
         }
     }
 }
