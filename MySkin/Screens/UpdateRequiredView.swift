@@ -15,13 +15,8 @@ struct UpdateRequiredView: View {
             WarmBackground()
             ScrollView {
                 VStack(spacing: 24) {
-                    Image(systemName: "arrow.down.app")
-                        .font(.system(size: 56, weight: .light))
-                        .foregroundStyle(Theme.accent)
-                        .frame(width: 130, height: 130)
-                        .glassEffect(.regular.tint(Theme.accentSoft.opacity(0.5)), in: .circle)
+                    VelviMascot(mood: .caring, size: 140, isIdle: false)
                         .padding(.top, 40)
-                        .accessibilityHidden(true)
                     VStack(spacing: 10) {
                         Text("Please update Velvi")
                             .font(.rounded(.title2, weight: .bold))

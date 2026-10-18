@@ -137,20 +137,27 @@ struct QuestionnaireView: View {
 struct ResultCard: View {
     let kind: QuestionnaireKind
     let score: Int
+    @State private var velviTrigger = 0
 
     var body: some View {
         let attention = Questionnaires.needsAttention(kind, score: score)
+        let velvi = VelviReaction.questionnaireResult(needsAttention: attention)
         VStack(alignment: .leading, spacing: 12) {
             Label("Saved to your diary", systemImage: "checkmark.circle.fill")
                 .font(.rounded(.subheadline, weight: .semibold))
                 .foregroundStyle(Theme.sageDeep)
-            HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text("\(score)")
-                    .font(.system(size: 56, weight: .bold, design: .rounded))
-                    .foregroundStyle(Theme.ink)
-                Text("of \(Questionnaires.maxScore(kind))")
-                    .font(.rounded(.title3))
-                    .foregroundStyle(Theme.inkSoft)
+            HStack(alignment: .bottom) {
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text("\(score)")
+                        .font(.system(size: 56, weight: .bold, design: .rounded))
+                        .foregroundStyle(Theme.ink)
+                    Text("of \(Questionnaires.maxScore(kind))")
+                        .font(.rounded(.title3))
+                        .foregroundStyle(Theme.inkSoft)
+                }
+                Spacer(minLength: 8)
+                VelviMascot(mood: velvi.mood, size: 64, motion: velvi.motion, trigger: velviTrigger)
+                    .onAppear { velviTrigger += 1 }
             }
             Text(Questionnaires.headline(kind, score: score))
                 .font(.rounded(.title3, weight: .semibold))

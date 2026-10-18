@@ -654,8 +654,9 @@ MySkinTests/      Swift Testing
 - **Сделано (2026-10-18):** `PaywallContent` — Velvi (92 pt, happy со звездой) справа от большого заголовка в градиентной шапке, машет при появлении; выбор плана — кивок, «Start free trial»/«Continue» — прыжок. При accessibility-размерах текста маскот скрыт (заголовку нужна вся ширина). Отступление от плана: радость после покупки не показываем — `hasAccess` переключается сразу и пейвол исчезает, задерживать поток StoreKit ради анимации не стали. Превью «Paywall · yearly».
 - **Готово, когда:** тесты 398/398 на iPhone A; превью. Покупка с `MySkin.storekit` на телефоне — за пользователем.
 
-### Шаг 64.4. В приложении
-Today (приветствие, реакция на чек-ин с облачком), пустые состояния без иллюстраций, результат опросника, экран блокировки, `UpdateRequiredView`/`StoreRecoveryView`.
+### Шаг 64.4. В приложении ✅
+- **Сделано (2026-10-18):** Today — Velvi 56 pt в шапке рядом с датой (приветствие под ним на всю ширину), настроение из `VelviReaction.greeting`; после сохранения чек-ина — реакция `afterCheckIn` и облачко под шапкой (хвостик вверх, `VelviBubble.Tail.top`) на 4 с; при красном флаге реакции нет. Insights › Patterns — thinking в «waiting» и «No clear links yet». Результат опросника (`ResultCard`) — caring/happy с кивком. `PrivacyLockView` — sleepy с замком вместо символа биометрии. `UpdateRequiredView`, `StoreRecoveryView` — caring без idle-анимации. Без маскота: `RedFlagView`, `AgeRestrictedView`, баннер Flare, `CalmDaysCard` (на экране — не больше одного анимированного Velvi), карточки трендов Insights и пустой календарь (умеренное присутствие).
+- **Готово, когда:** тесты 398/398 на iPhone A; Release-сборка без `VelviGalleryView`/`PreviewData`; превью Today (Calm/Flare). Превью `PrivacyLockView` не дождалось кадра (таймаут); в превью Today текст карточки чек-ина снят посреди анимации загрузки — на телефоне проверить.
 
 ---
 

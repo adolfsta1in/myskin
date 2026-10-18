@@ -19,11 +19,7 @@ struct StoreRecoveryView: View {
             WarmBackground()
             ScrollView {
                 VStack(spacing: 24) {
-                    Image(systemName: "externaldrive.badge.exclamationmark")
-                        .font(.system(size: 56, weight: .light))
-                        .foregroundStyle(Theme.accent)
-                        .frame(width: 130, height: 130)
-                        .glassEffect(.regular.tint(Theme.accentSoft.opacity(0.5)), in: .circle)
+                    VelviMascot(mood: .caring, size: 140, isIdle: false)
                         .padding(.top, 40)
                     VStack(spacing: 10) {
                         Text("Velvi can't open your diary")

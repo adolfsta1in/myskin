@@ -7,6 +7,8 @@ struct VelviBubble: View {
         case leading
         /// Mascot below the bubble.
         case bottom
+        /// Mascot above the bubble, near its leading edge.
+        case top
     }
 
     let text: Text
@@ -33,8 +35,16 @@ struct VelviBubble: View {
             .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
-            .padding(tail == .leading ? .leading : .bottom, Self.tailSize)
+            .padding(tailEdge, Self.tailSize)
             .glassEffect(.regular, in: BubbleShape(tail: tail, tailSize: Self.tailSize))
+    }
+
+    private var tailEdge: Edge.Set {
+        switch tail {
+        case .leading: .leading
+        case .bottom: .bottom
+        case .top: .top
+        }
     }
 }
 
@@ -46,16 +56,26 @@ nonisolated private struct BubbleShape: Shape {
 
     func path(in rect: CGRect) -> Path {
         var body = rect
-        if tail == .leading {
+        switch tail {
+        case .leading:
             body.origin.x += tailSize
             body.size.width -= tailSize
-        } else {
+        case .bottom:
+            body.size.height -= tailSize
+        case .top:
+            body.origin.y += tailSize
             body.size.height -= tailSize
         }
         let r = min(18, body.height / 2, body.width / 2)
         let t = tailSize
         var p = Path()
         p.move(to: CGPoint(x: body.minX + r, y: body.minY))
+        if tail == .top {
+            let x = body.minX + min(32, body.width / 2)
+            p.addLine(to: CGPoint(x: x - t, y: body.minY))
+            p.addQuadCurve(to: CGPoint(x: x - t * 0.4, y: rect.minY), control: CGPoint(x: x - t * 0.5, y: body.minY - t * 0.3))
+            p.addLine(to: CGPoint(x: x + t * 0.6, y: body.minY))
+        }
         p.addArc(tangent1End: CGPoint(x: body.maxX, y: body.minY), tangent2End: CGPoint(x: body.maxX, y: body.maxY), radius: r)
         p.addArc(tangent1End: CGPoint(x: body.maxX, y: body.maxY), tangent2End: CGPoint(x: body.minX, y: body.maxY), radius: r)
         if tail == .bottom {

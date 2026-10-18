@@ -59,9 +59,13 @@ struct PatternsCard: View {
             if report.checkInsUntilFirstAnalysis > 0 {
                 waiting(report)
             } else if report.findings.isEmpty {
-                Text("No clear links yet. Keep logging triggers and food — patterns need a few repeats to show.")
-                    .font(.rounded(.subheadline))
-                    .foregroundStyle(Theme.inkSoft)
+                HStack(alignment: .top, spacing: 12) {
+                    VelviMascot(mood: .thinking, size: 56)
+                    Text("No clear links yet. Keep logging triggers and food — patterns need a few repeats to show.")
+                        .font(.rounded(.subheadline))
+                        .foregroundStyle(Theme.inkSoft)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 seeAll(report, title: String(localized: "What was checked"))
             } else {
                 ForEach(report.findings.prefix(3)) { finding in
@@ -81,9 +85,13 @@ struct PatternsCard: View {
 
     private func waiting(_ report: PatternReport) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Keep logging — \(report.checkInsUntilFirstAnalysis) more check-ins to look for patterns.")
-                .font(.rounded(.subheadline))
-                .foregroundStyle(Theme.ink)
+            HStack(alignment: .center, spacing: 12) {
+                VelviMascot(mood: .thinking, size: 56)
+                Text("Keep logging — \(report.checkInsUntilFirstAnalysis) more check-ins to look for patterns.")
+                    .font(.rounded(.subheadline))
+                    .foregroundStyle(Theme.ink)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             ProgressView(value: Double(report.checkInDays), total: Double(Patterns.Threshold.minCheckIns))
                 .tint(Theme.accent)
             Text("Log triggers and food on most days: links between them and your itch show up after about three weeks.")

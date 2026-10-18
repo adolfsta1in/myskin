@@ -81,7 +81,7 @@ struct VelviMascot: View {
     var size: CGFloat = 120
     var motion: VelviMotion = .hop
     var trigger: Int = 0
-    /// Off for screens that should stay still (a lock screen, an error).
+    /// Off for screens that should stay still (an error, a list of many).
     var isIdle = true
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion

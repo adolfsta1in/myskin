@@ -15,11 +15,7 @@ struct PrivacyLockView: View {
             WarmBackground()
             VStack(spacing: 28) {
                 Spacer()
-                Image(systemName: method.systemImage)
-                    .font(.system(size: 64, weight: .light))
-                    .foregroundStyle(Theme.accent)
-                    .frame(width: 140, height: 140)
-                    .glassEffect(.regular.tint(Theme.accentSoft.opacity(0.5)), in: .circle)
+                VelviMascot(mood: .sleepy, prop: .lock, size: 160)
                 VStack(spacing: 10) {
                     Text("Velvi is locked")
                         .font(.rounded(.title, weight: .bold))

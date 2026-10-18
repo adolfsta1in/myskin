@@ -14,6 +14,9 @@ struct TodayView: View {
     @State private var shownFlags: [RedFlag] = []
     /// Today's check-in as it is being edited, so the mode reacts before it is saved.
     @State private var draftSample: CheckInSample?
+    /// Velvi's answer to the last saved check-in; cleared after a few seconds.
+    @State private var velviCue: VelviCue?
+    @State private var velviTrigger = 0
 
     /// Calm / Flare is computed from the data (`FlareDetector`), never chosen by hand.
     private var status: FlareStatus {
@@ -26,14 +29,32 @@ struct TodayView: View {
         Array(BodyMapSummary.make(zones: assessments.datedScores).current.values)
     }
 
+    private var greetingCue: VelviCue {
+        VelviReaction.greeting(
+            mode: status.mode,
+            hasCheckedInToday: checkIns.contains { Calendar.current.isDateInToday($0.day) },
+            hour: Calendar.current.component(.hour, from: .now)
+        )
+    }
+
     var body: some View {
         let status = status
+        let velvi = velviCue ?? greetingCue
         // Flags from the body map alone stay visible until the map changes (they can't be hidden).
         let mapFlags = RedFlagRules.flags(zones: currentZones, symptoms: RedFlagSymptoms(), isFlare: status.mode == .flare)
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
-                    TodayHeader(onLongPress: { isShowingCanvas = true }, onSettings: { isShowingSettings = true })
+                    TodayHeader(
+                        velvi: velvi,
+                        velviTrigger: velviTrigger,
+                        onLongPress: { isShowingCanvas = true },
+                        onSettings: { isShowingSettings = true }
+                    )
+                    if let line = velviCue?.line {
+                        VelviBubble(line.text, tail: .top)
+                            .transition(.scale(scale: 0.6, anchor: .topLeading).combined(with: .opacity))
+                    }
                     ModeBanner(status: status)
                     if let remoteConfig, let announcement = remoteConfig.announcement() {
                         AnnouncementCard(announcement: announcement) { remoteConfig.dismiss(announcement) }
@@ -44,7 +65,11 @@ struct TodayView: View {
 
                     CheckInCard(mode: status.mode, onDraftChange: { draftSample = $0 }) { symptoms in
                         let flags = RedFlagRules.flags(zones: currentZones, symptoms: symptoms, isFlare: status.mode == .flare)
-                        if !flags.isEmpty { shownFlags = flags }
+                        if !flags.isEmpty {
+                            shownFlags = flags
+                        } else {
+                            reactToCheckIn(mode: status.mode)
+                        }
                     }
                     FoodLogCard()
                     if status.mode == .calm {
@@ -70,6 +95,13 @@ struct TodayView: View {
             .screenScaffold()
             .toolbar(.hidden, for: .navigationBar)
             .animation(.smooth, value: status.mode)
+            .animation(.spring(duration: 0.4, bounce: 0.3), value: velviCue)
+            .task(id: velviCue) {
+                guard velviCue != nil else { return }
+                try? await Task.sleep(for: .seconds(4))
+                guard !Task.isCancelled else { return }
+                velviCue = nil
+            }
             .sheet(isPresented: $isShowingSettings) {
                 SettingsView()
             }
@@ -85,6 +117,16 @@ struct TodayView: View {
             }
             #endif
         }
+    }
+}
+
+extension TodayView {
+    /// Velvi answers a saved check-in (not when a red flag takes over the screen).
+    private func reactToCheckIn(mode: AppMode) {
+        let today = checkIns.first { Calendar.current.isDateInToday($0.day) }
+        guard let itch = draftSample?.itch ?? today?.itch else { return }
+        velviCue = VelviReaction.afterCheckIn(itch: itch, mode: mode)
+        velviTrigger += 1
     }
 }
 
@@ -233,6 +275,8 @@ private struct AnnouncementCard: View {
 
 private struct TodayHeader: View {
     @Query(sort: \Profile.createdAt) private var profiles: [Profile]
+    let velvi: VelviCue
+    let velviTrigger: Int
     var onLongPress: () -> Void
     var onSettings: () -> Void
 
@@ -241,31 +285,32 @@ private struct TodayHeader: View {
     }
 
     var body: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 10) {
+                VelviMascot(mood: velvi.mood, prop: velvi.prop, size: 56, motion: velvi.motion, trigger: velviTrigger)
                 Text(Date.now.formatted(.dateTime.weekday(.wide).month(.wide).day()))
                     .font(.rounded(.subheadline, weight: .medium))
                     .foregroundStyle(Theme.inkSoft)
-                Text(greeting)
-                    .font(.rounded(.largeTitle, weight: .bold))
-                    .foregroundStyle(Theme.ink)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.7)
-                    #if DEBUG
-                    // Hidden entry point to the design canvas (debug builds only).
-                    .onLongPressGesture(perform: onLongPress)
-                    #endif
+                Spacer()
+                Button(action: onSettings) {
+                    Image(systemName: "gearshape")
+                        .font(.title3)
+                        .foregroundStyle(Theme.ink)
+                        .frame(width: 44, height: 44)
+                }
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
+                .accessibilityLabel("Settings")
             }
-            Spacer()
-            Button(action: onSettings) {
-                Image(systemName: "gearshape")
-                    .font(.title3)
-                    .foregroundStyle(Theme.ink)
-                    .frame(width: 44, height: 44)
-            }
-            .buttonStyle(.glass)
-            .buttonBorderShape(.circle)
-            .accessibilityLabel("Settings")
+            Text(greeting)
+                .font(.rounded(.largeTitle, weight: .bold))
+                .foregroundStyle(Theme.ink)
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
+                #if DEBUG
+                // Hidden entry point to the design canvas (debug builds only).
+                .onLongPressGesture(perform: onLongPress)
+                #endif
         }
         .padding(.top, 12)
     }
