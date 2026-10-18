@@ -1,5 +1,7 @@
 # План миграции: демо → MVP
 
+> **2026-10-18: приложение переименовано в Velvi** (в App Store — «Velvi: Psoriasis Tracker»). Ниже «MySkin» в описаниях — прежнее название; пути и внутренние имена (`MySkin/`, `MySkinTests/`, `app.myskin.ios`, myskin.cc) остались прежними.
+
 Источники: `docs/current-state.md` (что есть), `docs/spec.md` (что нужно).
 
 Рамки MVP, принятые на сегодня:
