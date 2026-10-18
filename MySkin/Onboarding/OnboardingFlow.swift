@@ -69,6 +69,8 @@ struct OnboardingFlow: View {
     @State private var velviLine: VelviLine?
     @State private var velviMotion: VelviMotion = .hop
     @State private var velviTrigger = 0
+    /// «Welcome to Velvi» after the commitment, just before the paywall.
+    @State private var isWelcoming = false
 
     init(startAt step: OnboardingStep = .welcome) {
         _step = State(initialValue: step)
@@ -94,6 +96,10 @@ struct OnboardingFlow: View {
                         insertion: .move(edge: isForward ? .trailing : .leading).combined(with: .opacity),
                         removal: .opacity
                     ))
+            }
+            if isWelcoming {
+                WelcomeToVelviView()
+                    .transition(.opacity)
             }
         }
         .environment(draft)
@@ -172,14 +178,12 @@ struct OnboardingFlow: View {
         velviTrigger += 1
     }
 
-    /// «Hold to commit»: Velvi celebrates, then onboarding ends and the paywall comes.
+    /// «Hold to commit»: a soft «Welcome to Velvi», then onboarding ends and the paywall comes.
     private func commit() {
-        let cue = VelviReaction.committed
-        velviMood = cue.mood
-        velviLine = cue.line
-        velviReact(cue.motion)
         Task {
-            try? await Task.sleep(for: .seconds(1.6))
+            try? await Task.sleep(for: .seconds(0.5))
+            withAnimation(.smooth(duration: 0.7)) { isWelcoming = true }
+            try? await Task.sleep(for: .seconds(2.6))
             advance()
         }
     }
@@ -327,7 +331,7 @@ struct OnboardingPage<Content: View, Footer: View>: View {
                                 .fixedSize(horizontal: false, vertical: true)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             if let velvi, velvi.presence == .companion {
-                                OnboardingVelviView(velvi: velvi, size: 64)
+                                OnboardingVelviView(velvi: velvi, size: 76)
                             }
                         }
                         if let line = velvi?.cue.line {

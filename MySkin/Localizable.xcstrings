@@ -7803,28 +7803,6 @@
         }
       }
     },
-    "Hold the button to make the promise." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Halte den Button gedrückt, um es dir zu versprechen."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mantén presionado el botón para hacer la promesa."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Segure o botão para fazer a promessa."
-          }
-        }
-      }
-    },
     "Hold to commit" : {
       "localizations" : {
         "de" : {
@@ -13439,28 +13417,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Progresso"
-          }
-        }
-      }
-    },
-    "Proud of you. Let's do this together." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ich bin stolz auf dich. Wir schaffen das zusammen."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Estoy orgulloso de ti. Hagámoslo juntos."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tenho orgulho de você. Vamos juntos nessa."
           }
         }
       }
@@ -19802,6 +19758,28 @@
         }
       }
     },
+    "Welcome to Velvi" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Willkommen bei Velvi"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te damos la bienvenida a Velvi"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boas-vindas ao Velvi"
+          }
+        }
+      }
+    },
     "What are you using right now?" : {
       "localizations" : {
         "de" : {
@@ -20458,6 +20436,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Seu diário não é enviado para lugar nenhum — você escolhe o que compartilhar. O tempo, se você ativar, usa sua localização aproximada"
+          }
+        }
+      }
+    },
+    "Your diary starts today." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Tagebuch beginnt heute."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu diario empieza hoy."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seu diário começa hoje."
           }
         }
       }

@@ -29,9 +29,7 @@ struct CommitmentStep: View {
             .glassCard()
         } footer: {
             HoldToCommitButton(onCommitted: onCommitted)
-            Text("Hold the button to make the promise.")
-                .font(.rounded(.footnote))
-                .foregroundStyle(Theme.inkSoft)
+                .frame(maxWidth: .infinity)
         }
     }
 
@@ -47,41 +45,60 @@ struct CommitmentStep: View {
     }
 }
 
-/// Fills while held; when full, it locks and calls `onCommitted` once.
+/// A round fingerprint button: while held it fills from the bottom, grows and hums with
+/// haptic ticks that get faster and stronger; when full it locks and calls `onCommitted` once.
 /// VoiceOver: a plain activation commits (holding is hard to do there).
 struct HoldToCommitButton: View {
     let onCommitted: () -> Void
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var progress: CGFloat = 0
     @State private var isPressing = false
     @State private var isDone = false
+    @State private var tick = 0
+    @State private var tickIntensity = 0.3
 
-    static let holdDuration = 1.5
+    static let holdDuration = 1.6
+    private let size: CGFloat = 112
 
     var body: some View {
-        ZStack {
-            Capsule().fill(Theme.accent)
-            GeometryReader { proxy in
-                Capsule()
-                    .fill(Theme.sageDeep)
-                    .frame(width: max(proxy.size.height, proxy.size.width * progress))
-                    .opacity(progress > 0 ? 1 : 0)
-            }
-            Label {
-                Text(isDone ? "Committed" : "Hold to commit")
-            } icon: {
-                Image(systemName: isDone ? "checkmark" : "hand.point.up.left.fill")
-            }
-            .font(.rounded(.headline, weight: .semibold))
-            .foregroundStyle(.white)
-            .contentTransition(.opacity)
+        VStack(spacing: 12) {
+            button
+            Text(isDone ? "Committed" : "Hold to commit")
+                .font(.rounded(.subheadline, weight: .semibold))
+                .foregroundStyle(isDone ? Theme.sageDeep : Theme.inkSoft)
+                .contentTransition(.opacity)
+                .animation(.smooth, value: isDone)
         }
-        .frame(height: 56)
-        .clipShape(Capsule())
-        .scaleEffect(isPressing && !isDone ? 0.97 : 1)
-        .animation(.spring(duration: 0.25), value: isPressing)
-        .contentShape(Capsule())
-        .onLongPressGesture(minimumDuration: Self.holdDuration, maximumDistance: 50) {
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(isDone ? "Committed" : "Hold to commit"))
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction { commit() }
+    }
+
+    private var button: some View {
+        ZStack {
+            Circle().fill(Theme.accentSoft)
+            fingerprint(color: Theme.accent)
+            // The filled part rises from the bottom and turns the fingerprint white as it goes.
+            ZStack {
+                Circle().fill(Theme.accent)
+                fingerprint(color: .white)
+            }
+            .mask(alignment: .bottom) {
+                Rectangle().frame(height: size * progress)
+            }
+            Circle()
+                .trim(from: 0, to: progress)
+                .stroke(Theme.sageDeep, style: StrokeStyle(lineWidth: 5, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+                .padding(-9)
+        }
+        .frame(width: size, height: size)
+        .scaleEffect(reduceMotion ? 1 : 1 + 0.16 * progress)
+        .shadow(color: Theme.accent.opacity(0.25 + 0.25 * progress), radius: 8 + 14 * progress, y: 4)
+        .contentShape(Circle())
+        .onLongPressGesture(minimumDuration: Self.holdDuration, maximumDistance: 60) {
             commit()
         } onPressingChanged: { pressing in
             guard !isDone else { return }
@@ -89,26 +106,73 @@ struct HoldToCommitButton: View {
             if pressing {
                 withAnimation(.linear(duration: Self.holdDuration)) { progress = 1 }
             } else {
-                withAnimation(.spring(duration: 0.3)) { progress = 0 }
+                withAnimation(.spring(duration: 0.4, bounce: 0.3)) { progress = 0 }
             }
         }
-        .sensoryFeedback(.impact(weight: .light), trigger: isPressing) { _, pressing in pressing }
+        // A hum while held: ticks get closer together and stronger as the circle fills.
+        .task(id: isPressing) {
+            guard isPressing else { return }
+            let start = Date.now
+            while !Task.isCancelled, isPressing, !isDone {
+                let share = min(Date.now.timeIntervalSince(start) / Self.holdDuration, 1)
+                tickIntensity = 0.35 + 0.65 * share
+                tick += 1
+                try? await Task.sleep(for: .milliseconds(Int(120 - 75 * share)))
+            }
+        }
+        .sensoryFeedback(trigger: tick) { _, _ in .impact(weight: .medium, intensity: tickIntensity) }
         .sensoryFeedback(.success, trigger: isDone)
         .disabled(isDone)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(isDone ? "Committed" : "Hold to commit"))
-        .accessibilityAddTraits(.isButton)
-        .accessibilityAction { commit() }
+    }
+
+    private func fingerprint(color: Color) -> some View {
+        Image(systemName: isDone ? "checkmark" : "touchid")
+            .font(.system(size: size * 0.46, weight: .regular))
+            .foregroundStyle(color)
+            .contentTransition(.symbolEffect(.replace))
     }
 
     private func commit() {
         guard !isDone else { return }
-        withAnimation(.smooth(duration: 0.2)) {
+        isPressing = false
+        withAnimation(.spring(duration: 0.45, bounce: 0.4)) {
             progress = 1
             isDone = true
-            isPressing = false
         }
         onCommitted()
+    }
+}
+
+/// The soft «Welcome to Velvi» between the commitment and the paywall.
+struct WelcomeToVelviView: View {
+    @State private var showsText = false
+    @State private var hop = 0
+
+    var body: some View {
+        ZStack {
+            WarmBackground()
+            VStack(spacing: 20) {
+                let cue = VelviReaction.committed
+                VelviMascot(mood: cue.mood, size: 200, motion: cue.motion, trigger: hop)
+                VStack(spacing: 8) {
+                    Text("Welcome to Velvi")
+                        .font(.rounded(.largeTitle, weight: .bold))
+                        .foregroundStyle(Theme.ink)
+                    Text("Your diary starts today.")
+                        .font(.rounded(.title3))
+                        .foregroundStyle(Theme.inkSoft)
+                }
+                .multilineTextAlignment(.center)
+                .opacity(showsText ? 1 : 0)
+                .offset(y: showsText ? 0 : 12)
+            }
+            .padding(.horizontal, 32)
+        }
+        .task {
+            try? await Task.sleep(for: .seconds(0.35))
+            hop += 1
+            withAnimation(.smooth(duration: 0.8)) { showsText = true }
+        }
     }
 }
 
@@ -119,6 +183,13 @@ struct HoldToCommitButton: View {
     return CommitmentStep(onCommitted: {})
         .environment(draft)
         .background(WarmBackground())
+        .previewSetup()
+}
+#endif
+
+#if DEBUG
+#Preview("Welcome to Velvi") {
+    WelcomeToVelviView()
         .previewSetup()
 }
 #endif
