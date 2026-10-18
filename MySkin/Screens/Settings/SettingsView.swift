@@ -436,13 +436,12 @@ private struct DeveloperSection: View {
     }
 }
 
-/// The paywall layout with sample prices, to look at it without StoreKit. Nothing can be bought here.
+/// The real paywall (RevenueCat, local `.storekit` when run from Xcode) with a close button.
 private struct PaywallPreviewCover: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var plan = PaywallPlan.preselected
 
     var body: some View {
-        PaywallContent(options: PreviewData.paywallOptions, selected: $plan, onClose: { dismiss() })
+        PaywallView(onClose: { dismiss() }, onSubscribed: { dismiss() })
     }
 }
 #endif

@@ -16,7 +16,7 @@ final class Subscriptions {
     /// Public Apple SDK key from the RevenueCat dashboard (Project › API keys); it's meant to ship in the app.
     static let apiKey = "appl_zDqmbQdsEHQZPKSzvUkVJYUCKeH"
     /// Entitlement in the RevenueCat dashboard that both plans unlock — don't rename.
-    static let entitlementID = "premium"
+    static let entitlementID = "Velvi"
 
     private(set) var options: [PaywallOption] = []
     private(set) var loadState: LoadState = .idle
