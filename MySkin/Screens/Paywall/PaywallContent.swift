@@ -19,6 +19,9 @@ struct PaywallContent: View {
     var onDebugSkip: (() -> Void)?
 
     @State private var showsSafety = false
+    @State private var velviMotion: VelviMotion = .wave
+    @State private var velviTrigger = 0
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private var current: PaywallOption? {
         options.first { $0.plan == selected } ?? options.first
@@ -53,6 +56,7 @@ struct PaywallContent: View {
         .safeAreaInset(edge: .bottom) { footer }
         .screenScaffold()
         .animation(.smooth(duration: 0.25), value: selected)
+        .onChange(of: selected) { velviReact(.nod) }
         // Red flags must stay visible even without a subscription.
         .fullScreenCover(isPresented: $showsSafety) {
             RedFlagView(flags: RedFlag.allCases)
@@ -71,19 +75,29 @@ struct PaywallContent: View {
                 closeButton
             }
             .frame(minHeight: 36)
-            Text(current?.trialDays == nil ? "Get full access to your diary" : "How your free trial works")
-                .font(.rounded(.title, weight: .bold))
-                .foregroundStyle(.white)
-                .fixedSize(horizontal: false, vertical: true)
-            HStack(spacing: 14) {
-                ForEach([String(localized: "No tracking"), String(localized: "Cancel anytime")], id: \.self) { item in
-                    Label(item, systemImage: "checkmark")
-                        .labelStyle(.titleAndIcon)
+            HStack(alignment: .bottom, spacing: 8) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(current?.trialDays == nil ? "Get full access to your diary" : "How your free trial works")
+                        .font(.rounded(.title, weight: .bold))
+                        .foregroundStyle(.white)
+                        .fixedSize(horizontal: false, vertical: true)
+                    HStack(spacing: 14) {
+                        ForEach([String(localized: "No tracking"), String(localized: "Cancel anytime")], id: \.self) { item in
+                            Label(item, systemImage: "checkmark")
+                                .labelStyle(.titleAndIcon)
+                        }
+                    }
+                    .font(.rounded(.footnote, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.9))
+                    .padding(.top, 4)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                // With very large text the title needs the whole width.
+                if !dynamicTypeSize.isAccessibilitySize {
+                    VelviMascot(mood: .happy, prop: .star, size: 92, motion: velviMotion, trigger: velviTrigger)
+                        .onAppear { velviTrigger += 1 }
                 }
             }
-            .font(.rounded(.footnote, weight: .semibold))
-            .foregroundStyle(.white.opacity(0.9))
-            .padding(.top, 4)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.top, 8)
@@ -109,6 +123,11 @@ struct PaywallContent: View {
             .buttonBorderShape(.circle)
             .accessibilityLabel("Close")
         }
+    }
+
+    private func velviReact(_ motion: VelviMotion) {
+        velviMotion = motion
+        velviTrigger += 1
     }
 
     // MARK: Plans
@@ -178,7 +197,10 @@ struct PaywallContent: View {
     private var footer: some View {
         VStack(spacing: 10) {
             priceSummary
-            PrimaryButton(title: current.map(PaywallOffer.buttonTitle) ?? String(localized: "Continue"), action: onContinue)
+            PrimaryButton(title: current.map(PaywallOffer.buttonTitle) ?? String(localized: "Continue")) {
+                velviReact(.hop)
+                onContinue()
+            }
                 .disabled(current == nil || isPurchasing)
                 .overlay {
                     if isPurchasing { ProgressView().tint(.white) }
@@ -343,3 +365,10 @@ private struct PlanCard: View {
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
+
+#if DEBUG
+#Preview("Paywall · yearly") {
+    PaywallContent(options: PreviewData.paywallOptions, selected: .constant(.yearly))
+        .previewSetup()
+}
+#endif
