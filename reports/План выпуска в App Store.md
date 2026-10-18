@@ -21,7 +21,7 @@ _Дата исследования: 2026-10-14. Это не юридическа
 | G — настройки подписки | ✅ Billing Grace Period, цены yearly $59.99 / weekly $9.99. ⏳ Small Business Program — заявка подана 2026-10-18 (без связанных аккаунтов), ждём ответа. |
 | Страны | Россия пока в списке (решение за владельцем: покупки там не проходят, при жёстком пейволе — только онбординг). |
 | C10 (iPhone) | ✅ Погода, Face ID, камера, экстренный звонок, PDF/CSV — проверил владелец. |
-| Release-сборка 2026-10-18 | ✅ После шага 63: без ошибок и предупреждений; в бинаре нет `PreviewData`/`ScreenshotMode`/`-onboardingDemo`; кнопка «Skip paywall» есть только как строка (в Release не показывается); entitlements WeatherKit и Declared Age Range, privacy manifest с Coarse Location и Product Interaction; `.storekit` только в Run-схеме. |
+| Release-сборка 2026-10-18 | ✅ После шага 63.2 (новое приветствие, артрит после карты тела; Xcode 27.0 27A266a): без ошибок и предупреждений; в бинаре нет `PreviewData`/`ScreenshotMode`/`-onboardingDemo`; кнопка «Skip paywall» есть только как строка (в Release не показывается); entitlements WeatherKit и Declared Age Range, privacy manifest с Coarse Location и Product Interaction; `.storekit` только в Run-схеме. |
 | F — отправка | Выпуск вручную. Подписки прикрепить к версии (раздел «In-App Purchases and Subscriptions» на странице версии). |
 | Локализация | 62.4 (вёрстка на языках на iPhone), 62.5 (метаданные App Store), 62.6 (переводы сайта) — не сделаны. |
 
