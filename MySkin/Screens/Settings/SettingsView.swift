@@ -406,6 +406,7 @@ private struct DeveloperSection: View {
     @Environment(AppSettings.self) private var settings
     @Environment(AppLock.self) private var lock
     @Environment(\.dismiss) private var dismiss
+    @State private var isShowingPaywall = false
 
     var body: some View {
         Section {
@@ -419,11 +420,29 @@ private struct DeveloperSection: View {
             } label: {
                 Label { Text(verbatim: "Velvi mascot") } icon: { Image(systemName: "face.smiling") }
             }
+            Button {
+                isShowingPaywall = true
+            } label: {
+                Label { Text(verbatim: "Show paywall") } icon: { Image(systemName: "creditcard") }
+            }
+            .fullScreenCover(isPresented: $isShowingPaywall) {
+                PaywallPreviewCover()
+            }
         } header: {
             Text("Developer")
         } footer: {
             Text("Debug builds only. Your diary is kept; treatments added in onboarding are added again.")
         }
+    }
+}
+
+/// The paywall layout with sample prices, to look at it without StoreKit. Nothing can be bought here.
+private struct PaywallPreviewCover: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var plan = PaywallPlan.preselected
+
+    var body: some View {
+        PaywallContent(options: PreviewData.paywallOptions, selected: $plan, onClose: { dismiss() })
     }
 }
 #endif
