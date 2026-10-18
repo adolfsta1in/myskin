@@ -9965,6 +9965,28 @@
         }
       }
     },
+    "Logged. See you tomorrow." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eingetragen. Bis morgen!"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registrado. ¡Hasta mañana!"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registrado. Até amanhã!"
+          }
+        }
+      }
+    },
     "Logging a few seconds a day makes these delayed links easier to notice." : {
       "localizations" : {
         "de" : {
@@ -14505,6 +14527,28 @@
         }
       }
     },
+    "Saved. Thanks for checking in." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesichert. Danke für deinen Check-in."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardado. Gracias por tu registro."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvo. Obrigado pelo registro."
+          }
+        }
+      }
+    },
     "Saving photo…" : {
       "localizations" : {
         "de" : {
@@ -17163,6 +17207,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Termos e aviso médico"
+          }
+        }
+      }
+    },
+    "That sounds tough. It's in your diary." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das klingt anstrengend. Es steht jetzt in deinem Tagebuch."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suena difícil. Ya está en tu diario."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parece difícil. Já está no seu diário."
           }
         }
       }
