@@ -2101,24 +2101,24 @@
         }
       }
     },
-    "A new language shows after you close MySkin and open it again." : {
+    "A new language shows after you close Velvi and open it again." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eine neue Sprache erscheint, nachdem du MySkin geschlossen und wieder geöffnet hast."
+            "value" : "Eine neue Sprache erscheint, nachdem du Velvi geschlossen und wieder geöffnet hast."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El nuevo idioma aparece después de cerrar MySkin y volver a abrirla."
+            "value" : "El nuevo idioma aparece después de cerrar Velvi y volver a abrirla."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O novo idioma aparece depois que você fecha o MySkin e abre de novo."
+            "value" : "O novo idioma aparece depois que você fecha o Velvi e abre de novo."
           }
         }
       }
@@ -2789,24 +2789,24 @@
         }
       }
     },
-    "Allow notifications for MySkin in the Settings app to get reminders." : {
+    "Allow notifications for Velvi in the Settings app to get reminders." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erlaube Mitteilungen für MySkin in der App „Einstellungen“, um Erinnerungen zu bekommen."
+            "value" : "Erlaube Mitteilungen für Velvi in der App „Einstellungen“, um Erinnerungen zu bekommen."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Permite las notificaciones de MySkin en la app Configuración para recibir recordatorios."
+            "value" : "Permite las notificaciones de Velvi en la app Configuración para recibir recordatorios."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Permita notificações do MySkin no app Ajustes para receber lembretes."
+            "value" : "Permita notificações do Velvi no app Ajustes para receber lembretes."
           }
         }
       }
@@ -2833,24 +2833,24 @@
         }
       }
     },
-    "Anonymous counts of which setup screens were opened help us improve MySkin — never your answers. You can turn them off in Settings" : {
+    "Anonymous counts of which setup screens were opened help us improve Velvi — never your answers. You can turn them off in Settings" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Anonyme Zählungen, welche Einrichtungsbildschirme geöffnet wurden, helfen uns, MySkin zu verbessern – nie deine Antworten. Du kannst sie in den Einstellungen ausschalten"
+            "value" : "Anonyme Zählungen, welche Einrichtungsbildschirme geöffnet wurden, helfen uns, Velvi zu verbessern – nie deine Antworten. Du kannst sie in den Einstellungen ausschalten"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conteos anónimos de qué pantallas de configuración se abrieron nos ayudan a mejorar MySkin, nunca tus respuestas. Puedes desactivarlos en Ajustes"
+            "value" : "Conteos anónimos de qué pantallas de configuración se abrieron nos ayudan a mejorar Velvi, nunca tus respuestas. Puedes desactivarlos en Ajustes"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contagens anônimas de quais telas de configuração foram abertas nos ajudam a melhorar o MySkin — nunca suas respostas. Você pode desativá-las nos Ajustes"
+            "value" : "Contagens anônimas de quais telas de configuração foram abertas nos ajudam a melhorar o Velvi — nunca suas respostas. Você pode desativá-las nos Ajustes"
           }
         }
       }
@@ -8089,24 +8089,24 @@
         }
       }
     },
-    "I understand that MySkin is not medical advice" : {
+    "I understand that Velvi is not medical advice" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ich verstehe, dass MySkin keine medizinische Beratung ist"
+            "value" : "Ich verstehe, dass Velvi keine medizinische Beratung ist"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Entiendo que MySkin no es consejo médico"
+            "value" : "Entiendo que Velvi no es consejo médico"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Entendo que o MySkin não é aconselhamento médico"
+            "value" : "Entendo que o Velvi não é aconselhamento médico"
           }
         }
       }
@@ -9855,68 +9855,68 @@
         }
       }
     },
-    "Location is off for MySkin, so humidity and UV can't be shown." : {
+    "Location is off for Velvi, so humidity and UV can't be shown." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ortungsdienste sind für MySkin aus, daher können Luftfeuchtigkeit und UV nicht angezeigt werden."
+            "value" : "Ortungsdienste sind für Velvi aus, daher können Luftfeuchtigkeit und UV nicht angezeigt werden."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La ubicación está desactivada para MySkin, así que no se pueden mostrar la humedad ni el UV."
+            "value" : "La ubicación está desactivada para Velvi, así que no se pueden mostrar la humedad ni el UV."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A localização está desativada para o MySkin, então umidade e UV não podem ser mostrados."
+            "value" : "A localização está desativada para o Velvi, então umidade e UV não podem ser mostrados."
           }
         }
       }
     },
-    "Lock MySkin with %@" : {
+    "Lock Velvi with %@" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MySkin mit %@ sperren"
+            "value" : "Velvi mit %@ sperren"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bloquear MySkin con %@"
+            "value" : "Bloquear Velvi con %@"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bloquear o MySkin com %@"
+            "value" : "Bloquear o Velvi com %@"
           }
         }
       }
     },
-    "Lock MySkin with your passcode" : {
+    "Lock Velvi with your passcode" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MySkin mit deinem Code sperren"
+            "value" : "Velvi mit deinem Code sperren"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bloquear MySkin con tu código"
+            "value" : "Bloquear Velvi con tu código"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bloquear o MySkin com seu código"
+            "value" : "Bloquear o Velvi com seu código"
           }
         }
       }
@@ -10489,248 +10489,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mais"
-          }
-        }
-      }
-    },
-    "MySkin" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin"
-          }
-        }
-      }
-    },
-    "MySkin Premium" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin Premium"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin Premium"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin Premium"
-          }
-        }
-      }
-    },
-    "MySkin Premium · %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin Premium · %@"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin Premium · %@"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin Premium · %@"
-          }
-        }
-      }
-    },
-    "MySkin can't open your diary" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin kann dein Tagebuch nicht öffnen"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin no puede abrir tu diario"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O MySkin não consegue abrir seu diário"
-          }
-        }
-      }
-    },
-    "MySkin is a diary, not a medical device." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin ist ein Tagebuch, kein Medizinprodukt."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin es un diario, no un dispositivo médico."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O MySkin é um diário, não um dispositivo médico."
-          }
-        }
-      }
-    },
-    "MySkin is a diary. It helps you notice patterns and talk to your doctor." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin ist ein Tagebuch. Es hilft dir, Muster zu erkennen und mit deinem Arzt oder deiner Ärztin zu sprechen."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin es un diario. Te ayuda a notar patrones y hablar con tu médico."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O MySkin é um diário. Ele ajuda você a notar padrões e conversar com seu médico."
-          }
-        }
-      }
-    },
-    "MySkin is for people %lld and older" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin ist für Menschen ab %lld Jahren"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin es para personas de %lld años o más"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O MySkin é para pessoas com %lld anos ou mais"
-          }
-        }
-      }
-    },
-    "MySkin is locked" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin ist gesperrt"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin está bloqueada"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O MySkin está bloqueado"
-          }
-        }
-      }
-    },
-    "MySkin report %@.pdf" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin-Bericht %@.pdf"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Informe MySkin %@.pdf"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Relatório MySkin %@.pdf"
-          }
-        }
-      }
-    },
-    "MySkin will open with an empty diary. The current diary file is set aside on this iPhone, not deleted, so it may still be recovered. Photos stay. «Delete all data» in Settings removes it." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin öffnet sich mit einem leeren Tagebuch. Die aktuelle Tagebuchdatei wird auf diesem iPhone beiseitegelegt, nicht gelöscht, und kann eventuell noch wiederhergestellt werden. Fotos bleiben erhalten. „Alle Daten löschen“ in den Einstellungen entfernt sie."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin se abrirá con un diario vacío. El archivo actual del diario se aparta en este iPhone, no se elimina, así que aún podría recuperarse. Las fotos se quedan. «Eliminar todos los datos» en Configuración lo borra."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O MySkin vai abrir com um diário vazio. O arquivo atual do diário fica guardado neste iPhone, não é apagado, então ainda pode ser recuperado. As fotos ficam. «Apagar todos os dados» nos Ajustes o remove."
-          }
-        }
-      }
-    },
-    "MySkin · Skin summary" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin · Hautübersicht"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin · Resumen de la piel"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MySkin · Resumo da pele"
           }
         }
       }
@@ -12519,24 +12277,24 @@
         }
       }
     },
-    "Only share it with people you trust, such as your doctor. Once it leaves MySkin, the app can't protect it." : {
+    "Only share it with people you trust, such as your doctor. Once it leaves Velvi, the app can't protect it." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Teile sie nur mit Menschen, denen du vertraust, etwa deinem Arzt oder deiner Ärztin. Sobald sie MySkin verlassen, kann die App sie nicht mehr schützen."
+            "value" : "Teile sie nur mit Menschen, denen du vertraust, etwa deinem Arzt oder deiner Ärztin. Sobald sie Velvi verlassen, kann die App sie nicht mehr schützen."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compártelo solo con personas de confianza, como tu médico. Una vez que sale de MySkin, la app no puede protegerlo."
+            "value" : "Compártelo solo con personas de confianza, como tu médico. Una vez que sale de Velvi, la app no puede protegerlo."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compartilhe só com pessoas de confiança, como seu médico. Depois que sai do MySkin, o app não consegue protegê-los."
+            "value" : "Compartilhe só com pessoas de confiança, como seu médico. Depois que sai do Velvi, o app não consegue protegê-los."
           }
         }
       }
@@ -12585,24 +12343,24 @@
         }
       }
     },
-    "Open the App Store and update MySkin." : {
+    "Open the App Store and update Velvi." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Öffne den App Store und aktualisiere MySkin."
+            "value" : "Öffne den App Store und aktualisiere Velvi."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Abre la App Store y actualiza MySkin."
+            "value" : "Abre la App Store y actualiza Velvi."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Abra a App Store e atualize o MySkin."
+            "value" : "Abra a App Store e atualize o Velvi."
           }
         }
       }
@@ -12827,24 +12585,24 @@
         }
       }
     },
-    "Patient-reported questionnaires written for MySkin; not validated clinical scores." : {
+    "Patient-reported questionnaires written for Velvi; not validated clinical scores." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vom Patienten ausgefüllte Fragebögen, die für MySkin geschrieben wurden; keine validierten klinischen Scores."
+            "value" : "Vom Patienten ausgefüllte Fragebögen, die für Velvi geschrieben wurden; keine validierten klinischen Scores."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cuestionarios respondidos por el paciente, creados para MySkin; no son puntuaciones clínicas validadas."
+            "value" : "Cuestionarios respondidos por el paciente, creados para Velvi; no son puntuaciones clínicas validadas."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Questionários respondidos pelo paciente, criados para o MySkin; não são escores clínicos validados."
+            "value" : "Questionários respondidos pelo paciente, criados para o Velvi; não são escores clínicos validados."
           }
         }
       }
@@ -13047,24 +12805,24 @@
         }
       }
     },
-    "Photos are kept inside MySkin. They are not added to your photo library and are not included in device backups." : {
+    "Photos are kept inside Velvi. They are not added to your photo library and are not included in device backups." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fotos bleiben in MySkin. Sie werden nicht zu deiner Mediathek hinzugefügt und sind nicht in Gerätebackups enthalten."
+            "value" : "Fotos bleiben in Velvi. Sie werden nicht zu deiner Mediathek hinzugefügt und sind nicht in Gerätebackups enthalten."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Las fotos se quedan dentro de MySkin. No se agregan a tu fototeca ni se incluyen en las copias de seguridad del dispositivo."
+            "value" : "Las fotos se quedan dentro de Velvi. No se agregan a tu fototeca ni se incluyen en las copias de seguridad del dispositivo."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "As fotos ficam dentro do MySkin. Elas não vão para a sua fototeca e não entram nos backups do aparelho."
+            "value" : "As fotos ficam dentro do Velvi. Elas não vão para a sua fototeca e não entram nos backups do aparelho."
           }
         }
       }
@@ -13245,24 +13003,24 @@
         }
       }
     },
-    "Please update MySkin" : {
+    "Please update Velvi" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bitte aktualisiere MySkin"
+            "value" : "Bitte aktualisiere Velvi"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Actualiza MySkin"
+            "value" : "Actualiza Velvi"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Atualize o MySkin"
+            "value" : "Atualize o Velvi"
           }
         }
       }
@@ -14131,24 +13889,24 @@
         }
       }
     },
-    "Reopen MySkin" : {
+    "Reopen Velvi" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MySkin neu öffnen"
+            "value" : "Velvi neu öffnen"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vuelve a abrir MySkin"
+            "value" : "Vuelve a abrir Velvi"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Abra o MySkin de novo"
+            "value" : "Abra o Velvi de novo"
           }
         }
       }
@@ -15099,24 +14857,24 @@
         }
       }
     },
-    "Self-reported diary data from the MySkin app. Severity index and area are the patient's own estimates, not a clinical PASI. Not a diagnosis." : {
+    "Self-reported diary data from the Velvi app. Severity index and area are the patient's own estimates, not a clinical PASI. Not a diagnosis." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Selbst erfasste Tagebuchdaten aus der App MySkin. Schweregrad-Index und Fläche sind eigene Schätzungen des Patienten, kein klinischer PASI. Keine Diagnose."
+            "value" : "Selbst erfasste Tagebuchdaten aus der App Velvi. Schweregrad-Index und Fläche sind eigene Schätzungen des Patienten, kein klinischer PASI. Keine Diagnose."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Datos de diario informados por el paciente en la app MySkin. El índice de gravedad y el área son estimaciones del propio paciente, no un PASI clínico. No es un diagnóstico."
+            "value" : "Datos de diario informados por el paciente en la app Velvi. El índice de gravedad y el área son estimaciones del propio paciente, no un PASI clínico. No es un diagnóstico."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dados de diário informados pelo próprio paciente no app MySkin. O índice de gravidade e a área são estimativas do paciente, não um PASI clínico. Não é um diagnóstico."
+            "value" : "Dados de diário informados pelo próprio paciente no app Velvi. O índice de gravidade e a área são estimativas do paciente, não um PASI clínico. Não é um diagnóstico."
           }
         }
       }
@@ -17547,24 +17305,24 @@
         }
       }
     },
-    "The new language shows after you close MySkin in the app switcher and open it again." : {
+    "The new language shows after you close Velvi in the app switcher and open it again." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die neue Sprache erscheint, nachdem du MySkin im App-Umschalter geschlossen und wieder geöffnet hast."
+            "value" : "Die neue Sprache erscheint, nachdem du Velvi im App-Umschalter geschlossen und wieder geöffnet hast."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El nuevo idioma aparece después de cerrar MySkin en el selector de apps y volver a abrirla."
+            "value" : "El nuevo idioma aparece después de cerrar Velvi en el selector de apps y volver a abrirla."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O novo idioma aparece depois que você fecha o MySkin no seletor de apps e abre de novo."
+            "value" : "O novo idioma aparece depois que você fecha o Velvi no seletor de apps e abre de novo."
           }
         }
       }
@@ -17591,46 +17349,46 @@
         }
       }
     },
-    "The photo is removed from MySkin for good." : {
+    "The photo is removed from Velvi for good." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das Foto wird endgültig aus MySkin entfernt."
+            "value" : "Das Foto wird endgültig aus Velvi entfernt."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La foto se eliminará de MySkin para siempre."
+            "value" : "La foto se eliminará de Velvi para siempre."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A foto será removida do MySkin para sempre."
+            "value" : "A foto será removida do Velvi para sempre."
           }
         }
       }
     },
-    "The skin impact and joint check questionnaires were written for MySkin. They are not validated clinical scores." : {
+    "The skin impact and joint check questionnaires were written for Velvi. They are not validated clinical scores." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Fragebögen zu Hautbelastung und Gelenken wurden für MySkin geschrieben. Sie sind keine validierten klinischen Scores."
+            "value" : "Die Fragebögen zu Hautbelastung und Gelenken wurden für Velvi geschrieben. Sie sind keine validierten klinischen Scores."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Los cuestionarios de impacto en la piel y de articulaciones se crearon para MySkin. No son puntuaciones clínicas validadas."
+            "value" : "Los cuestionarios de impacto en la piel y de articulaciones se crearon para Velvi. No son puntuaciones clínicas validadas."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Os questionários de impacto na pele e das articulações foram criados para o MySkin. Não são escores clínicos validados."
+            "value" : "Os questionários de impacto na pele e das articulações foram criados para o Velvi. Não são escores clínicos validados."
           }
         }
       }
@@ -17679,24 +17437,24 @@
         }
       }
     },
-    "These questionnaires were written for MySkin and are not validated clinical scores. Use them to talk with your doctor, not as a diagnosis." : {
+    "These questionnaires were written for Velvi and are not validated clinical scores. Use them to talk with your doctor, not as a diagnosis." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Fragebögen wurden für MySkin geschrieben und sind keine validierten klinischen Scores. Nutze sie fürs Gespräch mit deinem Arzt oder deiner Ärztin, nicht als Diagnose."
+            "value" : "Diese Fragebögen wurden für Velvi geschrieben und sind keine validierten klinischen Scores. Nutze sie fürs Gespräch mit deinem Arzt oder deiner Ärztin, nicht als Diagnose."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estos cuestionarios se crearon para MySkin y no son puntuaciones clínicas validadas. Úsalos para hablar con tu médico, no como diagnóstico."
+            "value" : "Estos cuestionarios se crearon para Velvi y no son puntuaciones clínicas validadas. Úsalos para hablar con tu médico, no como diagnóstico."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estes questionários foram criados para o MySkin e não são escores clínicos validados. Use-os para conversar com seu médico, não como diagnóstico."
+            "value" : "Estes questionários foram criados para o Velvi e não são escores clínicos validados. Use-os para conversar com seu médico, não como diagnóstico."
           }
         }
       }
@@ -17855,24 +17613,24 @@
         }
       }
     },
-    "This is safety information based on what you entered. MySkin is a diary and can't assess you. If you feel very unwell, call emergency services or go to the nearest emergency department." : {
+    "This is safety information based on what you entered. Velvi is a diary and can't assess you. If you feel very unwell, call emergency services or go to the nearest emergency department." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das ist ein Sicherheitshinweis auf Grundlage deiner Angaben. MySkin ist ein Tagebuch und kann dich nicht untersuchen. Wenn es dir sehr schlecht geht, ruf den Notruf oder geh in die nächste Notaufnahme."
+            "value" : "Das ist ein Sicherheitshinweis auf Grundlage deiner Angaben. Velvi ist ein Tagebuch und kann dich nicht untersuchen. Wenn es dir sehr schlecht geht, ruf den Notruf oder geh in die nächste Notaufnahme."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esta es información de seguridad según lo que ingresaste. MySkin es un diario y no puede evaluarte. Si te sientes muy mal, llama a emergencias o ve a la sala de urgencias más cercana."
+            "value" : "Esta es información de seguridad según lo que ingresaste. Velvi es un diario y no puede evaluarte. Si te sientes muy mal, llama a emergencias o ve a la sala de urgencias más cercana."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esta é uma informação de segurança baseada no que você informou. O MySkin é um diário e não pode avaliar você. Se você se sentir muito mal, ligue para a emergência ou vá ao pronto-socorro mais próximo."
+            "value" : "Esta é uma informação de segurança baseada no que você informou. O Velvi é um diário e não pode avaliar você. Se você se sentir muito mal, ligue para a emergência ou vá ao pronto-socorro mais próximo."
           }
         }
       }
@@ -19021,6 +18779,248 @@
         }
       }
     },
+    "Velvi" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi"
+          }
+        }
+      }
+    },
+    "Velvi Premium" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi Premium"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi Premium"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi Premium"
+          }
+        }
+      }
+    },
+    "Velvi Premium · %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi Premium · %@"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi Premium · %@"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi Premium · %@"
+          }
+        }
+      }
+    },
+    "Velvi can't open your diary" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi kann dein Tagebuch nicht öffnen"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi no puede abrir tu diario"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Velvi não consegue abrir seu diário"
+          }
+        }
+      }
+    },
+    "Velvi is a diary, not a medical device." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi ist ein Tagebuch, kein Medizinprodukt."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi es un diario, no un dispositivo médico."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Velvi é um diário, não um dispositivo médico."
+          }
+        }
+      }
+    },
+    "Velvi is a diary. It helps you notice patterns and talk to your doctor." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi ist ein Tagebuch. Es hilft dir, Muster zu erkennen und mit deinem Arzt oder deiner Ärztin zu sprechen."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi es un diario. Te ayuda a notar patrones y hablar con tu médico."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Velvi é um diário. Ele ajuda você a notar padrões e conversar com seu médico."
+          }
+        }
+      }
+    },
+    "Velvi is for people %lld and older" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi ist für Menschen ab %lld Jahren"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi es para personas de %lld años o más"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Velvi é para pessoas com %lld anos ou mais"
+          }
+        }
+      }
+    },
+    "Velvi is locked" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi ist gesperrt"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi está bloqueada"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Velvi está bloqueado"
+          }
+        }
+      }
+    },
+    "Velvi report %@.pdf" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi-Bericht %@.pdf"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informe Velvi %@.pdf"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relatório Velvi %@.pdf"
+          }
+        }
+      }
+    },
+    "Velvi will open with an empty diary. The current diary file is set aside on this iPhone, not deleted, so it may still be recovered. Photos stay. «Delete all data» in Settings removes it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi öffnet sich mit einem leeren Tagebuch. Die aktuelle Tagebuchdatei wird auf diesem iPhone beiseitegelegt, nicht gelöscht, und kann eventuell noch wiederhergestellt werden. Fotos bleiben erhalten. „Alle Daten löschen“ in den Einstellungen entfernt sie."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi se abrirá con un diario vacío. El archivo actual del diario se aparta en este iPhone, no se elimina, así que aún podría recuperarse. Las fotos se quedan. «Eliminar todos los datos» en Configuración lo borra."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Velvi vai abrir com um diário vazio. O arquivo atual do diário fica guardado neste iPhone, não é apagado, então ainda pode ser recuperado. As fotos ficam. «Apagar todos os dados» nos Ajustes o remove."
+          }
+        }
+      }
+    },
+    "Velvi · Skin summary" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi · Hautübersicht"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi · Resumen de la piel"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velvi · Resumo da pele"
+          }
+        }
+      }
+    },
     "Version" : {
       "localizations" : {
         "de" : {
@@ -19153,24 +19153,24 @@
         }
       }
     },
-    "We couldn't find an active MySkin subscription for this Apple Account." : {
+    "We couldn't find an active Velvi subscription for this Apple Account." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wir haben für diesen Apple Account kein aktives MySkin-Abo gefunden."
+            "value" : "Wir haben für diesen Apple Account kein aktives Velvi-Abo gefunden."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No encontramos una suscripción activa de MySkin para esta Cuenta de Apple."
+            "value" : "No encontramos una suscripción activa de Velvi para esta Cuenta de Apple."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Não encontramos uma assinatura ativa do MySkin para esta Conta Apple."
+            "value" : "Não encontramos uma assinatura ativa do Velvi para esta Conta Apple."
           }
         }
       }
@@ -19647,24 +19647,24 @@
         }
       }
     },
-    "When on, MySkin locks each time you leave the app and hides its content in the app switcher." : {
+    "When on, Velvi locks each time you leave the app and hides its content in the app switcher." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wenn aktiviert, sperrt sich MySkin jedes Mal, wenn du die App verlässt, und verbirgt den Inhalt im App-Umschalter."
+            "value" : "Wenn aktiviert, sperrt sich Velvi jedes Mal, wenn du die App verlässt, und verbirgt den Inhalt im App-Umschalter."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cuando está activado, MySkin se bloquea cada vez que sales de la app y oculta su contenido en el selector de apps."
+            "value" : "Cuando está activado, Velvi se bloquea cada vez que sales de la app y oculta su contenido en el selector de apps."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quando ativado, o MySkin bloqueia toda vez que você sai do app e esconde o conteúdo no seletor de apps."
+            "value" : "Quando ativado, o Velvi bloqueia toda vez que você sai do app e esconde o conteúdo no seletor de apps."
           }
         }
       }

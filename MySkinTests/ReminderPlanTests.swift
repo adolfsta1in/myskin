@@ -68,7 +68,7 @@ struct ReminderPlanTests {
     @Test func textsNeverNameMedicines() {
         let all = plan(now: date(hour: 9), checkIn: true, [twiceADay])
         #expect(Set(all.map(\.body)) == [ReminderPlan.checkInBody, ReminderPlan.doseBody])
-        #expect(all.allSatisfy { $0.title == "MySkin" && $0.id.hasPrefix(ReminderPlan.idPrefix) })
+        #expect(all.allSatisfy { $0.title == "Velvi" && $0.id.hasPrefix(ReminderPlan.idPrefix) })
     }
 
     @Test func staysUnderSystemLimit() {

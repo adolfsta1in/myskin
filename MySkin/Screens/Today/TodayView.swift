@@ -821,7 +821,7 @@ private struct WeatherCard: View {
             prompt(
                 systemImage: "location.slash",
                 title: String(localized: "Weather is off"),
-                text: String(localized: "Location is off for MySkin, so humidity and UV can't be shown.")
+                text: String(localized: "Location is off for Velvi, so humidity and UV can't be shown.")
             )
             Button("Open Settings") {
                 if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }

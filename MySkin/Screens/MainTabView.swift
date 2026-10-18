@@ -93,7 +93,7 @@ struct RootView: View {
                 UpdateRequiredView(updateURL: remoteConfig.config.updateURL)
                     .transition(.opacity)
             } else if ageAssurance.isBlocked {
-                // Age assurance laws (Texas and others): MySkin is 16+.
+                // Age assurance laws (Texas and others): Velvi is 16+.
                 AgeRestrictedView()
                     .transition(.opacity)
             } else if !settings.hasCompletedOnboarding {

@@ -31,7 +31,7 @@ private struct HealthDataShare: ViewModifier {
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("Only share it with people you trust, such as your doctor. Once it leaves MySkin, the app can't protect it.")
+                Text("Only share it with people you trust, such as your doctor. Once it leaves Velvi, the app can't protect it.")
             }
             .alert("Couldn't export", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
                 Button("OK", role: .cancel) {}

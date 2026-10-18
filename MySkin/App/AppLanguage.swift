@@ -2,7 +2,7 @@ import Foundation
 
 /// The app's own language, chosen in Settings. iOS keeps per-app languages in the app's `AppleLanguages`
 /// default (the same one the iOS Settings app writes), and reads it at launch — so a change shows
-/// after MySkin is reopened.
+/// after Velvi is reopened.
 nonisolated enum AppLanguage: String, CaseIterable, Identifiable, Sendable {
     case system
     case english = "en"
@@ -44,7 +44,7 @@ nonisolated enum AppLanguage: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    /// The language MySkin is showing in this launch.
+    /// The language Velvi is showing in this launch.
     static var shown: AppLanguage {
         Bundle.main.preferredLocalizations.first.flatMap(AppLanguage.init(rawValue:)) ?? .english
     }

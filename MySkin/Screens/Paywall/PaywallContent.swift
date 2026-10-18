@@ -64,7 +64,7 @@ struct PaywallContent: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text(current?.trialDays == nil ? "MySkin Premium" : "Let's get started")
+                Text(current?.trialDays == nil ? "Velvi Premium" : "Let's get started")
                     .font(.rounded(.headline, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.75))
                 Spacer()

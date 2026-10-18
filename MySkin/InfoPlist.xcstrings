@@ -8,7 +8,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "MySkin"
+            "value" : "Velvi"
           }
         }
       },
@@ -21,7 +21,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "MySkin"
+            "value" : "Velvi"
           }
         }
       },
@@ -34,25 +34,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MySkin nutzt die Kamera, um Fotos deiner Haut für dein Tagebuch aufzunehmen."
+            "value" : "Velvi nutzt die Kamera, um Fotos deiner Haut für dein Tagebuch aufzunehmen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "MySkin uses the camera to take photos of your skin for your diary."
+            "value" : "Velvi uses the camera to take photos of your skin for your diary."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MySkin usa la cámara para tomar fotos de tu piel para tu diario."
+            "value" : "Velvi usa la cámara para tomar fotos de tu piel para tu diario."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O MySkin usa a câmera para tirar fotos da sua pele para o seu diário."
+            "value" : "O Velvi usa a câmera para tirar fotos da sua pele para o seu diário."
           }
         }
       }
@@ -64,25 +64,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MySkin nutzt Face ID, um dein Tagebuch zu entsperren."
+            "value" : "Velvi nutzt Face ID, um dein Tagebuch zu entsperren."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "MySkin uses Face ID to unlock your diary."
+            "value" : "Velvi uses Face ID to unlock your diary."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MySkin usa Face ID para desbloquear tu diario."
+            "value" : "Velvi usa Face ID para desbloquear tu diario."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O MySkin usa o Face ID para desbloquear o seu diário."
+            "value" : "O Velvi usa o Face ID para desbloquear o seu diário."
           }
         }
       }
@@ -94,25 +94,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MySkin nutzt deinen ungefähren Standort, um Luftfeuchtigkeit und UV-Index an deinem Ort anzuzeigen. Dein Standort wird nicht gespeichert."
+            "value" : "Velvi nutzt deinen ungefähren Standort, um Luftfeuchtigkeit und UV-Index an deinem Ort anzuzeigen. Dein Standort wird nicht gespeichert."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "MySkin uses your approximate location to show humidity and UV where you are. Your location isn't stored."
+            "value" : "Velvi uses your approximate location to show humidity and UV where you are. Your location isn't stored."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MySkin usa tu ubicación aproximada para mostrar la humedad y el índice UV donde estás. Tu ubicación no se guarda."
+            "value" : "Velvi usa tu ubicación aproximada para mostrar la humedad y el índice UV donde estás. Tu ubicación no se guarda."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O MySkin usa sua localização aproximada para mostrar a umidade e o índice UV onde você está. Sua localização não é armazenada."
+            "value" : "O Velvi usa sua localização aproximada para mostrar a umidade e o índice UV onde você está. Sua localização não é armazenada."
           }
         }
       }

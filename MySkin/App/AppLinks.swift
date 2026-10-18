@@ -15,7 +15,7 @@ nonisolated enum AppLinks {
 
     static let supportEmail = "support@myskin.cc"
     /// Opens Mail with the support address and a subject — nothing about the diary.
-    static let contactSupport = URL(string: "mailto:\(supportEmail)?subject=MySkin%20support")
+    static let contactSupport = URL(string: "mailto:\(supportEmail)?subject=Velvi%20support")
 
     private static func page(_ path: String) -> URL? {
         URL(string: "https://myskin.cc/" + path)

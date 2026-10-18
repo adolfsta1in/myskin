@@ -49,7 +49,7 @@ struct AgeRestrictedView: View {
             Image(systemName: "person.badge.shield.checkmark")
                 .font(.system(size: 52, weight: .light))
                 .foregroundStyle(Theme.accent)
-            Text("MySkin is for people \(AgeGate.minimumAge) and older")
+            Text("Velvi is for people \(AgeGate.minimumAge) and older")
                 .font(.rounded(.title2, weight: .bold))
                 .foregroundStyle(Theme.ink)
                 .multilineTextAlignment(.center)

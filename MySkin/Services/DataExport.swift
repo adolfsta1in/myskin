@@ -71,7 +71,7 @@ enum DataExport {
         let directory = try ExportFolder.prepare(folder)
         let stamp = ReportRenderer.fileDate(date)
         return try tables(in: context).map { table in
-            let url = directory.appending(path: "MySkin \(table.name) \(stamp).csv")
+            let url = directory.appending(path: "Velvi \(table.name) \(stamp).csv")
             try Data(table.csv.utf8).write(to: url, options: [.atomic, .completeFileProtection])
             return url
         }

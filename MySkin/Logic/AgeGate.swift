@@ -1,10 +1,10 @@
 import Foundation
 
 /// Age assurance for regions whose laws require it (Texas, Utah, Louisiana app store acts).
-/// MySkin is rated 16+ and is not for children. The age range comes from Apple's Declared Age Range
+/// Velvi is rated 16+ and is not for children. The age range comes from Apple's Declared Age Range
 /// service and is used only for this decision; nothing about it is stored.
 nonisolated enum AgeGate {
-    /// Youngest age MySkin is for (App Store rating 16+, Terms).
+    /// Youngest age Velvi is for (App Store rating 16+, Terms).
     static let minimumAge = 16
 
     enum Status: Equatable, Sendable {

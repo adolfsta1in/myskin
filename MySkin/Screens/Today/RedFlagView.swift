@@ -35,7 +35,7 @@ struct RedFlagView: View {
                     }
                     .glassCard(tint: Theme.intensityModerate)
 
-                    Text("This is safety information based on what you entered. MySkin is a diary and can't assess you. If you feel very unwell, call emergency services or go to the nearest emergency department.")
+                    Text("This is safety information based on what you entered. Velvi is a diary and can't assess you. If you feel very unwell, call emergency services or go to the nearest emergency department.")
                         .font(.rounded(.subheadline))
                         .foregroundStyle(Theme.inkSoft)
                         .fixedSize(horizontal: false, vertical: true)

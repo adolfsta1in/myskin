@@ -23,7 +23,7 @@ struct UpdateRequiredView: View {
                         .padding(.top, 40)
                         .accessibilityHidden(true)
                     VStack(spacing: 10) {
-                        Text("Please update MySkin")
+                        Text("Please update Velvi")
                             .font(.rounded(.title2, weight: .bold))
                             .foregroundStyle(Theme.ink)
                             .multilineTextAlignment(.center)
@@ -37,7 +37,7 @@ struct UpdateRequiredView: View {
                             openURL(updateURL)
                         }
                     } else {
-                        Text("Open the App Store and update MySkin.")
+                        Text("Open the App Store and update Velvi.")
                             .font(.rounded(.subheadline, weight: .semibold))
                             .foregroundStyle(Theme.ink)
                             .multilineTextAlignment(.center)

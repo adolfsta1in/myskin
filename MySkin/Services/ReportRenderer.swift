@@ -29,7 +29,7 @@ enum ReportRenderer {
         let renderer = ImageRenderer(content: page)
         renderer.proposedSize = ProposedViewSize(width: pageWidth, height: nil)
 
-        let url = try ExportFolder.prepare(folder).appending(path: String(localized: "MySkin report \(fileDate(report.end)).pdf"))
+        let url = try ExportFolder.prepare(folder).appending(path: String(localized: "Velvi report \(fileDate(report.end)).pdf"))
         var written = false
         renderer.render { size, render in
             var box = CGRect(origin: .zero, size: size)

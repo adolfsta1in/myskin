@@ -60,7 +60,7 @@ struct DisclaimerStep: View {
     let next: () -> Void
 
     private let points: [(String, String)] = [
-        ("book.closed", String(localized: "MySkin is a diary. It helps you notice patterns and talk to your doctor.")),
+        ("book.closed", String(localized: "Velvi is a diary. It helps you notice patterns and talk to your doctor.")),
         ("stethoscope", String(localized: "It does not diagnose, and it does not prescribe or change treatment.")),
         ("exclamationmark.triangle", String(localized: "If something worries you — or you feel very unwell — contact your doctor or emergency services.")),
     ]
@@ -86,7 +86,7 @@ struct DisclaimerStep: View {
                 .glassCard()
 
                 Toggle(isOn: $draft.hasAcceptedDisclaimer) {
-                    Text("I understand that MySkin is not medical advice")
+                    Text("I understand that Velvi is not medical advice")
                         .font(.rounded(.body, weight: .medium))
                         .foregroundStyle(Theme.ink)
                 }

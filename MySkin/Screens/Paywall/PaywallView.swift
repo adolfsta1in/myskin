@@ -109,7 +109,7 @@ private struct PaywallMessage: Identifiable {
     static let pending = PaywallMessage(title: String(localized: "Waiting for approval"),
                                         text: String(localized: "Your purchase needs approval. You'll get access as soon as it's approved."))
     static let nothingToRestore = PaywallMessage(title: String(localized: "No subscription found"),
-                                                 text: String(localized: "We couldn't find an active MySkin subscription for this Apple Account."))
+                                                 text: String(localized: "We couldn't find an active Velvi subscription for this Apple Account."))
     static func failed(_ text: String) -> PaywallMessage { PaywallMessage(title: String(localized: "Purchase didn't go through"), text: text) }
 }
 

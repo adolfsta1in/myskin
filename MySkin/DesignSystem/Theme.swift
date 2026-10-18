@@ -1,7 +1,7 @@
 import SwiftData
 import SwiftUI
 
-/// Central palette, spacing and typography for MySkin.
+/// Central palette, spacing and typography for Velvi.
 /// Warm neutrals + one calm accent. Intensity colors are reserved for charts and the body map.
 enum Theme {
     // MARK: Brand neutrals

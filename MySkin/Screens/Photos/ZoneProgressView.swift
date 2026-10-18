@@ -96,7 +96,7 @@ struct ZoneProgressView: View {
         ) { photo in
             Button("Delete photo", role: .destructive) { delete(photo) }
         } message: { _ in
-            Text("The photo is removed from MySkin for good.")
+            Text("The photo is removed from Velvi for good.")
         }
         .alert("Couldn't delete the photo", isPresented: Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })) {
             Button("OK", role: .cancel) {}

@@ -27,7 +27,7 @@ struct SettingsView: View {
                 } header: {
                     Text("Privacy")
                 } footer: {
-                    Text("When on, MySkin locks each time you leave the app and hides its content in the app switcher.")
+                    Text("When on, Velvi locks each time you leave the app and hides its content in the app switcher.")
                 }
                 UsageStatsSection()
                 SubscriptionSection()
@@ -64,7 +64,7 @@ struct SettingsView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("Allow notifications for MySkin in the Settings app to get reminders.")
+                Text("Allow notifications for Velvi in the Settings app to get reminders.")
             }
         }
         .tint(Theme.accent)
@@ -193,14 +193,14 @@ struct SettingsView: View {
     private var aboutSection: some View {
         Section("About") {
             VStack(alignment: .leading, spacing: 8) {
-                Label("MySkin is a diary, not a medical device.", systemImage: "book.closed")
+                Label("Velvi is a diary, not a medical device.", systemImage: "book.closed")
                     .font(.rounded(.subheadline, weight: .semibold))
                 Text("It does not diagnose, and it does not prescribe or change treatment. Discuss your results with your doctor. If you feel very unwell, contact your doctor or emergency services.")
                     .font(.rounded(.footnote))
                     .foregroundStyle(Theme.inkSoft)
             }
             .padding(.vertical, 4)
-            Text("The skin impact and joint check questionnaires were written for MySkin. They are not validated clinical scores.")
+            Text("The skin impact and joint check questionnaires were written for Velvi. They are not validated clinical scores.")
                 .font(.rounded(.footnote))
                 .foregroundStyle(Theme.inkSoft)
             Text("Safety information is based on the American Academy of Dermatology psoriasis guidelines and NICE guideline CG153 (Psoriasis: assessment and management). Medication schedules are typical examples — use what your doctor prescribed.")
@@ -228,7 +228,7 @@ struct SettingsView: View {
     }
 }
 
-/// The app's own language. iOS applies it at the next launch, so the user is asked to reopen MySkin.
+/// The app's own language. iOS applies it at the next launch, so the user is asked to reopen Velvi.
 private struct LanguageSection: View {
     @State private var chosen = AppLanguage.chosen()
     @State private var isAskingToReopen = false
@@ -247,12 +247,12 @@ private struct LanguageSection: View {
         } header: {
             Text("Language")
         } footer: {
-            Text("A new language shows after you close MySkin and open it again.")
+            Text("A new language shows after you close Velvi and open it again.")
         }
-        .alert("Reopen MySkin", isPresented: $isAskingToReopen) {
+        .alert("Reopen Velvi", isPresented: $isAskingToReopen) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text("The new language shows after you close MySkin in the app switcher and open it again.")
+            Text("The new language shows after you close Velvi in the app switcher and open it again.")
         }
     }
 }
@@ -288,7 +288,7 @@ private struct SubscriptionSection: View {
             Section {
                 if let current = subscriptions.current {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("MySkin Premium · \(current.title)")
+                        Text("Velvi Premium · \(current.title)")
                             .foregroundStyle(Theme.ink)
                         if let detail = current.detail {
                             Text(detail)

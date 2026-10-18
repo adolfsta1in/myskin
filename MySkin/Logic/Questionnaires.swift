@@ -15,7 +15,7 @@ struct Question: Identifiable, Hashable, Sendable {
     let options: [QuestionOption]
 }
 
-/// MySkin's own questionnaires (not validated clinical scores). Stored answers are option indices
+/// Velvi's own questionnaires (not validated clinical scores). Stored answers are option indices
 /// in question order (`QuestionnaireResult.answers`).
 /// Retired kinds (`dlqi`, `pest`) have no questions: they can't be taken again, only shown.
 enum Questionnaires {

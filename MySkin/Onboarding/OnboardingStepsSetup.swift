@@ -250,7 +250,7 @@ struct NotificationsStep: View {
                         .background(Theme.sageDeep, in: .rect(cornerRadius: 9))
                     VStack(alignment: .leading, spacing: 2) {
                         HStack {
-                            Text("MySkin").font(.rounded(.subheadline, weight: .semibold))
+                            Text("Velvi").font(.rounded(.subheadline, weight: .semibold))
                             Spacer()
                             Text("now").font(.rounded(.caption)).foregroundStyle(Theme.inkSoft)
                         }
@@ -339,7 +339,7 @@ struct PrivacyStep: View {
                     privacyRow("iphone", String(localized: "Your diary is stored in the app on this iPhone and included in your iPhone backup"))
                     privacyRow("person.crop.circle.badge.xmark", String(localized: "No account needed"))
                     privacyRow("square.and.arrow.up", String(localized: "Your diary isn't sent anywhere — you choose what to share. Weather, if you turn it on, uses your approximate location"))
-                    privacyRow("chart.bar", String(localized: "Anonymous counts of which setup screens were opened help us improve MySkin — never your answers. You can turn them off in Settings"))
+                    privacyRow("chart.bar", String(localized: "Anonymous counts of which setup screens were opened help us improve Velvi — never your answers. You can turn them off in Settings"))
                 }
                 .glassCard()
 
@@ -380,7 +380,7 @@ struct LockToggle: View {
                     Image(systemName: method.systemImage)
                         .font(.title2)
                         .foregroundStyle(Theme.accent)
-                    Text(method == .passcode ? "Lock MySkin with your passcode" : "Lock MySkin with \(method.title)")
+                    Text(method == .passcode ? "Lock Velvi with your passcode" : "Lock Velvi with \(method.title)")
                         .font(.rounded(.body, weight: .semibold))
                         .foregroundStyle(Theme.ink)
                 }

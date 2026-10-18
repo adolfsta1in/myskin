@@ -2,7 +2,7 @@ import Foundation
 
 /// Name, age and greeting rules for the profile.
 enum ProfileInfo {
-    /// Ages offered in onboarding and settings; MySkin is 16+ (`AgeGate.minimumAge`, Terms).
+    /// Ages offered in onboarding and settings; Velvi is 16+ (`AgeGate.minimumAge`, Terms).
     static let ages = Array(AgeGate.minimumAge...100)
     /// Longest name kept; the greeting has to fit on one line.
     static let maxNameLength = 30

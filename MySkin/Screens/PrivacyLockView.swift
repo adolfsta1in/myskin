@@ -21,7 +21,7 @@ struct PrivacyLockView: View {
                     .frame(width: 140, height: 140)
                     .glassEffect(.regular.tint(Theme.accentSoft.opacity(0.5)), in: .circle)
                 VStack(spacing: 10) {
-                    Text("MySkin is locked")
+                    Text("Velvi is locked")
                         .font(.rounded(.title, weight: .bold))
                         .foregroundStyle(Theme.ink)
                     Text("Unlock to open your diary.")

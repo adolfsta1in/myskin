@@ -24,6 +24,6 @@ struct AppLinksTests {
     @Test func contactSupportIsAMailtoWithoutDiaryData() throws {
         let url = try #require(AppLinks.contactSupport)
         #expect(url.scheme == "mailto")
-        #expect(url.absoluteString == "mailto:support@myskin.cc?subject=MySkin%20support")
+        #expect(url.absoluteString == "mailto:support@myskin.cc?subject=Velvi%20support")
     }
 }

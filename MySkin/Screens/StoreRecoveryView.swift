@@ -26,7 +26,7 @@ struct StoreRecoveryView: View {
                         .glassEffect(.regular.tint(Theme.accentSoft.opacity(0.5)), in: .circle)
                         .padding(.top, 40)
                     VStack(spacing: 10) {
-                        Text("MySkin can't open your diary")
+                        Text("Velvi can't open your diary")
                             .font(.rounded(.title2, weight: .bold))
                             .foregroundStyle(Theme.ink)
                             .multilineTextAlignment(.center)
@@ -80,7 +80,7 @@ struct StoreRecoveryView: View {
             Button("Start a new diary", role: .destructive) { startNewDiary() }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("MySkin will open with an empty diary. The current diary file is set aside on this iPhone, not deleted, so it may still be recovered. Photos stay. «Delete all data» in Settings removes it.")
+            Text("Velvi will open with an empty diary. The current diary file is set aside on this iPhone, not deleted, so it may still be recovered. Photos stay. «Delete all data» in Settings removes it.")
         }
         .alert("Couldn't start a new diary", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
             Button("OK", role: .cancel) {}

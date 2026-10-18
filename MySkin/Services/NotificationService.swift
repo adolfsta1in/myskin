@@ -41,7 +41,7 @@ enum NotificationService {
         )
     }
 
-    /// Removes all of MySkin's pending and delivered reminders (used by «Delete all data»).
+    /// Removes all of Velvi's pending and delivered reminders (used by «Delete all data»).
     static func removeAll() async {
         let center = UNUserNotificationCenter.current()
         let isOurs: (String) -> Bool = { $0.hasPrefix(ReminderPlan.idPrefix) || $0 == trialReminderID }
@@ -52,7 +52,7 @@ enum NotificationService {
     }
 }
 
-/// Shows reminders as banners even while MySkin is open.
+/// Shows reminders as banners even while Velvi is open.
 final class NotificationPresenter: NSObject, UNUserNotificationCenterDelegate {
     static let shared = NotificationPresenter()
 

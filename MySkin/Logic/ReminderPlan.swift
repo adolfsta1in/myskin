@@ -32,7 +32,7 @@ extension Treatment {
 /// Which reminders should be pending right now (spec §6, migration plan step 36).
 enum ReminderPlan {
     static let idPrefix = "myskin."
-    static let title = "MySkin"
+    static let title = "Velvi"
     static let checkInBody = String(localized: "Time for your diary check-in.")
     static let doseBody = String(localized: "Time for your treatment.")
 

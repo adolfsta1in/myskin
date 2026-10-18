@@ -13,7 +13,7 @@ struct DesignCanvasView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 14) {
-                Text("MySkin · Design canvas")
+                Text("Velvi · Design canvas")
                     .font(.rounded(.headline, weight: .semibold))
                 Spacer()
                 Image(systemName: "minus.magnifyingglass")

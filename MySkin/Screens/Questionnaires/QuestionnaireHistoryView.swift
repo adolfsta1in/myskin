@@ -13,7 +13,7 @@ struct QuestionnaireHistoryView: View {
                 ForEach(shownKinds) { kind in
                     section(kind, results: results.filter { $0.kind == kind })
                 }
-                Text("These questionnaires were written for MySkin and are not validated clinical scores. Use them to talk with your doctor, not as a diagnosis.")
+                Text("These questionnaires were written for Velvi and are not validated clinical scores. Use them to talk with your doctor, not as a diagnosis.")
                     .font(.rounded(.footnote))
                     .foregroundStyle(Theme.inkSoft)
             }

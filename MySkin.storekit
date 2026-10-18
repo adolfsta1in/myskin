@@ -22,7 +22,7 @@
       "localizations" : [
 
       ],
-      "name" : "MySkin Premium",
+      "name" : "Velvi Premium",
       "subscriptions" : [
         {
           "adHocOffers" : [
@@ -43,8 +43,8 @@
           },
           "localizations" : [
             {
-              "description" : "Full access to MySkin for a year",
-              "displayName" : "MySkin Premium Yearly",
+              "description" : "Full access to Velvi for a year",
+              "displayName" : "Velvi Premium Yearly",
               "locale" : "en_US"
             }
           ],
@@ -70,8 +70,8 @@
           "internalID" : "6500000002",
           "localizations" : [
             {
-              "description" : "Full access to MySkin for a week",
-              "displayName" : "MySkin Premium Weekly",
+              "description" : "Full access to Velvi for a week",
+              "displayName" : "Velvi Premium Weekly",
               "locale" : "en_US"
             }
           ],

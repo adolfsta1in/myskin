@@ -36,7 +36,7 @@ struct PhotosView: View {
                         }
                     }
 
-                    Label("Photos are kept inside MySkin. They are not added to your photo library and are not included in device backups.", systemImage: "lock.fill")
+                    Label("Photos are kept inside Velvi. They are not added to your photo library and are not included in device backups.", systemImage: "lock.fill")
                         .font(.rounded(.footnote))
                         .foregroundStyle(Theme.inkSoft)
                         .glassCard(padding: 14)

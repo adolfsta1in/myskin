@@ -167,7 +167,7 @@ struct ReportPaper: View {
                         ? String(localized: "\(joint.kind.title): \(joint.score) of \(maxScore) · joint symptoms noted")
                         : String(localized: "\(joint.kind.title): \(joint.score) of \(maxScore)")
                 } ?? String(localized: "Joint check: not taken"))
-                line(String(localized: "Patient-reported questionnaires written for MySkin; not validated clinical scores."))
+                line(String(localized: "Patient-reported questionnaires written for Velvi; not validated clinical scores."))
                 if let arthritis = ArthritisRules.reportText(report.patient.arthritis) {
                     line(arthritis)
                 }
@@ -214,7 +214,7 @@ struct ReportPaper: View {
                 }
             }
 
-            Text("Self-reported diary data from the MySkin app. Severity index and area are the patient's own estimates, not a clinical PASI. Not a diagnosis.")
+            Text("Self-reported diary data from the Velvi app. Severity index and area are the patient's own estimates, not a clinical PASI. Not a diagnosis.")
                 .font(.rounded(.caption2))
                 .foregroundStyle(Theme.inkSoft)
                 .fixedSize(horizontal: false, vertical: true)
@@ -233,7 +233,7 @@ struct ReportPaper: View {
     private var header: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("MySkin · Skin summary")
+                Text("Velvi · Skin summary")
                     .font(.rounded(.headline, weight: .bold))
                 Text("\(report.start.formatted(.dateTime.month(.abbreviated).day())) – \(report.end.formatted(.dateTime.month(.abbreviated).day().year()))")
                     .font(.rounded(.caption))
