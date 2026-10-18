@@ -55,6 +55,7 @@ struct DesignCanvasView: View {
                         phone("Skin impact") { QuestionnaireView(kind: .skinImpact) }
                         phone("Red flag") { RedFlagView(flags: [.widespreadPustules]) }
                         phone("Settings") { SettingsView() }
+                        phone("Velvi") { NavigationStack { VelviGalleryView() } }
                         phone("Privacy lock") { PrivacyLockView() }
                         phone("Paywall · yearly") {
                             PaywallContent(options: PreviewData.paywallOptions, selected: .constant(.yearly))

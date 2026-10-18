@@ -635,6 +635,25 @@ MySkinTests/      Swift Testing
 ### Шаг 63.2. Вопрос про артрит — после карты тела ✅
 - **Сделано (2026-10-18, по просьбе пользователя):** `OnboardingStep.joints` перенесён после `bodyMap` (Welcome → Disclaimer → About you → Your psoriasis → Skin now → Goals → Insight → Body map → **Joints** → Treatments → …). `usageName` не менялись; порядок обновлён в `UsageStatsTests` и в `queries/funnel.sql` сайта (`~/Desktop/myskinsite`, там не закоммичено). Тесты 372/372 на iPhone A.
 
+### Шаг 64. Маскот Velvi
+Персик Velvi сопровождает пользователя в онбординге, на пейволе и местами в приложении. Нативный SwiftUI (без Rive/Lottie): векторный риг, мимика параметрами, анимации системные. Умеренное присутствие; нет на красных флагах, возрасте, дисклеймере-предупреждениях; при Flare и высоком зуде — сочувствует, не радуется; реплики не советуют о лечении.
+
+### Шаг 64.0. Персонаж ✅
+- **Сделано (2026-10-18):** `DesignSystem/Mascot/VelviShapes.swift` — `VelviPalette` (цвета персонажа, единственное исключение из «новых цветов не вводить»), `VelviFace` (16 параметров мимики в `SIMD16`, `VectorArithmetic` — настроения морфятся), `VelviDrawing` (Canvas, поле 100 × 100: тело, тень, складка, листик вокруг черенка, пятнышки с чешуйками, румянец, глаза, брови, рот). `VelviMascot.swift` — `VelviMood` (happy, joyful, curious, thinking, caring, calm, sleepy, proud), `VelviProp` (report, bell, lock, heart, star), `VelviMotion` (hop, wiggle, nod, wave — `KeyframeAnimator` по `trigger`; `switch` только внутри `KeyframeTrack`), idle: дыхание и листик (`PhaseAnimator`), моргание раз в 2.5–5 с; Reduce Motion — неподвижен, смена настроения — короткая; `accessibilityHidden`. `VelviBubble.swift` — облачко-реплика на Liquid Glass с хвостиком (один контур). `Canvas/VelviGalleryView.swift` (DEBUG) — Settings › Developer › «Velvi mascot» и канвас. Превью с множеством анимированных маскотов не дожидается кадра — в листах превью `isIdle: false`.
+- **Готово, когда:** сборка; превью настроений и облачка; пользователь одобрил вид и анимацию на iPhone A.
+
+### Шаг 64.1. Логика реакций
+`Logic/VelviReaction.swift` — настроение, движение и реплика для чек-ина, приветствия на Today, результата опросника и каждого шага онбординга; тесты: при Flare, зуде ≥ 7 и результате «стоит обсудить» нет joyful/proud.
+
+### Шаг 64.2. Онбординг
+Один Velvi над содержимым шагов (вне `.id(step)`), прыгает и меняет настроение при смене шага; крупный на Welcome (вместо `WelcomeHero`) и Plan; скрыт на карте тела и лечении.
+
+### Шаг 64.3. Пейвол
+Velvi в градиентной шапке со звездой; выбор плана — кивок, покупка — радость.
+
+### Шаг 64.4. В приложении
+Today (приветствие, реакция на чек-ин с облачком), пустые состояния без иллюстраций, результат опросника, экран блокировки, `UpdateRequiredView`/`StoreRecoveryView`.
+
 ---
 
 ## Сводка по этапам

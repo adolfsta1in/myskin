@@ -414,6 +414,11 @@ private struct DeveloperSection: View {
                 lock.isLocked = false
                 settings.hasCompletedOnboarding = false
             }
+            NavigationLink {
+                VelviGalleryView()
+            } label: {
+                Label { Text(verbatim: "Velvi mascot") } icon: { Image(systemName: "face.smiling") }
+            }
         } header: {
             Text("Developer")
         } footer: {
